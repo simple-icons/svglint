@@ -69,7 +69,7 @@ module.exports = function rootAttrGenerator(config={}) {
             .map(k => {
                 if (ast.attr && ast.attr[k] === undefined) {
                     return new LintError(
-                        `Failed on "${k}": ${str_expected(config[attr])}`
+                        `Failed on "${k}": ${str_expected(config[k])}`
                     );
                 }
                 return true;
