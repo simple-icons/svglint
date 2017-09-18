@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "chalk": "^2.0.1",
+    "cheerio": "^1.0.0-rc.2",
     "log-update": "^2.1.0",
-    "meow": "^3.7.0",
-    "xmldoc": "^1.1.0"
+    "meow": "^3.7.0"
   },
   "devDependencies": {
     "eslint": "^4.4.1",

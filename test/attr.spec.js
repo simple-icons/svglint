@@ -18,7 +18,8 @@ Default functionality acts as a blacklist. If the key `rule::whitelist` is set t
     viewBox: "0 0 24 24",         // viewBox must be "0 0 24 24"
     xmlns: true,                  // xmlns must be set
     width: false,                 // width must not be set
-    "rule::whitelist": true       // no other attributes can be set
+    "rule::whitelist": true,      // no other attributes can be set
+    "rule::selector": "svg"       // on the svg object
 }
 ```
  */
@@ -32,13 +33,14 @@ const testConfig = {
     xmlns: true,                  // xmlns must be set
     width: false,                 // width must not be set
     // "rule::whitelist": true       // no other attributes can be set
+    "rule::selector": "svg"
 };
 
-describe("Rule attr/root", function(){
+describe("Rule attr", function(){
     it("should succeed without config", function(done){
         const linter = new SVGLint({
             rules: {
-                "attr/root": undefined
+                "attr": undefined
             }
         });
         linter.lint(testSVG)
@@ -49,7 +51,20 @@ describe("Rule attr/root", function(){
     it("should succeed with a matching config", async function(){
         const linter = new SVGLint({
             rules: {
-                "attr/root": testConfig
+                "attr": testConfig
+            }
+        });
+
+        const value = await linter.lint(testSVG);
+        expect(value).toBe(true);
+    });
+    it("should succeed with multiple configs", async function(){
+        const linter = new SVGLint({
+            rules: {
+                "attr": [
+                    testConfig,
+                    { foo: false, "rule::selector": "g" }
+                ]
             }
         });
 
@@ -57,6 +72,24 @@ describe("Rule attr/root", function(){
         expect(value).toBe(true);
     });
 
+    it("should fail with one failing out of multiple configs", async function(){
+        const linter = new SVGLint({
+            rules: {
+                "attr": [
+                    testConfig,
+                    { foo: true, "rule::selector": "g" }
+                ]
+            }
+        });
+
+        let value;
+        try {
+            value = await linter.lint(testSVG);
+        } catch (e) {
+            // eslint-disable-line no-empty
+        }
+        expect(value).toBe(undefined);
+    });
     it("should fail with non-matching array", async function(){
         return testFails({
             role: ["progressbar", "foo"]
@@ -92,7 +125,7 @@ describe("Rule attr/root", function(){
 async function testFails(config) {
     config = {
         rules: {
-            "attr/root": Object.assign({},
+            "attr": Object.assign({},
                 testConfig,
                 config
             )

@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const xml = require("xmldoc");
+const cheerio = require("cheerio");
 const log = require("./log");
 const transformRuleName = require("./util").transformRuleName;
 
@@ -30,36 +30,48 @@ class SVGLint {
                 .then(data => {
                     let ast;
                     try {
-                        ast = new xml.XmlDocument(data);
+                        ast = cheerio.load(data);
                     } catch (e) {
                         throw new Error(`SVG parsing error: ${e.message}`);
                     }
 
-                    if (Object.keys(ast).length === 1 && ast.doctype === "") {
-                        throw new Error("Invalid SVG");
-                    }
-
                     let errors = [];
 
-                    // populate errors
+                    // flatten our rule config into array of { rule: "foo", config: {...} }
+                    let rules = [];
                     Object.keys(this.config.rules || {})
                         .forEach(ruleName => {
-                            const rulePath = path.join("rules/", transformRuleName(ruleName));
-                            let rule;
-                            try {
-                                rule = require(`./${rulePath}`)(this.config.rules[ruleName]);
-                            } catch (e) {
-                                return log.warn("Unknown rule (", rule, "). It will be ignored");
+                            const config = this.config.rules[ruleName];
+                            let configs;
+                            if (config instanceof Array) {
+                                configs = config;
+                            } else {
+                                configs = [config];
                             }
 
-                            let result = rule(ast);
-                            if (result !== true) {
-                                result = result.forEach(error => {
-                                    error.message = `${ruleName}: ${error.message}`;
-                                    errors.push(error);
-                                });
-                            }
+                            configs = configs.map(v => ({ rule: ruleName, config: v }));
+                            rules = rules.concat(configs);
                         });
+
+                    // populate errors
+                    rules.forEach(ruleObj => {
+                        const ruleName = ruleObj.rule;
+                        const rulePath = path.join("rules/", transformRuleName(ruleName));
+                        let rule;
+                        try {
+                            rule = require(`./${rulePath}`)(ruleObj.config);
+                        } catch (e) {
+                            return log.warn("Unknown rule (", rule, "). It will be ignored");
+                        }
+
+                        let result = rule(ast);
+                        if (result !== true) {
+                            result = result.forEach(error => {
+                                error.message = `${ruleName}: ${error.message}`;
+                                errors.push(error);
+                            });
+                        }
+                    });
 
                     // call callback
                     if (errors.length) {
