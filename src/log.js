@@ -2,7 +2,7 @@ const util = require("util");
 const chalk = require("chalk");
 const logUpdate = require("log-update");
 
-const { LintError, LintWarning } = require("./rule-results.js");
+const { LintWarning } = require("./rule-results.js");
 
 const { chunkString } = require("./util.js");
 
