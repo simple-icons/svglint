@@ -54,7 +54,7 @@ module.exports = function rootAttrGenerator(config={}) {
                             return allowUndefined
                                 ||
                                 new LintError(`Failed on attr "${attr}"; unexpected attributes not allowed
-${$.html($(node).empty())}`);
+  ${$.html($(node).empty())}`);
                         }
 
                         const result = testAttr(node.attribs[attr], config[attr]);
@@ -64,7 +64,7 @@ ${$.html($(node).empty())}`);
 
                         return new LintError(
                             `Failed on attr "${attr}"; ${str_expected(config[attr])} {expected}
-${$.html($(node).empty())}`,
+  ${$.html($(node).empty())}`,
                             { expected: config[attr] }
                         );
                     });

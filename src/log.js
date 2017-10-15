@@ -138,9 +138,15 @@ class Log {
                 ];
                 outp += " " + spinner[this.state.frame % spinner.length];
             } else if (result !== true) {
-                outp += "\n    "
-                    + result.map(v => v.stringify ? v.stringify() : ""+v)
-                        .join("\n    ");
+                const stringified =
+                    result.map(v => v.stringify ? v.stringify(false) : ""+v)
+                        .join("\n");
+                const padding = "\n    ";
+
+                outp += padding+chunkString(
+                    stringified,
+                    columns-(padding.length-1)
+                ).join(padding);
             }
             return meta.color(outp);
         });
