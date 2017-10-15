@@ -119,7 +119,7 @@ class Log {
                     prefix: "⚠",
                     color: chalk.yellow,
                 };
-            } else if (result.some(v => v instanceof LintError)) {
+            } else if (result.some(v => v instanceof Error)) {
                 meta = {
                     prefix: "✖",
                     color: chalk.red,
@@ -139,7 +139,7 @@ class Log {
                 outp += " " + spinner[this.state.frame % spinner.length];
             } else if (result !== true) {
                 outp += "\n    "
-                    + result.map(v => v.stringify())
+                    + result.map(v => v.stringify ? v.stringify() : ""+v)
                         .join("\n    ");
             }
             return meta.color(outp);

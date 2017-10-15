@@ -13,7 +13,7 @@ class SVGLint {
      * Lints a file
      * @param {String} file  Either the path to a file, or a string to lint
      * @param {Function} [cb]  Callback - receives either `true` or an Error/Warning object
-     * @returns {Promise<Boolean|Object>} Evaluates to either `true` or an Error/Warning object
+     * @returns {Promise<Boolean|Object>} Resolves to `true` or rejects to an Error/Warning object
      */
     lint(file, cb) {
         return new Promise((res, rej) => {
@@ -64,12 +64,14 @@ class SVGLint {
                             return log.warn("Unknown rule (", rule, "). It will be ignored");
                         }
 
-                        let result = rule(ast);
-                        if (result !== true) {
-                            result = result.forEach(error => {
-                                error.message = `${ruleName}: ${error.message}`;
-                                errors.push(error);
-                            });
+                        if (rule) {
+                            let result = rule(ast);
+                            if (result !== true) {
+                                result.forEach(error => {
+                                    error.message = `${ruleName}: ${error.message}`;
+                                    errors.push(error);
+                                });
+                            }
                         }
                     });
 
@@ -86,6 +88,7 @@ class SVGLint {
                     }
                     e.message = `Error in ${fileName}: ${e.message}`;
                     rej(e);
+                    if (cb) { cb([e]); }
                 });
         });
     }

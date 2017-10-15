@@ -1,5 +1,5 @@
 const { LintError } = require("../rule-results");
-const { str_expected } = require("../util");
+const { str_expected, flatten } = require("../util");
 
 function testAttr(value, expected) {
     // handle arrays (must be one of)
@@ -94,7 +94,7 @@ ${$.html($(node).empty())}`,
         if (nodeResults.every(v => v === true)) {
             return true;
         } else {
-            return nodeResults.filter(v => v !== true);
+            return flatten(nodeResults.filter(v => v !== true));
         }
     };
 };

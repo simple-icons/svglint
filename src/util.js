@@ -51,8 +51,26 @@ function str_expected(value) {
     return "expected";
 }
 
+/**
+ * Flattens an array such that it consists solely of non-array elements
+ * @param {Array} arr  The array to flatten
+ * @returns {Array}  The flattened array
+ */
+function flatten(arr) {
+    const outp = [];
+    for (let i = 0; i < arr.length; ++i) {
+        if (arr[i] instanceof Array) {
+            outp = outp.concat(flatten(arr[i]));
+        } else {
+            outp.push(arr[i]);
+        }
+    }
+    return outp;
+}
+
 module.exports = {
     chunkString,
     transformRuleName,
     str_expected,
+    flatten,
 };
