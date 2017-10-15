@@ -12,8 +12,8 @@ class SVGLint {
     /**
      * Lints a file
      * @param {String} file  Either the path to a file, or a string to lint
-     * @param {Function} [cb]  Callback - receives either `true` or an Error/Warning object
-     * @returns {Promise<Boolean|Object>} Resolves to `true` or rejects to an Error/Warning object
+     * @param {Function} [cb]  Callback - receives either `true` or an array of Error/Warning objects
+     * @returns {Promise<Boolean|Object>} Resolves to `true` or rejects to an array of Error/Warning objects
      */
     lint(file, cb) {
         return new Promise((res, rej) => {
@@ -90,7 +90,13 @@ class SVGLint {
                     rej(e);
                     if (cb) { cb([e]); }
                 });
-        });
+        }).catch(e => { // make sure our error output is always an array
+            if (e instanceof Array) {
+                throw e;
+            } else {
+                throw [e];
+            }
+        })
     }
 
     /**

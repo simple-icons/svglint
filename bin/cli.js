@@ -47,9 +47,9 @@ const cli = meow({
     files.forEach(filePath => {
         const displayPath = path.relative(process.cwd(), filePath);
         log.file(displayPath, undefined); // show the file as processing
-        linter.lint(filePath, result => { // lint it
-            log.file(displayPath, result); // show the result
-        });
+        linter.lint(filePath)
+            .then(v => log.file(displayPath, v))
+            .catch(errs => log.file(displayPath, errs));
     });
 })();
 
