@@ -126,7 +126,7 @@ class Log {
                 };
             }
 
-            let outp = `${meta.prefix} ${name}`;
+            let outp = meta.color(`${meta.prefix} ${name}`);
             if (result === undefined) {
                 const spinner = [
                     "   ",
@@ -148,7 +148,7 @@ class Log {
                     columns-(padding.length-1)
                 ).join(padding);
             }
-            return meta.color(outp);
+            return outp;
         });
     }
 

@@ -28,6 +28,7 @@ function chunkString(str, N) {
             const match = tester.exec(str.slice(i));
             if (match) {
                 i += match[0].length - 1;
+                tmp += match[0];
                 blacklisted = true;
                 break;
             }

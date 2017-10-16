@@ -59,12 +59,26 @@ class RuleResult extends Error {
 
 class LintWarning extends RuleResult {
     color(...args) {
-        return chalk.yellow.apply(chalk, args);
+        let str = args[0];
+        return str.replace(
+            /^[0-9a-zA-Z]+:/,
+            v => chalk.yellow(v)
+        ).replace(
+            /\n.+/,
+            v => chalk.dim.gray(v)
+        );
     }
 }
 class LintError extends RuleResult {
     color(...args) {
-        return chalk.red.apply(chalk, args);
+        let str = args[0];
+        return str.replace(
+            /^[0-9a-zA-Z]+:/,
+            v => chalk.red(v)
+        ).replace(
+            /\n.+/,
+            v => chalk.dim.gray(v)
+        );
     }
 }
 

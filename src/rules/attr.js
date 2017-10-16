@@ -1,4 +1,4 @@
-const { LintError } = require("../rule-results");
+const { LintError, LintWarning } = require("../rule-results");
 const { str_expected, flatten } = require("../util");
 
 function testAttr(value, expected) {
@@ -53,7 +53,7 @@ module.exports = function rootAttrGenerator(config={}) {
                         if (config[attr] === undefined) {
                             return allowUndefined
                                 ||
-                                new LintError(`Failed on attr "${attr}"; unexpected attributes not allowed
+                                new LintWarning(`Failed on attr "${attr}"; unexpected attributes not allowed
   ${$.html($(node).empty())}`);
                         }
 

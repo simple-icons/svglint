@@ -22,7 +22,7 @@ class SVGLint {
                 if (result === true) {
                     res(result);
                 } else {
-                    rej(new Error(result.join("\n")));
+                    rej(result);
                 }
             };
 
@@ -67,6 +67,9 @@ class SVGLint {
                         if (rule) {
                             let result = rule(ast);
                             if (result !== true) {
+                                if (!(result instanceof Array)) {
+                                    result = [result];
+                                }
                                 result.forEach(error => {
                                     error.message = `${ruleName}: ${error.message}`;
                                     errors.push(error);

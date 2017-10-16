@@ -6,21 +6,28 @@ process.on("unhandledRejection", error => {
 });
 
 /**
- * ### `attr/root`
+ * ### `attr`
 
-Specifies the attributes on the root `<svg>` object. Specified as a map with keys mapping to the wanted values. Supported value types are `Array<String>|String|Boolean`.
+Specifies the attributes on the elements that match the selector. 
+Specified as a map with keys mapping to the wanted values. Supported value types are `Array<String>|String|Boolean`.  
+The selector is given in key `rule::selector`. It defaults to `"*"`.
 
 Default functionality acts as a blacklist. If the key `rule::whitelist` is set to `true`, it will instead act as a whitelist.
 
 ```javascript
-{
+[{
     role: ["img", "progressbar"], // role must be one of ["img","progressbar"]
     viewBox: "0 0 24 24",         // viewBox must be "0 0 24 24"
     xmlns: true,                  // xmlns must be set
     width: false,                 // width must not be set
     "rule::whitelist": true,      // no other attributes can be set
-    "rule::selector": "svg"       // on the svg object
-}
+    "rule::selector": "svg",      // check attributes on the root svg object
+}, {
+    "rule::whitelist": true,      // ban all attributes
+    "rule::selector": "title",    // on all title elements
+}, {
+    stroke: false,                // ban strokes on all elements
+}]
 ```
  */
 
@@ -90,7 +97,7 @@ describe("Rule attr", function(){
         }
         expect(value).toBe(undefined);
     });
-    it("should fail with non-matching array", async function(){
+    it("should fail with non-matching array", function(){
         return testFails({
             role: ["progressbar", "foo"]
         });

@@ -23,7 +23,7 @@ The generator function should then return a new function, which receives [a chee
 
 ### Rule results
 
-Rules can result in either success, a warning or an error.  
+Rules can result in either success, warnings or errors.  
 Success is represented by the value `true`, and does not have an accompanying message.  
 A warning is represented by a `LintWarning` object from `src/rule-results.js`.  
 An error is represented by an `LintError` object from `src/rule-results.js`.  
