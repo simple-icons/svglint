@@ -75,7 +75,8 @@ module.exports = function rootAttrGenerator(config={}) {
                     .map(k => {
                         if (node.attribs && node.attribs[k] === undefined) {
                             return new LintError(
-                                `Failed on "${k}": ${str_expected(config[k])}`
+                                `Failed on "${k}": ${str_expected(config[k])}
+  ${$.html($(node).empty())}`
                             );
                         }
                         return true;
