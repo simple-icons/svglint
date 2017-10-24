@@ -1,4 +1,4 @@
-const { LintError, LintWarning } = require("../rule-results");
+const { LintError } = require("../rule-results");
 const { str_expected, flatten } = require("../util");
 
 function testAttr(value, expected) {
@@ -39,7 +39,7 @@ function testAttr(value, expected) {
     return value === expected;
 }
 
-module.exports = function rootAttrGenerator(config={}) {
+module.exports = function attrGenerator(config={}) {
     const allowUndefined = !config["rule::whitelist"];
     const selector = config["rule::selector"] || "*";
 
@@ -53,7 +53,7 @@ module.exports = function rootAttrGenerator(config={}) {
                         if (config[attr] === undefined) {
                             return allowUndefined
                                 ||
-                                new LintWarning(`Failed on attr "${attr}"; unexpected attributes not allowed
+                                new LintError(`Failed on attr "${attr}"; unexpected attributes not allowed
   ${$.html($(node).empty())}`);
                         }
 

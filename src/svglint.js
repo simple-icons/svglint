@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const cheerio = require("cheerio");
-const log = require("./log");
 const transformRuleName = require("./util").transformRuleName;
 
 class SVGLint {
@@ -13,9 +12,10 @@ class SVGLint {
      * Lints a file
      * @param {String} file  Either the path to a file, or a string to lint
      * @param {Function} [cb]  Callback - receives either `true` or an array of Error/Warning objects
+     * @param {Object} log  Logger to use. Usually `console`
      * @returns {Promise<Boolean|Object>} Resolves to `true` or rejects to an array of Error/Warning objects
      */
-    lint(file, cb) {
+    lint(file, cb, log=undefined) {
         return new Promise((res, rej) => {
             const _cb = result => {
                 if (cb) { cb(result); }
@@ -30,7 +30,9 @@ class SVGLint {
                 .then(data => {
                     let ast;
                     try {
-                        ast = cheerio.load(data);
+                        ast = cheerio.load(data, {
+                            xmlMode: true
+                        });
                     } catch (e) {
                         throw new Error(`SVG parsing error: ${e.message}`);
                     }
@@ -61,7 +63,10 @@ class SVGLint {
                         try {
                             rule = require(`./${rulePath}`)(ruleObj.config);
                         } catch (e) {
-                            return log.warn("Unknown rule (", rule, "). It will be ignored");
+                            if (log) {
+                                log.warn("Unknown rule (", rule, "). It will be ignored");
+                            }
+                            return;
                         }
 
                         if (rule) {
@@ -71,8 +76,10 @@ class SVGLint {
                                     result = [result];
                                 }
                                 result.forEach(error => {
-                                    error.message = `${ruleName}: ${error.message}`;
-                                    errors.push(error);
+                                    if (error && error !== true) {
+                                        error.message = `${ruleName}: ${error.message}`;
+                                        errors.push(error);
+                                    }
                                 });
                             }
                         }
@@ -99,7 +106,7 @@ class SVGLint {
             } else {
                 throw [e];
             }
-        })
+        });
     }
 
     /**
