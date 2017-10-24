@@ -43,6 +43,10 @@ module.exports = function attrGenerator(config={}) {
     const allowUndefined = !config["rule::whitelist"];
     const selector = config["rule::selector"] || "*";
 
+    config = Object.assign({}, config);
+    delete config["rule::whitelist"];
+    delete config["rule::selector"];
+
     // the actual linting function
     return function($) {
         const nodes = $(selector).toArray();
