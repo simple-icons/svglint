@@ -1,33 +1,26 @@
 const cheerio = require("cheerio");
-const { LintError } = require("../rule-results");
 
-function checkMatch(nodes, value, config, selector, $) {
+function checkMatch(nodes, value, config, selector, $, reporter) {
     if (value === true) {
         if (nodes.length !== 0) { return true; }
-        return new LintError("Element required for selector {selector}", { selector });
+        reporter.error(
+            "Element required for selector", selector
+        );
+        return;
     }
     if (typeof value === "number") {
         if (nodes.length === value) { return true; }
-        return new LintError(
-            "Expected {value} elements, found {num}, for selector {selector}",
-            {
-                value,
-                num: nodes.length,
-                selector
-            }
+        reporter.error(
+            "Expected", value, "elements, found", nodes.length, "for selector", selector
         );
+        return;
     }
     if (value instanceof Array) {
         if (nodes.length >= value[0] && nodes.length <= value[1]) { return true; }
-        return new LintError(
-            "Expected between {min} and {max} elements, found {num}, for selector {selector}",
-            {
-                min: value[0],
-                max: value[0],
-                num: nodes.length,
-                selector
-            }
+        reporter.error(
+            "Expected between", value[0], "and", value[0], "elements, found", nodes.length, "for selector", selector
         );
+        return;
     }
     if (value === false) {
         // check that at least one node isn't allowed by other rules
@@ -48,32 +41,26 @@ function checkMatch(nodes, value, config, selector, $) {
         );
 
         if (!nonAllowedNodes.length) { return true; }
-        return new LintError(
-            "Expected no elements, found {num}, for selector {selector}\n{elms}",
-            {
-                num: nonAllowedNodes.length,
-                selector,
-                elms: nonAllowedNodes.map(
-                    (i, node) => {
-                        cheerio(node).empty();
-                        return cheerio.html(node);
-                    }
-                ).toArray().join("\n")
-            }
+        reporter.error(
+            "Expected no elements, found", nonAllowedNodes.length, "for selector", selector, `
+  ${nonAllowedNodes.map(
+        (i, node) => cheerio.html(cheerio(node).empty())
+    ).toArray().join("\n  ")}`
         );
+        return;
     }
 }
 
 module.exports = function elmGenerator(config={}) {
     // the actual rule function
-    return function($) {
+    return function($, reporter) {
         const outp = [];
         Object.keys(config).forEach(
             selector => {
                 const nodes = $(selector);
                 const val = config[selector];
 
-                const match = checkMatch(nodes, val, config, selector, $);
+                const match = checkMatch(nodes, val, config, selector, $, reporter);
                 if (match !== true) {
                     outp.push(match);
                 }

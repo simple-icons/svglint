@@ -1,4 +1,3 @@
-const { LintError } = require("../rule-results");
 const { str_expected, flatten } = require("../util");
 
 function testAttr(value, expected) {
@@ -12,7 +11,7 @@ function testAttr(value, expected) {
     // handle booleans (must be set/must not be set)
     if (expected instanceof Boolean) {
         // if value is set, fail if expected === false
-        if (value !== "" && value !== undefined) {
+        if (value !== undefined) {
             return !!expected;
         // if value is not set, fail if expected === true
         } else {
@@ -48,17 +47,19 @@ module.exports = function attrGenerator(config={}) {
     delete config["rule::selector"];
 
     // the actual linting function
-    return function($) {
+    return function($, reporter) {
         const nodes = $(selector).toArray();
         const nodeResults = nodes.map(
             node => {
                 const attrResults = Object.keys(node.attribs || {})
                     .map(attr => {
                         if (config[attr] === undefined) {
-                            return allowUndefined
-                                ||
-                                new LintError(`Failed on attr "${attr}"; unexpected attributes not allowed
+                            if (!allowUndefined) {
+                                reporter.error(
+                                    `Failed on attr "${attr}"; unexpected attributes not allowed
   ${$.html($(node).empty())}`);
+                            }
+                            return;
                         }
 
                         const result = testAttr(node.attribs[attr], config[attr]);
@@ -66,10 +67,9 @@ module.exports = function attrGenerator(config={}) {
                             return true;
                         }
 
-                        return new LintError(
-                            `Failed on attr "${attr}"; ${str_expected(config[attr])} {expected}
-  ${$.html($(node).empty())}`,
-                            { expected: config[attr] }
+                        reporter.error(
+                            `Failed on attr "${attr}"; ${str_expected(config[attr])}`, config[attr], `
+  ${$.html($(node).empty())}`
                         );
                     });
         
@@ -78,10 +78,11 @@ module.exports = function attrGenerator(config={}) {
                     .filter(k => config[k] === true)
                     .map(k => {
                         if (node.attribs && node.attribs[k] === undefined) {
-                            return new LintError(
+                            reporter.error(
                                 `Failed on "${k}": ${str_expected(config[k])}
   ${$.html($(node).empty())}`
                             );
+                            return;
                         }
                         return true;
                     })

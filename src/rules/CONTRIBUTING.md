@@ -19,13 +19,8 @@ with `"/"` replaced by `"_"`. For instance, `a11y/attr` should be defined in
 ## Rule behavior
 
 The rule should consist of a generator function that receives the rule value from the config.  
-The generator function should then return a new function, which receives [a cheerio document](https://www.npmjs.com/package/cheerio) and returns a [rule result](#rule-results).
+The generator function should then return a new function, which receives [a cheerio document](https://www.npmjs.com/package/cheerio) and a reporter, on which it should call `.warn()`, `.error()`, or `.succeed()`.
 
 ### Rule results
 
-Rules can result in either success, warnings or errors.  
-Success is represented by the value `true`, and does not have an accompanying message.  
-A warning is represented by a `LintWarning` object from `src/rule-results.js`.  
-An error is represented by an `LintError` object from `src/rule-results.js`.  
-
-See `src/rule-results.js` for instructions on formatting messages.
+The rule should report its result through the passed RuleReporter - an object with three methods, `.warn()`, `.error()`, and `.succeed()`. Succeed should only be called once, but the other methods can be called once for each warning/error you wish to report.

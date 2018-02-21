@@ -1,9 +1,7 @@
 const util = require("util");
 const chalk = require("chalk");
 const logUpdate = require("log-update");
-
-const { LintWarning } = require("./rule-results.js");
-
+const path = require("path");
 const { chunkString } = require("./util.js");
 
 // @ts-ignore
@@ -12,28 +10,69 @@ const separator = (str="") => {
     const halfLength = str ?
         Math.floor((columns-str.length)/2)
         : Math.floor(columns/2);
-    const half = chalk.gray(" ".repeat(halfLength));
+    const half = " ".repeat(halfLength);
     str = chalk.bold.underline(str);
     return `${half}${str}${half}`;
 };
 separator.toString = separator;
 
+const STATES = {
+    unknown: undefined,
+    success: true,
+    warning: "warn",
+    error: "error"
+};
+
+const MSG_META = {
+    "unknown": {
+        symbol: "?",
+        color: chalk.gray,
+    },
+    "success": {
+        symbol: "✓",
+        color: chalk.green,
+        prefix: "[Success]",
+    },
+    "debug": {
+        symbol: "d",
+        color: chalk.gray,
+        prefix: "[Debug]"
+    },
+    "info": {
+        symbol: "i",
+        color: chalk.blue,
+        prefix: "[Info]",
+    },
+    "warning": {
+        symbol: "!",
+        color: chalk.yellow,
+        prefix: "[Warn]",
+    },
+    "error": {
+        symbol: "x",
+        color: chalk.red,
+        prefix: "[Error]"
+    }
+};
+
 class Log {
     constructor() {
         this.state = {
             logs: [], /** @type {Array<String>} */
-            files: {}, /** @type {Object<Array<Object>|Boolean>} */
+            fileReporters: [],
             frame: 0,
         };
         this._cachedRender = "";
         this.debugging = false;
         this.PREFIX_LENGTH = 8;
-        this.PREFIXES = {
-            debug: chalk.gray("[Debug] "),
-            info: chalk.blue("[Info]  "),
-            warn: chalk.yellow("[Warn]  "),
-            error: chalk.bgRed("[Error]")+" ",
-        };
+        this.SPINNER = [
+            "   ",
+            ".  ",
+            ".. ",
+            "...",
+            " ..",
+            "  .",
+        ];
     }
 
     /**
@@ -50,8 +89,8 @@ class Log {
     }
 
     shouldAnimate() {
-        return Object.keys(this.state.files).some(
-            k => this.state.files[k] === undefined
+        return this.state.fileReporters.some(
+            reporter => reporter.getStatus() === STATES.unknown
         );
     }
 
@@ -65,8 +104,8 @@ class Log {
         return [
             this.state.logs.length ? separator("LOG") : "",
             ...this.state.logs,
-            Object.keys(this.state.files).length ? separator("FILES") : "",
-            ...this.renderFiles(this.state.files)
+            this.state.fileReporters.length ? separator("FILES") : "",
+            ...this.renderFiles(this.state.fileReporters)
         ].filter(Boolean).join("\n");
     }
 
@@ -81,70 +120,38 @@ class Log {
     }
 
     /**
-     * Updates a file log
-     * @param {String} fileName  The file name to display
-     * @param {Array<Object>|Boolean} [result]  The result to display
-     */
-    file(fileName, result) {
-        const isAnimating = this.shouldAnimate();
-        const newFiles = this.state.files;
-        newFiles[fileName] = result;
-        this.setState({ files: newFiles });
-        if (this.shouldAnimate() && !isAnimating) {
-            this.tick();
-        }
-    }
-
-    /**
      * Formats some files for logging
-     * @param {Object} files
+     * @param {Object[]} fileReporters
      * @returns {Array<String>}
      */
-    renderFiles(files) {
-        return Object.keys(files).map(name => {
-            const result = files[name];
+    renderFiles(fileReporters) {
+        return fileReporters.map(reporter => {
+            const status = reporter.getStatus();
             let meta;
-            if (result === undefined) {
-                meta = {
-                    prefix: "?",
-                    color: chalk.gray,
-                };
-            } else if (result === true) {
-                meta = {
-                    prefix: "✔",
-                    color: chalk.green,
-                };
-            } else if (result.every(v => v instanceof LintWarning)) {
-                meta = {
-                    prefix: "⚠",
-                    color: chalk.yellow,
-                };
-            } else if (result.some(v => v instanceof Error)) {
-                meta = {
-                    prefix: "✖",
-                    color: chalk.red,
-                };
+            switch (status) {
+                case STATES.success:
+                    meta = MSG_META.success;
+                    break;
+                case STATES.warning:
+                    meta = MSG_META.warning;
+                    break;
+                case STATES.error:
+                    meta = MSG_META.error;
+                    break;
+                default:
+                    meta = MSG_META.unknown;
+                    break;
             }
 
-            let outp = meta.color(`${meta.prefix} ${name}`);
-            if (result === undefined) {
-                const spinner = [
-                    "   ",
-                    ".  ",
-                    ".. ",
-                    "...",
-                    " ..",
-                    "  .",
-                ];
-                outp += " " + spinner[this.state.frame % spinner.length];
-            } else if (result !== true) {
-                const stringified =
-                    result.map(v => v.stringify ? v.stringify(false) : ""+v)
-                        .join("\n");
+            let outp = meta.color(`[${meta.symbol}] ${reporter.name}`);
+            if (status === STATES.unknown) {
+                outp += " " + this.getSpinner();
+            } else if (status !== STATES.success) {
+                const lines = reporter.getLines();
                 const padding = "\n    ";
 
                 outp += padding+chunkString(
-                    stringified,
+                    lines.join("\n"),
                     columns-(padding.length-1)
                 ).join(padding);
             }
@@ -152,6 +159,17 @@ class Log {
         });
     }
 
+    /**
+     * Gets an object which handles logging for a single file
+     * @param {String} filePath The path to log for
+     */
+    getFileReporter(filePath) {
+        const reporter = new FileReporter(filePath);
+        this.setState({
+            fileReporters: [...this.state.fileReporters, reporter]
+        });
+        return reporter;
+    }
 
     /**
      * Formats some arguments for logging
@@ -173,13 +191,25 @@ class Log {
             .join("\n");
     }
 
+    /** Gets a colored and padded prefix */
+    getPrefix(metaObj) {
+        return metaObj.color(
+            metaObj.prefix.padEnd(this.PREFIX_LENGTH, " ")
+        );
+    }
+
+    /** Gets the current frame of the spinner */
+    getSpinner() {
+        return this.SPINNER[this.state.frame % this.SPINNER.length];
+    }
+
     /** Logs a debug message */
     debug(...args) {
         if (this.debugging) {
             this.setState({
                 logs: [
                     ...this.state.logs,
-                    this.PREFIXES.debug+this.formatLog.apply(this, args)
+                    this.getPrefix(MSG_META.debug)+this.formatLog.apply(this, args)
                 ]
             });
         }
@@ -189,7 +219,7 @@ class Log {
         this.setState({
             logs: [
                 ...this.state.logs,
-                this.PREFIXES.info+this.formatLog.apply(this, args)
+                this.getPrefix(MSG_META.info)+this.formatLog.apply(this, args)
             ]
         });
     }
@@ -198,19 +228,106 @@ class Log {
         this.setState({
             logs: [
                 ...this.state.logs,
-                this.PREFIXES.warn+this.formatLog.apply(this, args)
+                this.getPrefix(MSG_META.warning)+this.formatLog.apply(this, args)
             ]
         });
     }
     /** Logs an error message */
     error(...args) {
-        const msg = this.PREFIXES.error+this.formatLog.apply(this, args);
         this.setState({
             logs: [
                 ...this.state.logs,
-                msg
+                this.getPrefix(MSG_META.error)+this.formatLog.apply(this, args)
             ]
         });
+    }
+}
+
+class FileReporter {
+    constructor(filePath) {
+        this.name = path.relative(process.cwd(), filePath);
+        this.rules = [];
+    }
+
+    getLines() {
+        let outp = [];
+        this.rules.forEach(rule => {
+            outp = outp.concat(
+                rule.getLines()
+            );
+        });
+        return outp;
+    }
+
+    getStatus() {
+        if (this.rules.some(rule => rule.status === STATES.unknown)) {
+            return STATES.unknown;
+        }
+        if (this.rules.some(rule => rule.status === STATES.error)) {
+            return STATES.error;
+        }
+        if (this.rules.some(rule => rule.status === STATES.warning)) {
+            return STATES.warning;
+        }
+        return STATES.success;
+    }
+
+    getRuleReporter(name) {
+        const reporter = new RuleReporter(name);
+        this.rules.push(reporter);
+        return reporter;
+    }
+}
+
+class RuleReporter {
+    constructor(name) {
+        this.name = name;
+        this.lines = [];
+        this.status = STATES.unknown;
+    }
+
+    stringify(...args) {
+        return args.map(
+            v=>(
+                typeof v === "string" ?
+                    v 
+                    : util.inspect(v, {colors: true, depth: 3})
+            ).replace(/^Error: /,"")
+        ).join(" ");
+    }
+
+    getLine(meta, data) {
+        return meta.color(
+            this.name
+        ) + (data.length ?
+            ` ${this.stringify(...data)}`
+            : "");
+    }
+
+    succeed(...args) {
+        if (this.status === STATES.unknown) {
+            this.status = STATES.success;
+        }
+        const meta = MSG_META.success;
+        this.lines.push(this.getLine(meta, args));
+    }
+
+    warn(...args) {
+        if (this.status !== STATES.error) {
+            this.status = STATES.warning;
+        }
+        const meta = MSG_META.warning;
+        this.lines.push(this.getLine(meta, args));
+    }
+
+    error(...args) {
+        this.status = STATES.error;
+        const meta = MSG_META.error;
+        this.lines.push(this.getLine(meta, args));
+    }
+
+    getLines() {
+        return this.lines;
     }
 }
 
