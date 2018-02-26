@@ -317,7 +317,9 @@ class RuleReporter {
             this.status = STATES.success;
         }
         const meta = MSG_META.success;
-        this.lines.push(this.getLine(meta, args));
+        if (args.length) {
+            this.lines.push(this.getLine(meta, args));
+        }
         this.logger.forceUpdate();
     }
 

@@ -59,7 +59,7 @@ module.exports = function attrGenerator(config={}) {
                         if (config[attr] === undefined) {
                             if (!allowUndefined) {
                                 reporter.error(
-                                    `Failed on attr "${attr}"; unexpected attributes not allowed
+                                    `Unexpected attribute "${attr}"
   ${$.html($(node).empty())}`);
                             }
                             return;
@@ -83,7 +83,7 @@ module.exports = function attrGenerator(config={}) {
                         log.debug("[attr] Checking for missing", k);
                         if (node.attribs && node.attribs[k] === undefined) {
                             reporter.error(
-                                `Failed on "${k}": ${str_expected(config[k])}
+                                `Missing attribute "${k}"
   ${$.html($(node).empty())}`
                             );
                             return;

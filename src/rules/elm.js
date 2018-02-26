@@ -18,7 +18,7 @@ function checkMatch(nodes, value, config, selector, $, reporter) {
     if (value instanceof Array) {
         if (nodes.length >= value[0] && nodes.length <= value[1]) { return true; }
         reporter.error(
-            "Expected between", value[0], "and", value[0], "elements, found", nodes.length, "for selector", selector
+            "Expected between", value[0], "and", value[0], "elements, found", nodes.length, "for selector", `"${selector}"`
         );
         return;
     }
@@ -42,7 +42,7 @@ function checkMatch(nodes, value, config, selector, $, reporter) {
 
         if (!nonAllowedNodes.length) { return true; }
         reporter.error(
-            "Expected no elements, found", nonAllowedNodes.length, "for selector", selector, `
+            "Expected no elements, found", nonAllowedNodes.length, "for selector", `"${selector}"`, `
   ${nonAllowedNodes.map(
         (i, node) => cheerio.html(cheerio(node).empty())
     ).toArray().join("\n  ")}`
