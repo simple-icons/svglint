@@ -1,4 +1,5 @@
 const { str_expected, flatten } = require("../util");
+const log = require("../log");
 
 function testAttr(value, expected) {
     // handle arrays (must be one of)
@@ -45,6 +46,7 @@ module.exports = function attrGenerator(config={}) {
     config = Object.assign({}, config);
     delete config["rule::whitelist"];
     delete config["rule::selector"];
+    log.debug("[attr] Executing", config);
 
     // the actual linting function
     return function($, reporter) {
@@ -53,6 +55,7 @@ module.exports = function attrGenerator(config={}) {
             node => {
                 const attrResults = Object.keys(node.attribs || {})
                     .map(attr => {
+                        log.debug("[attr] Checking", attr, { actual: node.attribs[attr], expected: config[attr] });
                         if (config[attr] === undefined) {
                             if (!allowUndefined) {
                                 reporter.error(
@@ -77,6 +80,7 @@ module.exports = function attrGenerator(config={}) {
                 const missing = Object.keys(config)
                     .filter(k => config[k] === true)
                     .map(k => {
+                        log.debug("[attr] Checking for missing", k);
                         if (node.attribs && node.attribs[k] === undefined) {
                             reporter.error(
                                 `Failed on "${k}": ${str_expected(config[k])}
@@ -98,7 +102,8 @@ module.exports = function attrGenerator(config={}) {
         );
 
         if (nodeResults.every(v => v === true)) {
-            return true;
+            reporter.succeed();
+            return;
         } else {
             return flatten(nodeResults.filter(v => v !== true));
         }

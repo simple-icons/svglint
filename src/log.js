@@ -109,6 +109,13 @@ class Log {
         ].filter(Boolean).join("\n");
     }
 
+    /** Forces an update */
+    forceUpdate() {
+        const rendered = this.render();
+        this._cachedRender = rendered;
+        this.output(rendered);
+    }
+
     /** @param {Object} newState The new state to set - is shallow merged with current state */
     setState(newState) {
         this.state = Object.assign(this.state, newState);
@@ -284,6 +291,7 @@ class RuleReporter {
         this.name = name;
         this.lines = [];
         this.status = STATES.unknown;
+        this.logger = module.exports;
     }
 
     stringify(...args) {
@@ -310,6 +318,7 @@ class RuleReporter {
         }
         const meta = MSG_META.success;
         this.lines.push(this.getLine(meta, args));
+        this.logger.forceUpdate();
     }
 
     warn(...args) {
@@ -318,12 +327,14 @@ class RuleReporter {
         }
         const meta = MSG_META.warning;
         this.lines.push(this.getLine(meta, args));
+        this.logger.forceUpdate();
     }
 
     error(...args) {
         this.status = STATES.error;
         const meta = MSG_META.error;
         this.lines.push(this.getLine(meta, args));
+        this.logger.forceUpdate();
     }
 
     getLines() {

@@ -4,14 +4,14 @@ function checkMatch(nodes, value, config, selector, $, reporter) {
     if (value === true) {
         if (nodes.length !== 0) { return true; }
         reporter.error(
-            "Element required for selector", selector
+            "Element required for selector", `"${selector}"`
         );
         return;
     }
     if (typeof value === "number") {
         if (nodes.length === value) { return true; }
         reporter.error(
-            "Expected", value, "elements, found", nodes.length, "for selector", selector
+            "Expected", value, "elements, found", nodes.length, "for selector", `"${selector}"`
         );
         return;
     }
