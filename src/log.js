@@ -1,8 +1,9 @@
 const util = require("util");
 const chalk = require("chalk");
 const logUpdate = require("log-update");
-const path = require("path");
-const { chunkString } = require("./util.js");
+const FileReporter = require("./reporter");
+const { chunkString } = require("./util");
+const STATES = FileReporter.STATES;
 
 // @ts-ignore
 const columns = process.stdout.columns || 80;
@@ -15,13 +16,6 @@ const separator = (str="") => {
     return `${half}${str}${half}`;
 };
 separator.toString = separator;
-
-const STATES = {
-    unknown: undefined,
-    success: true,
-    warning: "warn",
-    error: "error"
-};
 
 const MSG_META = {
     "unknown": {
@@ -133,7 +127,7 @@ class Log {
      */
     renderFiles(fileReporters) {
         return fileReporters.map(reporter => {
-            const status = reporter.getStatus();
+            const { status, messages } = reporter.getState();
             let meta;
             switch (status) {
                 case STATES.success:
@@ -154,16 +148,58 @@ class Log {
             if (status === STATES.unknown) {
                 outp += " " + this.getSpinner();
             } else if (status !== STATES.success) {
-                const lines = reporter.getLines();
+                const messages = reporter.getMessages();
                 const padding = "\n    ";
 
                 outp += padding+chunkString(
-                    lines.join("\n"),
+                    messages.map(
+                        this.stringifyMessage.bind(this)
+                    ).filter(Boolean).join("\n"),
                     columns-(padding.length-1)
                 ).join(padding);
             }
             return outp;
         });
+    }
+
+    /**
+     * Stringifies a message from a reporter
+     */
+    stringifyMessage(msg) {
+        if (!msg || (msg.type === STATES.success
+            && (!msg.args || !msg.args.length))) {
+            return null;
+        }
+
+        let meta;
+        switch (msg.type) {
+            case STATES.success:
+                meta = MSG_META.success;
+                break;
+            case STATES.warning:
+                meta = MSG_META.warning;
+                break;
+            case STATES.error:
+                meta = MSG_META.error;
+                break;
+            default:
+                meta = MSG_META.unknown;
+        }
+
+        return `${meta.color(msg.rule)} ${this.stringifyArgs(msg.args)}`;
+    }
+
+    /**
+     * Stringifies a list of data into a colorized single line
+     */
+    stringifyArgs(args) {
+        return args.map(
+            v => (
+                typeof v === "string"
+                    ? v
+                    : util.inspect(v, { colors: true, depth: 3 })
+            ).replace(/^Error: /, "")
+        ).join(" ");
     }
 
     /**
@@ -183,13 +219,7 @@ class Log {
      * @returns {String}
      */
     formatLog(...args) {
-        const stringified = args.map(
-            v=>(
-                typeof v === "string" ?
-                    v 
-                    : util.inspect(v, {colors: true, depth: 3})
-            ).replace(/^Error: /,"")
-        ).join(" ");
+        const stringified = this.stringifyArgs(args);
         
         // split string into column sized chunks
         // then indent them to the prefix length
@@ -250,98 +280,6 @@ class Log {
     }
 }
 
-class FileReporter {
-    constructor(filePath) {
-        this.name = path.relative(process.cwd(), filePath);
-        this.rules = [];
-    }
 
-    getLines() {
-        let outp = [];
-        this.rules.forEach(rule => {
-            outp = outp.concat(
-                rule.getLines()
-            );
-        });
-        return outp;
-    }
-
-    getStatus() {
-        if (this.rules.some(rule => rule.status === STATES.unknown)) {
-            return STATES.unknown;
-        }
-        if (this.rules.some(rule => rule.status === STATES.error)) {
-            return STATES.error;
-        }
-        if (this.rules.some(rule => rule.status === STATES.warning)) {
-            return STATES.warning;
-        }
-        return STATES.success;
-    }
-
-    getRuleReporter(name) {
-        const reporter = new RuleReporter(name);
-        this.rules.push(reporter);
-        return reporter;
-    }
-}
-
-class RuleReporter {
-    constructor(name) {
-        this.name = name;
-        this.lines = [];
-        this.status = STATES.unknown;
-        this.logger = module.exports;
-    }
-
-    stringify(...args) {
-        return args.map(
-            v=>(
-                typeof v === "string" ?
-                    v 
-                    : util.inspect(v, {colors: true, depth: 3})
-            ).replace(/^Error: /,"")
-        ).join(" ");
-    }
-
-    getLine(meta, data) {
-        return meta.color(
-            this.name
-        ) + (data.length ?
-            ` ${this.stringify(...data)}`
-            : "");
-    }
-
-    succeed(...args) {
-        if (this.status === STATES.unknown) {
-            this.status = STATES.success;
-        }
-        const meta = MSG_META.success;
-        if (args.length) {
-            this.lines.push(this.getLine(meta, args));
-        }
-        this.logger.forceUpdate();
-    }
-
-    warn(...args) {
-        if (this.status !== STATES.error) {
-            this.status = STATES.warning;
-        }
-        const meta = MSG_META.warning;
-        this.lines.push(this.getLine(meta, args));
-        this.logger.forceUpdate();
-    }
-
-    error(...args) {
-        this.status = STATES.error;
-        const meta = MSG_META.error;
-        this.lines.push(this.getLine(meta, args));
-        this.logger.forceUpdate();
-    }
-
-    getLines() {
-        return this.lines;
-    }
-}
 
 module.exports = new Log();
