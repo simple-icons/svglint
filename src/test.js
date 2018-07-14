@@ -24,8 +24,8 @@ const linting = svglint.lintSource(`<svg xmlns="a">
                 message: "This is simply a log",
             }],
             async: {
-                method: "warn",
-                message: "This isn't so bad",
+                method: "log",
+                message: "This is delayed",
                 wait: 5,
             },
         }
@@ -34,7 +34,7 @@ const linting = svglint.lintSource(`<svg xmlns="a">
 
 console.log(linting);
 linting.on("rule", function(rule){
-    console.log("Linting emitted rule", rule.name, rule.reporter);
+    console.log("Linting emitted rule", rule.name, rule.result);
     console.log()
 });
 linting.once("done", () => {

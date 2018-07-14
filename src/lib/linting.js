@@ -125,7 +125,7 @@ class Linting extends EventEmitter {
         this.logger.debug("Rule finished", Logger.colorize(ruleName));
         this.emit("rule", {
             name: ruleName,
-            reporter,
+            result: reporter,
         });
         this.results[ruleName] = reporter;
 
