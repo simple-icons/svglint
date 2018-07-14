@@ -13,10 +13,16 @@ const linting = svglint.lintSource(`<svg xmlns="a">
         rules: {
             fails: {},
             doesntFailBecauseRemoved: {},
-            identity: {
+            identity: [{
                 method: "error",
                 message: "This fails spectacularly",
-            },
+            }, {
+                method: "warn",
+                message: "This only warns",
+            }, {
+                method: "log",
+                message: "This is simply a log",
+            }],
             async: {
                 method: "warn",
                 message: "This isn't so bad",
@@ -27,8 +33,9 @@ const linting = svglint.lintSource(`<svg xmlns="a">
 );
 
 console.log(linting);
-linting.on("rule", function(){
-    console.log("Linting emitted rule", [...arguments]);
+linting.on("rule", function(rule){
+    console.log("Linting emitted rule", rule.name, rule.reporter);
+    console.log()
 });
 linting.once("done", () => {
     console.log(`Linting done

@@ -18,7 +18,7 @@ const logger = require("./lib/logger.js")("");
  *   e.g. overwriting presets).
  */
 /**
- * @typedef {Object<string,Function>} NormalizedRules
+ * @typedef {Object<string,Function|Function[]>} NormalizedRules
  * The RulesConfig after being normalized - each function is a rule.
  */
 /**
@@ -61,11 +61,24 @@ function normalizeRules(rulesConfig) {
         .forEach(
             ruleName => {
                 // TODO: error handling when invalid rule given
+                /** @type {RuleModule} */
+                let loadedRule;
                 try {
-                    outp[ruleName] = loadRule(ruleName)
-                        .generate(rulesConfig[ruleName]);
+                    loadedRule = loadRule(ruleName);
                 } catch (e) {
                     logger.warn(`Unknown rule "${ruleName}".`);
+                    return;
+                }
+
+                // handle the case where there are multiple configs for a single rule
+                const config = rulesConfig[ruleName];
+                if (config instanceof Array) {
+                    /** @type {Array} */
+                    outp[ruleName] = config.map(
+                        config => loadedRule.generate(config)
+                    );
+                } else {
+                    outp[ruleName] = loadedRule.generate(config);
                 }
             }
         );
