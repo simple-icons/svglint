@@ -12,17 +12,11 @@ const Reporter = require("./reporter");
 const logger = require("./logger");
 
 const STATES = Object.freeze({
-    "ignored": -1,
-    "linting": undefined,
+    "ignored": "ignored",
+    "linting": "linting",
     "success": "success",
-    "warn":    "warning",
+    "warn":    "warn",
     "error":   "error",
-
-    "_-1": "ignored",
-    "_undefined": "linting",
-    "_success": "success",
-    "_warning": "warn",
-    "_error": "error",
 });
 
 /**
@@ -103,7 +97,7 @@ class Linting extends EventEmitter {
         --this.activeRules;
         if (this.activeRules === 0) {
             this.state = this._calculateState();
-            logger.debug("Linting finished", logger.colorize(STATES["_"+this.state]));
+            logger.debug("Linting finished", logger.colorize(this.state));
             this.emit("done");
         }
     }
