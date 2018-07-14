@@ -1,103 +1,124 @@
-const fs = require("fs");
-const path = require("path");
-const cheerio = require("cheerio");
-const flatten = require("./util").flatten;
-const transformRuleName = require("./util").transformRuleName;
-const log = require("./log");
+/**
+ * @fileoverview The SVGLint entry file.
+ * This is the publicly exposed JS API, which the CLI also uses.
+ * It exposes .lintSource() and .lintFile().
+ * Main responsibility is handling the consumer<->Linting communication,
+ *   and converting the user-provided config into an object of rules.
+ */
+const Linting = require("./lib/linting");
+const parse = require("./lib/parse");
+const loadRule = require("./lib/rule-loader");
+const logger = require("./lib/logger.js");
 
-class SVGLint {
-    constructor(config) {
-        this.config = config;
-    }
+/**
+ * @typedef {Object<string,Object<string,*>|false>} RulesConfig
+ * An object with each key representing a rule name, and each value representing
+ *   a rule config.
+ * If the rule config is set to `false`, then the rule is disabled (useful for
+ *   e.g. overwriting presets).
+ */
+/**
+ * @typedef {Object<string,Function>} NormalizedRules
+ * The RulesConfig after being normalized - each function is a rule.
+ */
+/**
+ * @typedef {String[]} IgnoreList
+ * An array of strings, each of which is a blob that represents files to ignore.
+ * If any blob matches a file, the file is not linted.
+ */
+/**
+ * @typedef Config
+ * @property {Boolean} [useSvglintRc=true] Whether to merge config with the one defined in .svglintrc
+ * @property {RulesConfig} [rules={}] The rules to lint by
+ * @property {IgnoreList} [ignore=[]] The blobs representing which files to ignore
+ */
+/**
+ * @typedef NormalizedConfig
+ * @property {NormalizedRules} rules The rules to lint by
+ * @property {IgnoreList} ignore The blobs representing which files to ignore
+ */
 
-    /**
-     * Gets the function responsible for executing a rule, given a rule object
-     * @param {String} ruleName The name of the rule to get executor for
-     * @returns {Function} The function that executes the rule
-     */
-    getRuleExecutor(ruleName) {
-        const rulePath = path.join("rules/", transformRuleName(ruleName));
-        try {
-            return require(`./${rulePath}`);
-        } catch (e) {
-            e.message = `Couldn't load rule ${ruleName}: ${e.message}`;
-            throw e;
-        }
-    }
+/** @type Config */
+const DEFAULT_CONFIG = Object.freeze({
+    useSvglintRc: true,
+    rules: {},
+    ignore: [],
+});
 
-    /**
-     * Lints a file
-     * @param {String} fileName Either the path to a file, or a string to lint
-     * @param {Object} logger  The logger to use for logging, or undefined if no log
-     * @returns {Promise<Boolean|Object>} Resolves to `true` or a {String[]} of errors
-     */
-    async lint(fileName, logger=undefined) {
-        log.debug("Linting", fileName);
-        const fileReporter = logger.getFileReporter(fileName);
-        const file = await this.getFile(fileName);
-        let ast;
-        try {
-            ast = cheerio.load(file, { xmlMode: true });
-        } catch (e) {
-            e.message = `SVG parsing error: ${e.message}`;
-            throw e;
-        }
-
-        // execute each rule
-        const promises = Object.keys(this.config.rules)
-            .map(
-                async name => {
-                    log.debug("Executing rule", name);
-                    const executor = this.getRuleExecutor(name);
-                    let configs = this.config.rules[name];
-                    // normalize our config to an array, even if there is only 1 config
-                    if (!(configs instanceof Array)) { configs = [configs]; }
-
-                    const reporter = fileReporter.getRuleReporter(name);
-                    const result = Promise.all(
-                        configs.map(
-                            async config => {
-                                return await executor(config)(ast, reporter);
-                            }
-                        )
-                    );
-                    return result;
+/**
+ * Normalizes a user-provided RulesConfig into a NormalizedRules.
+ * Figures out which rules should be kept, and calls their generator with the
+ *   user-provided config. The returned function is the actual linting func.
+ * @param {RulesConfig} rulesConfig The user-provided config
+ * @returns {NormalizedRules} The normalized rules
+ */
+function normalizeRules(rulesConfig) {
+    /** @type {NormalizedRules} */
+    const outp = {};
+    Object.keys(rulesConfig)
+        // make sure no disabled rules are allowed in
+        .filter(k => rulesConfig[k] !== false)
+        // then convert each rule config into a rule func
+        .forEach(
+            ruleName => {
+                // TODO: error handling when invalid rule given
+                try {
+                    outp[ruleName] = loadRule(ruleName)
+                        .generate(rulesConfig[ruleName]);
+                } catch (e) {
+                    logger.warn(`Unknown rule "${ruleName}".`);
                 }
-            );
-        
-        // wait for each result to come in, and then return
-        Promise.all(promises)
-            .then(results => {
-                const errors = flatten(results).filter(v => v !== true);
-                if (errors.length) {
-                    return errors;
-                }
-                return true;
-            });
-    }
-
-    /**
-     * Calls a callback with the content of a file
-     * Can also handle being given the content of the file
-     */
-    getFile(file) {
-        return new Promise(res => {
-            log.debug("Loading file", file);
-            try {
-                fs.readFile(
-                    file,
-                    "utf8",
-                    (err, data) => {
-                        if (err) {
-                            return res(file);
-                        }
-                        return res(data);
-                    }
-                );
-            } catch (e) {
-                res(file);
             }
-        });
-    }
+        );
+    return outp;
 }
-module.exports = SVGLint;
+
+/**
+ * Normalizes a user-provided config to make sure it has every property we need.
+ * Also handles merging with defaults and .svglintrc.
+ * @param {Config} config The user-provided config
+ * @returns {NormalizedConfig} The normalized config
+ */
+function normalizeConfig(config) {
+    // TODO: load and merge .svglintrc if { useSvglintRc: true } is set
+    const defaulted = Object.assign({},
+        DEFAULT_CONFIG,
+        config,
+    );
+    /** @type NormalizedConfig */
+    const outp = {
+        rules: normalizeRules(defaulted.rules),
+        ignore: defaulted.ignore,
+    };
+    return outp;
+}
+
+module.exports = {
+    /**
+     * Lints a single SVG string.
+     * The function returns before the Linting is finished.
+     * You should listen to Linting.on("done") to wait for the result.
+     * @param {String} source The SVG to lint
+     * @param {Config} config The config to lint by
+     * @return {Linting} The Linting that represents the result
+     */
+    lintSource(source, config) {
+        const ast = parse.parseSource(source);
+        const conf = normalizeConfig(config);
+        return new Linting(null, ast, conf.rules);
+    },
+
+    /**
+     * Lints a single file.
+     * The returned Promise resolves before the Linting is finished.
+     * You should listen to Linting.on("done") to wait for the result.
+     * @param {String} file The file path to lint
+     * @param {Config} config The config to lint by
+     * @returns {Promise<Linting>} Resolves to the Linting that represents the result
+     */
+    async lintFile(file, config) {
+        const ast = await parse.parseFile(file);
+        const conf = normalizeConfig(config);
+        return new Linting(file, ast, conf.rules);
+    }
+};
