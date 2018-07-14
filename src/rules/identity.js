@@ -13,7 +13,7 @@ module.exports = {
      */
     generate(config) {
         return function IdentityRule(reporter) {
-            logger.log("[rule:identity]", "Called", config);
+            logger.debug("[rule:identity]", "Called", config);
             // Report the message if type !== succeed
             if (config.method) {
                 reporter[config.method](config.message);
