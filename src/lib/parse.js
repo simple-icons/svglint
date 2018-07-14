@@ -6,6 +6,7 @@
  */
 const Parser = require("htmlparser2");
 const fs = require("fs");
+const path = require("path");
 
 module.exports = {
     /**
@@ -26,9 +27,12 @@ module.exports = {
      * @returns {Promise<AST>} The parsed AST
      */
     parseFile(file) {
+        const filePath = path.isAbsolute(file)
+            ? file
+            : path.join(process.cwd(), file);
         return new Promise((res, rej) => {
             fs.readFile(
-                file,
+                filePath,
                 "utf8",
                 (err, data) => {
                     if (err) {

@@ -2,7 +2,7 @@ const logger = require("../lib/logger")("rule:async");
 
 /**
  * @typedef AsyncConfig
- * @property {"error"|"warn"|null} method The method to call on reporter
+ * @property {"error"|"warn"|"log"|null} method The method to call on reporter
  * @property {String} message The message to warn/error with
  * @property {Number} wait The number of seconds to wait
  */

@@ -66,6 +66,13 @@ class Linting extends EventEmitter {
 
         // keep track of when every rule has finished
         const ruleNames = Object.keys(this.rules);
+        if (ruleNames.length === 0) {
+            this.logger.debug("No rules to lint, finishing");
+            this.state = STATES.success;
+            Promise.resolve()
+                .then(() => this.emit("done"));
+            return;
+        }
         this.activeRules = ruleNames.length;
 
         this.logger.debug("Started linting");
@@ -179,6 +186,6 @@ class Linting extends EventEmitter {
         return reporter;
     }
 }
-Linting.STATES = STATES;
+Linting.STATES = Linting.prototype.STATES = STATES;
 
 module.exports = Linting;

@@ -112,6 +112,10 @@ function normalizeConfig(config) {
  * @returns {Linting} The linting that represents the result
  */
 function lint(file, ast, config) {
+    if (!ast.length && ast.source.trim() !== "") {
+        throw new Error(`Unable to parse SVG from ${file || "API"}:
+${ast.source}`);
+    }
     const conf = normalizeConfig(config);
     return new Linting(file, ast, conf.rules);
 }
