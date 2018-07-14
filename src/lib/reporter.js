@@ -55,7 +55,7 @@ class Reporter extends EventEmitter {
      * @param {Error} e The exception that occured.
      */
     exception(e) {
-        logger.debug("["+this.name+"]", "Exception reported:", e);
+        logger.debug(`[rprt:${this.name}]`, "Exception reported:", e);
         this.emit("exception", e);
         this.exceptions.push(e);
     }
@@ -67,7 +67,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the error is related to a node, the AST of the file
      */
     error(message, node, ast) {
-        logger.debug("["+this.name+"]", "Error reported:", JSON.stringify(message));
+        logger.debug(`[rprt:${this.name}]`, "Error reported:", JSON.stringify(message));
         const result = generateResult(message, node, ast);
         this.errors.push(result);
     }
@@ -79,7 +79,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the warning is related to a node, the AST of the file
      */
     warn(message, node, ast) {
-        logger.debug("["+this.name+"]", "Warn reported:", JSON.stringify(message));
+        logger.debug(`[rprt:${this.name}]`, "Warn reported:", JSON.stringify(message));
         const result = generateResult(message, node, ast);
         this.warns.push(result);
     }
@@ -91,7 +91,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the message is related to a node, the AST of the file
      */
     log(message, node, ast) {
-        logger.debug("["+this.name+"]", "Log reported:", JSON.stringify(message));
+        logger.debug(`[rprt:${this.name}]`, "Log reported:", JSON.stringify(message));
         const result = generateResult(message, node, ast);
         this.logs.push(result);
     }

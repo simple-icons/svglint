@@ -14,7 +14,12 @@ const linting = svglint.lintSource(`<svg xmlns="a">
             identity: {
                 method: "error",
                 message: "This fails spectacularly",
-            }
+            },
+            async: {
+                method: "warn",
+                message: "This isn't so bad",
+                wait: 5,
+            },
         }
     }
 );

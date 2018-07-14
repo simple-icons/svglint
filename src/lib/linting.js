@@ -40,7 +40,7 @@ class Linting extends EventEmitter {
         this.state = STATES.linting;
         this.name = file
             ? path.relative(process.cwd(), file)
-            : "";
+            : "API";
         /** @type Object<string,Reporter> */
         this.results = {};
 
@@ -59,8 +59,8 @@ class Linting extends EventEmitter {
         const rules = Object.keys(this.rules);
         this.activeRules = rules.length;
 
-        logger.debug("Started linting", (this.name || "API-provided file"));
-        logger.debug("  Rules:", rules);
+        logger.debug(`[lint:${this.name}]`, "Started linting");
+        logger.debug(`[lint:${this.name}]`, "  Rules:", rules);
 
         // start every rule
         rules.forEach(ruleName => {
@@ -87,7 +87,7 @@ class Linting extends EventEmitter {
      * @private
      */
     _onRuleFinish(ruleName, reporter) {
-        logger.debug("Rule finished", logger.colorize(ruleName));
+        logger.debug(`[lint:${this.name}]`, "Rule finished", logger.colorize(ruleName));
         this.emit("rule", {
             name: ruleName,
             reporter,
@@ -97,7 +97,7 @@ class Linting extends EventEmitter {
         --this.activeRules;
         if (this.activeRules === 0) {
             this.state = this._calculateState();
-            logger.debug("Linting finished", logger.colorize(this.state));
+            logger.debug(`[lint:${this.name}]`, "Linting finished", logger.colorize(this.state));
             this.emit("done");
         }
     }
