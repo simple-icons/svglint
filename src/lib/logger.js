@@ -5,6 +5,7 @@
  */
 const chalk = require("chalk");
 const inspect = require("util").inspect;
+const EventEmitter = require("events").EventEmitter;
 
 const CONSOLE_COLORS = Object.freeze({
     debug: chalk.dim.gray,
@@ -36,6 +37,29 @@ METHODS.forEach(method => {
     };
 });
 
+// create a simple collector & emitter of messages for use in CLIs
+class CliConsole extends EventEmitter {
+    constructor() {
+        super();
+        /** The messages that have been emitted so far.
+         * @type {Array<{ prefix: String, args: Array, type: String }>} */
+        this.messages = [];
+        METHODS.forEach(method => {
+            this[method] = (prefix, args) => {
+                const msg = {
+                    prefix: prefix.replace(/^SVGLint ?/, ""),
+                    args,
+                    type: method,
+                };
+                this.messages.push(msg);
+                this.emit("msg", msg);
+            };
+        });
+    }
+}
+CliConsole.prototype.EVENTS = METHODS;
+const cliConsole = new CliConsole();
+
 module.exports = function(prefix) {
     prefix = "SVGLint" + (prefix ? " " + prefix : "");
     const logger = {};
@@ -43,7 +67,7 @@ module.exports = function(prefix) {
         logger[method] = function(...args) {
             if (level > LEVELS[method]) { return; }
             if (isCLI) {
-                // TODO: implement custom logger
+                cliConsole[method].call(cliConsole, prefix, args);
             } else {
                 wrappedConsole[method].call(wrappedConsole, prefix, args);
             }
@@ -51,6 +75,7 @@ module.exports = function(prefix) {
     });
     return logger;
 };
+module.exports.cliConsole = cliConsole;
 module.exports.setCLI = value => { isCLI = value; };
 module.exports.setLevel = value => { level = value; };
 module.exports.LEVELS = LEVELS;
