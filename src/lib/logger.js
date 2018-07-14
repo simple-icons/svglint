@@ -1,6 +1,6 @@
 /**
  * @fileoverview Exposes the logger we should use for displaying info.
- * If called using the JS API, this will be `console` with methods prefixed.
+ * If called using the JS API, this will be `console` with prefixes.
  * If called using the CLI, this will be our own custom logger.
  */
 const chalk = require("chalk");

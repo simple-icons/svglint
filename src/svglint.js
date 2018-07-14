@@ -28,7 +28,6 @@ const logger = require("./lib/logger.js")("");
  */
 /**
  * @typedef Config
- * @property {Boolean} [useSvglintRc=true] Whether to merge config with the one defined in .svglintrc
  * @property {RulesConfig} [rules={}] The rules to lint by
  * @property {IgnoreList} [ignore=[]] The blobs representing which files to ignore
  */
@@ -75,12 +74,11 @@ function normalizeRules(rulesConfig) {
 
 /**
  * Normalizes a user-provided config to make sure it has every property we need.
- * Also handles merging with defaults and .svglintrc.
+ * Also handles merging with defaults.
  * @param {Config} config The user-provided config
  * @returns {NormalizedConfig} The normalized config
  */
 function normalizeConfig(config) {
-    // TODO: load and merge .svglintrc if { useSvglintRc: true } is set
     const defaulted = Object.assign({},
         DEFAULT_CONFIG,
         config,
@@ -91,6 +89,18 @@ function normalizeConfig(config) {
         ignore: defaulted.ignore,
     };
     return outp;
+}
+
+/**
+ * The main function. Lints the provided AST using the user-provided config.
+ * @param {String} file The file we are linting
+ * @param {AST} AST The AST to lint
+ * @param {Config} config The user-provided config to lint by
+ * @returns {Linting} The linting that represents the result
+ */
+function lint(file, ast, config) {
+    const conf = normalizeConfig(config);
+    return new Linting(file, ast, conf.rules);
 }
 
 module.exports = {
@@ -104,8 +114,7 @@ module.exports = {
      */
     lintSource(source, config) {
         const ast = parse.parseSource(source);
-        const conf = normalizeConfig(config);
-        return new Linting(null, ast, conf.rules);
+        return lint(null, ast, config);
     },
 
     /**
@@ -118,7 +127,6 @@ module.exports = {
      */
     async lintFile(file, config) {
         const ast = await parse.parseFile(file);
-        const conf = normalizeConfig(config);
-        return new Linting(file, ast, conf.rules);
+        return lint(file, ast, config);
     }
 };

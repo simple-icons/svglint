@@ -1,4 +1,6 @@
 const svglint = require("./svglint");
+const Logger = require("./lib/logger");
+Logger.setLevel(Logger.LEVELS.debug);
 const linting = svglint.lintSource(`<svg xmlns="a">
 <g>
     <path></path>
@@ -26,7 +28,7 @@ const linting = svglint.lintSource(`<svg xmlns="a">
 
 console.log(linting);
 linting.on("rule", function(){
-    console.log("Linting emitted event", [...arguments]);
+    console.log("Linting emitted rule", [...arguments]);
 });
 linting.once("done", () => {
     console.log(`Linting done

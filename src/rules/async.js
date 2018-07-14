@@ -15,7 +15,6 @@ module.exports = {
     generate(config) {
         return function AsyncRule(reporter) {
             logger.debug("Called", config);
-            logger.log("Waiting", config.wait, "seconds");
             let wait = config.wait;
             return new Promise(res => {
                 const intervalID = setInterval(() => {

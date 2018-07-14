@@ -18,7 +18,7 @@ const path = require("path");
  * If the rule name does not contain a slash then it will be loaded from the
  *   built-in SVGLint rules.
  * @param {String} ruleName The name of the rule
- * @param {String} [dir] The dir to load the rules from
+ * @param {String} [dir] The dir to load the rules from if not from a package
  * @returns {RuleModule} The function exported by the rule if found.
  */
 function ruleLoader(ruleName, dir="../rules") {
