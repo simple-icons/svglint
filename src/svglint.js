@@ -8,7 +8,7 @@
 const Linting = require("./lib/linting");
 const parse = require("./lib/parse");
 const loadRule = require("./lib/rule-loader");
-const logger = require("./lib/logger.js");
+const logger = require("./lib/logger.js")("");
 
 /**
  * @typedef {Object<string,Object<string,*>|false>} RulesConfig

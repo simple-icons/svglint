@@ -2,7 +2,7 @@
  * @fileoverview The object that rules use to report errors, warnings and messages.
  */
 const EventEmitter = require("events").EventEmitter;
-const logger = require("./logger");
+const Logger = require("./logger");
 
 /**
  * @typedef {Object} Result
@@ -38,6 +38,7 @@ class Reporter extends EventEmitter {
     constructor(name) {
         super();
         this.name = name;
+        this.logger = Logger(`rprt:${this.name}`);
         /** @type {Error[]} */
         this.exceptions = [];
         /** @type {Result[]} */
@@ -55,7 +56,7 @@ class Reporter extends EventEmitter {
      * @param {Error} e The exception that occured.
      */
     exception(e) {
-        logger.debug(`[rprt:${this.name}]`, "Exception reported:", e);
+        this.logger.debug("Exception reported:", e);
         this.emit("exception", e);
         this.exceptions.push(e);
     }
@@ -67,7 +68,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the error is related to a node, the AST of the file
      */
     error(message, node, ast) {
-        logger.debug(`[rprt:${this.name}]`, "Error reported:", JSON.stringify(message));
+        this.logger.debug("Error reported:", JSON.stringify(message));
         const result = generateResult(message, node, ast);
         this.errors.push(result);
     }
@@ -79,7 +80,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the warning is related to a node, the AST of the file
      */
     warn(message, node, ast) {
-        logger.debug(`[rprt:${this.name}]`, "Warn reported:", JSON.stringify(message));
+        this.logger.debug("Warn reported:", JSON.stringify(message));
         const result = generateResult(message, node, ast);
         this.warns.push(result);
     }
@@ -91,7 +92,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the message is related to a node, the AST of the file
      */
     log(message, node, ast) {
-        logger.debug(`[rprt:${this.name}]`, "Log reported:", JSON.stringify(message));
+        this.logger.debug("Log reported:", JSON.stringify(message));
         const result = generateResult(message, node, ast);
         this.logs.push(result);
     }

@@ -9,7 +9,7 @@
 const EventEmitter = require("events").EventEmitter;
 const path = require("path");
 const Reporter = require("./reporter");
-const logger = require("./logger");
+const Logger = require("./logger");
 
 const STATES = Object.freeze({
     "ignored": "ignored",
@@ -43,6 +43,7 @@ class Linting extends EventEmitter {
             : "API";
         /** @type Object<string,Reporter> */
         this.results = {};
+        this.logger = Logger(`lint:${this.name}`);
 
         this.lint();
         // TODO: add reporter
@@ -59,8 +60,8 @@ class Linting extends EventEmitter {
         const rules = Object.keys(this.rules);
         this.activeRules = rules.length;
 
-        logger.debug(`[lint:${this.name}]`, "Started linting");
-        logger.debug(`[lint:${this.name}]`, "  Rules:", rules);
+        this.logger.debug("Started linting");
+        this.logger.debug("  Rules:", rules);
 
         // start every rule
         rules.forEach(ruleName => {
@@ -87,7 +88,7 @@ class Linting extends EventEmitter {
      * @private
      */
     _onRuleFinish(ruleName, reporter) {
-        logger.debug(`[lint:${this.name}]`, "Rule finished", logger.colorize(ruleName));
+        this.logger.debug("Rule finished", Logger.colorize(ruleName));
         this.emit("rule", {
             name: ruleName,
             reporter,
@@ -97,7 +98,7 @@ class Linting extends EventEmitter {
         --this.activeRules;
         if (this.activeRules === 0) {
             this.state = this._calculateState();
-            logger.debug(`[lint:${this.name}]`, "Linting finished", logger.colorize(this.state));
+            this.logger.debug("Linting finished", Logger.colorize(this.state));
             this.emit("done");
         }
     }

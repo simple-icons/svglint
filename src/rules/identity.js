@@ -1,4 +1,4 @@
-const logger = require("../lib/logger");
+const logger = require("../lib/logger")("rule:identity");
 
 /**
  * @typedef IdentityConfig
@@ -13,7 +13,7 @@ module.exports = {
      */
     generate(config) {
         return function IdentityRule(reporter) {
-            logger.debug("[rule:identity]", "Called", config);
+            logger.debug("Called", config);
             // Report the message if type !== succeed
             if (config.method) {
                 reporter[config.method](config.message);

@@ -1,4 +1,4 @@
-const logger = require("../lib/logger");
+const logger = require("../lib/logger")("rule:async");
 
 /**
  * @typedef AsyncConfig
@@ -14,7 +14,8 @@ module.exports = {
      */
     generate(config) {
         return function AsyncRule(reporter) {
-            logger.debug("[rule:async]", "Called", config);
+            logger.debug("Called", config);
+            logger.log("Waiting", config.wait, "seconds");
             let wait = config.wait;
             return new Promise(res => {
                 const intervalID = setInterval(() => {
