@@ -62,9 +62,9 @@ const cli = meow({
         process.exit(1);
     }
 
+    // lint all the files
     /** @type {Promise<Linting>[]} */
     const lintingPromises = [];
-
     files.forEach(filePath => {
         lintingPromises.push(
             SVGLint.lintFile(filePath, configObj)
@@ -74,6 +74,7 @@ const cli = meow({
         );
     });
 
+    // wait for the lintings to finish
     let hasErrors = false;
     let activeLintings = lintingPromises.length;
     const onLintingDone = () => {
