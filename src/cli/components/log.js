@@ -51,7 +51,7 @@ module.exports = class Log {
             const message = stringifyArgs(msg.args);
             return meta.color(prefix) + " "
                 + utils.chunkString(message, COLUMNS - prefix.length - 1)
-                    .join("\n" + " ".repeat(msg.prefix ? 0 : 4));
+                    .join("\n" + " ".repeat(msg.prefix ? 0 : 3));
         }).join("\n");
     }
 };

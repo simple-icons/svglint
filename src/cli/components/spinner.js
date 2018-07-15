@@ -5,7 +5,8 @@
 module.exports = class Spinner {
     constructor() {
         this.i = 0;
-        this.frames = ["   ", ".  ", ".. ", "...", " ..", "  .", "   "];
+        //this.frames = ["---", "=--", "==-", "===", "-==", "--=", "---"];
+        this.frames = ["'", ":", ".", ".", ":", "'"];
     }
     toString() {
         this.i = (this.i + 1) % this.frames.length;

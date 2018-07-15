@@ -9,15 +9,11 @@ const Logger = require("../lib/logger");
 const logHistory = Logger.cliConsole;
 
 const Separator = require("./components/separator");
-const Spinner = require("./components/spinner");
 const Log = require("./components/log");
+const LintingDisplay = require("./components/linting");
 
 module.exports = class GUI {
     constructor() {
-        /** The Lintings we are currently showing.
-         * @type {Linting[]} */
-        this.lintings = [];
-
         // subscribe to global logs
         Logger.setCLI(true);
         logHistory.on("msg", () => this.update());
@@ -28,6 +24,8 @@ module.exports = class GUI {
             lints: new Separator("Files"),
         };
         this.$log = new Log(logHistory);
+        /** @type {Linting[]} */
+        this.$lintings = [];
     }
 
     /**
@@ -40,7 +38,25 @@ module.exports = class GUI {
             outp.push(this.$titles.log);
             outp.push(this.$log);
         }
+        if (this.$lintings.length) {
+            outp.push(this.$titles.lints);
+            outp.push(...this.$lintings);
+        }
         logUpdate(outp.join("\n"));
+
+        // animate if we should
+        if (this.shouldAnimate()) {
+            clearTimeout(this._animTimeout);
+            this._animTimeout = setTimeout(() => this.update(), 100);
+        }
+    }
+
+    /**
+     * Returns whether we should animate actively (e.g. for a spinner)
+     * @returns {Boolean}
+     */
+    shouldAnimate() {
+        return this.$lintings.some($linting => $linting.shouldAnimate());
     }
 
     /**
@@ -49,6 +65,8 @@ module.exports = class GUI {
      * @param {Linting} linting The linting to show
      */
     addLinting(linting) {
-        this.lintings.push(linting);
+        this.$lintings.push(new LintingDisplay(linting));
+        linting.on("rule", () => this.update());
+        linting.on("done", () => this.update());
     }
 };
