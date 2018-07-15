@@ -63,34 +63,27 @@ const cli = meow({
     }
 
     // lint all the files
-    /** @type {Promise<Linting>[]} */
-    const lintingPromises = [];
-    files.forEach(filePath => {
-        lintingPromises.push(
-            SVGLint.lintFile(filePath, configObj)
-                .catch(e => {
-                    logger.error("Failed to lint file", filePath, e.message);
-                })
-        );
-    });
-
-    // wait for the lintings to finish
+    // also keep track so we know when every linting has finished
     let hasErrors = false;
-    let activeLintings = lintingPromises.length;
+    let activeLintings = files.length;
     const onLintingDone = () => {
         --activeLintings;
+        logger.debug("Linting done,", activeLintings, "to go");
         if (activeLintings <= 0) {
             GUI.finish();
             process.exit(hasErrors ? 1 : 0);
         }
     };
-    Promise.all(lintingPromises)
-        .then(lintings => {
-            lintings.forEach(linting => {
+    files.forEach(filePath => {
+        SVGLint.lintFile(filePath, configObj)
+            .then(linting => {
+                // handle case where linting failed (e.g. invalid file)
                 if (!linting) {
                     onLintingDone();
                     return;
                 }
+
+                // otherwise add it to GUI and wait for it to finish
                 GUI.addLinting(linting);
                 linting.on("done", () => {
                     if (linting.state === linting.STATES.error) {
@@ -98,6 +91,9 @@ const cli = meow({
                     }
                     onLintingDone();
                 });
+            })
+            .catch(e => {
+                logger.error("Failed to lint file", filePath, e.message);
             });
-        });
+    });
 })();
