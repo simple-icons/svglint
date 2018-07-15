@@ -2,6 +2,7 @@
  * @fileoverview The object that rules use to report errors, warnings and messages.
  */
 const EventEmitter = require("events").EventEmitter;
+const chalk = require("chalk");
 const Logger = require("./logger");
 
 /**
@@ -25,13 +26,20 @@ const Logger = require("./logger");
  */
 function generateResult(message, type, node, ast) {
     const _message = message instanceof Array ? message : [message];
-    return {
+    const outp = {
         message: message,
         _message,
         _node: node,
         _ast: ast,
-        type
+        type,
     };
+    if (message instanceof Error) {
+        outp.message = message.stack || message.toString();
+    }
+    if (node) {
+        outp.message += `\n  At node ${chalk.bold("<"+node.name+">")} (${node.lineNum}:${node.lineIndex})`;
+    }
+    return outp;
 }
 
 class Reporter extends EventEmitter {
@@ -70,7 +78,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the error is related to a node, the AST of the file
      */
     error(message, node, ast) {
-        this.logger.debug("Error reported:", JSON.stringify(message));
+        this.logger.debug("Error reported:", JSON.stringify(message), !!node);
         const result = generateResult(message, "error", node, ast);
         this.hasErrors = true;
         this.messages.push(result);
@@ -83,7 +91,7 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the warning is related to a node, the AST of the file
      */
     warn(message, node, ast) {
-        this.logger.debug("Warn reported:", JSON.stringify(message));
+        this.logger.debug("Warn reported:", JSON.stringify(message), !!node);
         const result = generateResult(message, "warn", node, ast);
         this.hasWarns = true;
         this.messages.push(result);

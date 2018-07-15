@@ -110,7 +110,7 @@ module.exports = class GUI {
     }
 
     /**
-     * Sets whether we should only output to STDOUT once.
+     * Sets whether we should only output to stdout once.
      * @param {Boolean} value If true, enable CI mode
      */
     setCI(value) {

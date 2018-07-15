@@ -1,4 +1,3 @@
-const chalk = require("chalk");
 const nodeUtil = require("util");
 const { MSG_META } = require("../util");
 

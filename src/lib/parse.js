@@ -10,6 +10,16 @@ const path = require("path");
 
 module.exports = {
     /**
+     * Clones an AST by re-parsing it's source
+     * @param {AST} ast The AST to clone
+     * @returns {AST} The cloned AST
+     */
+    clone(ast) {
+        // @ts-ignore
+        return module.exports.parseSource(ast.source);
+    },
+
+    /**
      * Parses an SVG source into an AST
      * @param {String} source The source to parse
      * @returns {AST} The parsed AST

@@ -1,43 +1,13 @@
 const svglint = require("./svglint");
 const Logger = require("./lib/logger");
 Logger.setLevel(Logger.LEVELS.debug);
-const linting = svglint.lintSource(`<svg xmlns="a">
-<g>
-    <path></path>
-    <path></path>
-</g>
-<g></g>
-<circle></circle>
-</svg>`,
-    {
-        rules: {
-            fails: {},
-            doesntFailBecauseRemoved: {},
-            identity: [{
-                method: "error",
-                message: "This fails spectacularly",
-            }, {
-                method: "warn",
-                message: "This only warns",
-            }, {
-                method: "log",
-                message: "This is simply a log",
-            }],
-            async: {
-                method: "log",
-                message: "This is delayed",
-                wait: 5,
-            },
+
+svglint.lintSource("<svg><path></path></svg>", {
+    rules: {
+        elms: {
+            method: "warn",
+            message: "This is a message with a related element",
+            selector: "path",
         }
     }
-);
-
-console.log(linting);
-linting.on("rule", function(rule){
-    console.log("Linting emitted rule", rule.name, rule.result);
-    console.log();
-});
-linting.once("done", () => {
-    console.log(`Linting done
-  State: ${linting.state}`);
-});
+})

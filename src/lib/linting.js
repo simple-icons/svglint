@@ -8,6 +8,8 @@
  */
 const EventEmitter = require("events").EventEmitter;
 const path = require("path");
+const cheerio = require("cheerio");
+const parse = require("./parse");
 const Reporter = require("./reporter");
 const Logger = require("./logger");
 
@@ -30,7 +32,7 @@ class Linting extends EventEmitter {
      * Creates and starts a new linting.
      * @param {String} file The file to lint
      * @param {AST} ast The AST of the file
-     * @param {NormalizedRules} rules The rules that represent 
+     * @param {NormalizedRules} rules The rules to lint by
      */
     constructor(file, ast, rules) {
         super();
@@ -80,6 +82,11 @@ class Linting extends EventEmitter {
 
         // start every rule
         ruleNames.forEach(ruleName => {
+            const ast = parse.clone(this.ast);
+            const cheerioParsed = cheerio.load(
+                ast,
+                { xml: { xmlMode: true } }
+            );
             /**
              * Executes a rule function.
              * @param {Function} rule The loaded rule
@@ -92,14 +99,13 @@ class Linting extends EventEmitter {
                 // execute the rule, potentially waiting for async rules
                 // also handles catching errors from the rule
                 Promise.resolve()
-                    .then(() => rule(reporter))
+                    .then(() => rule(reporter, cheerioParsed, ast))
                     .catch(e => reporter.exception(e))
                     .then(() => onDone(reporter));
             };
 
             /** @type {Function|Function[]} */
             const rule = this.rules[ruleName];
-            this.logger.debug("Got rule", ruleName, rule);
             if (rule instanceof Array) {
                 // TODO: implement handling of multi-config rules
                 /** @type {Reporter[]} */
@@ -139,7 +145,7 @@ class Linting extends EventEmitter {
         --this.activeRules;
         if (this.activeRules === 0) {
             this.state = this._calculateState();
-            this.logger.debug("Linting finished", Logger.colorize(this.state));
+            this.logger.debug("Linting finished with status", Logger.colorize(this.state));
             this.emit("done");
         }
     }
