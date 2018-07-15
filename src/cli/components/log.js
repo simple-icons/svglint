@@ -1,24 +1,6 @@
 const chalk = require("chalk");
 const nodeUtil = require("util");
-
-const MSG_META = Object.freeze({
-    "debug": Object.freeze({
-        symbol: "d",
-        color: chalk.gray.dim.bold,
-    }),
-    "log": Object.freeze({
-        symbol: "i",
-        color: chalk.blue.bold,
-    }),
-    "warn": Object.freeze({
-        symbol: "!",
-        color: chalk.yellow.bold,
-    }),
-    "error": Object.freeze({
-        symbol: "x",
-        color: chalk.red.bold,
-    })
-});
+const { MSG_META } = require("../util");
 
 /**
  * Stringifies a list of data into a colorized single line

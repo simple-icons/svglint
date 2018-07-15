@@ -1,11 +1,48 @@
 /**
  * @fileoverview Utilities for the CLI.
  */
-
+const chalk = require("chalk");
 const ansiRegex = require("ansi-regex");
+
+const COLUMNS = process.stdout.columns || 80;
+const MSG_META = Object.freeze({
+    // logs
+    "debug": Object.freeze({
+        symbol: "d",
+        color: chalk.gray.dim.bold,
+    }),
+    "log": Object.freeze({
+        symbol: "i",
+        color: chalk.blue.bold,
+    }),
+
+    // lintings
+    "linting": Object.freeze({
+        symbol: null,
+        color: chalk.gray.dim,
+    }),
+    "success": Object.freeze({
+        symbol: "✓",
+        color: chalk.green.bold,
+    }),
+    "warn": Object.freeze({
+        symbol: "!",
+        color: chalk.yellow.bold,
+    }),
+    "error": Object.freeze({
+        symbol: "x",
+        color: chalk.red.bold,
+    }),
+    "exception": Object.freeze({
+        symbol: "!!!",
+        color: chalk.bgRed.bold,
+    }),
+});
 
 module.exports = {
     chunkString,
+    MSG_META,
+    COLUMNS,
 };
 
 /**

@@ -40,3 +40,11 @@ SVGLint.lintFile(path.join(process.cwd(), "test/svgs/attr.fail.svg"), {
         }
     }
 }).then(linting => GUI.addLinting(linting));
+
+SVGLint.lintFile(path.join(process.cwd(), "test/svgs/attr.fail.svg"), {
+    rules: {
+        identity: {
+            method: "warn",
+        }
+    }
+}).then(linting => GUI.addLinting(linting));

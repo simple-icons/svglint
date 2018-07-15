@@ -35,7 +35,7 @@ const linting = svglint.lintSource(`<svg xmlns="a">
 console.log(linting);
 linting.on("rule", function(rule){
     console.log("Linting emitted rule", rule.name, rule.result);
-    console.log()
+    console.log();
 });
 linting.once("done", () => {
     console.log(`Linting done

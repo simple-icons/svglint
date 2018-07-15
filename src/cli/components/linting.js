@@ -1,33 +1,8 @@
 const chalk = require("chalk");
-const Linting = require("../../lib/linting");
-const utils = require("../util");
+const { chunkString, MSG_META, COLUMNS } = require("../util");
 const stripAnsi = require("strip-ansi");
 
 const Spinner = require("./spinner");
-
-const COLUMNS = process.stdout.columns || 80;
-const MSG_META = Object.freeze({
-    "linting": Object.freeze({
-        symbol: null,
-        color: chalk.gray.dim,
-    }),
-    "success": Object.freeze({
-        symbol: "✓",
-        color: chalk.green.bold,
-    }),
-    "warn": Object.freeze({
-        symbol: "!",
-        color: chalk.yellow.bold,
-    }),
-    "error": Object.freeze({
-        symbol: "x",
-        color: chalk.red.bold,
-    }),
-    "exception": Object.freeze({
-        symbol: "!!!",
-        color: chalk.bgRed.bold,
-    }),
-});
 
 /**
  * Turns a results object into a flat array of Reporters, in a stable-sorted manner.
@@ -118,7 +93,7 @@ class ReporterDisplay {
         } `;
         const prefixLength = stripAnsi(prefix).length;
         return prefix
-            + utils.chunkString(msg.message.toString() || "", COLUMNS - prefixLength - 1)
+            + chunkString((msg.message||"").toString() || "", COLUMNS - prefixLength - 1)
                 .join("\n"+" ".repeat(prefixLength));
     }
 

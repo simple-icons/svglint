@@ -7,6 +7,7 @@ const Logger = require("./logger");
 /**
  * @typedef {Object} Result
  * @property {String} message The message as a single string, suitable for human consumption
+ * @property {"error"|"warn"|"exception"} type The type of result
  * @property {String} [stacktrace] If Result is related to a node, a human-suitable string showing the related part of the file
  * @property {any[]} _message The original message, as given by the rule
  * @property {Node} [_node] If Result is related to a node, the related node

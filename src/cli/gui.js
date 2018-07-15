@@ -3,7 +3,6 @@
  * Handles formatting the state of a (multifile) linting in a human-friendly way.
  * Expects a terminal to be present as process.stdout.
  */
-const chalk = require("chalk");
 const logUpdate = require("log-update");
 const Logger = require("../lib/logger");
 const logHistory = Logger.cliConsole;
@@ -11,6 +10,7 @@ const logHistory = Logger.cliConsole;
 const Separator = require("./components/separator");
 const Log = require("./components/log");
 const LintingDisplay = require("./components/linting");
+const Summary = require("./components/summary");
 
 module.exports = class GUI {
     constructor() {
@@ -22,8 +22,10 @@ module.exports = class GUI {
         this.$titles = {
             log: new Separator("Log"),
             lints: new Separator("Files"),
+            summary: new Separator("Summary"),
         };
         this.$log = new Log(logHistory);
+        this.$summary = new Summary();
         /** @type {Linting[]} */
         this.$lintings = [];
     }
@@ -33,22 +35,43 @@ module.exports = class GUI {
      * Should be called any time anything has changed.
      */
     update() {
-        const outp = [];
-        if (logHistory.messages.length) {
-            outp.push(this.$titles.log);
-            outp.push(this.$log);
-        }
-        if (this.$lintings.length) {
-            outp.push(this.$titles.lints);
-            outp.push(...this.$lintings);
-        }
-        logUpdate(outp.join("\n"));
+        logUpdate(this.render());
 
         // animate if we should
         if (this.shouldAnimate()) {
             clearTimeout(this._animTimeout);
             this._animTimeout = setTimeout(() => this.update(), 100);
         }
+    }
+
+    /**
+     * Returns the string that represents the GUI.
+     * This string can be logged directly to console.
+     */
+    render() {
+        const outp = [];
+        if (logHistory.messages.length) {
+            outp.push(
+                "",
+                this.$titles.log,
+                this.$log
+            );
+        }
+        if (this.$lintings.length) {
+            outp.push(
+                "",
+                this.$titles.lints,
+                this.$lintings
+                    .join("\n"),
+            );
+        }
+        outp.push(
+            "",
+            this.$titles.summary,
+            this.$summary
+        );
+        if (outp[0] === "") { outp.shift(); }
+        return outp.join("\n");
     }
 
     /**
@@ -66,6 +89,7 @@ module.exports = class GUI {
      */
     addLinting(linting) {
         this.$lintings.push(new LintingDisplay(linting));
+        this.$summary.addLinting(linting);
         linting.on("rule", () => this.update());
         linting.on("done", () => this.update());
     }

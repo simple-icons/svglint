@@ -107,7 +107,7 @@ function normalizeConfig(config) {
 /**
  * The main function. Lints the provided AST using the user-provided config.
  * @param {String} file The file we are linting
- * @param {AST} AST The AST to lint
+ * @param {AST} ast The AST to lint
  * @param {Config} config The user-provided config to lint by
  * @returns {Linting} The linting that represents the result
  */
