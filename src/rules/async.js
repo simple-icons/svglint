@@ -26,7 +26,7 @@ module.exports = {
                         }
                         res();
                     } else {
-                        reporter.log([wait, "seconds to go"]);
+                        logger.log(wait, "seconds to go");
                     }
                 }, 1000);
             });

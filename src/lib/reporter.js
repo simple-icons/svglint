@@ -17,17 +17,19 @@ const Logger = require("./logger");
  * Generates a Result from the arguments given to .error()/.warn()/.log().
  * Mostly involves formatting the message that should be shown when logged.
  * @param {any[]|any} message The message of the result, in console.log format
+ * @param {"error"|"warn"|"exception"} type The type of message
  * @param {Node} [node] If the error is related to a node, the related node
  * @param {AST} [ast] If the error is related to a node, the related AST
  * @returns {Result}
  */
-function generateResult(message, node, ast) {
+function generateResult(message, type, node, ast) {
     const _message = message instanceof Array ? message : [message];
     return {
-        message: "foo",
+        message: message,
         _message,
         _node: node,
         _ast: ast,
+        type
     };
 }
 
@@ -39,14 +41,12 @@ class Reporter extends EventEmitter {
         super();
         this.name = name;
         this.logger = Logger(`rprt:${this.name}`);
-        /** @type {Error[]} */
-        this.exceptions = [];
         /** @type {Result[]} */
-        this.errors = [];
-        /** @type {Result[]} */
-        this.warns = [];
-        /** @type {Result[]} */
-        this.logs = [];
+        this.messages = [];
+
+        this.hasExceptions = false;
+        this.hasWarns = false;
+        this.hasErrors = false;
     }
 
     /**
@@ -58,7 +58,8 @@ class Reporter extends EventEmitter {
     exception(e) {
         this.logger.debug("Exception reported:", e);
         this.emit("exception", e);
-        this.exceptions.push(e);
+        this.hasExceptions = true;
+        this.messages.push(generateResult(e, "exception"));
     }
 
     /**
@@ -69,8 +70,9 @@ class Reporter extends EventEmitter {
      */
     error(message, node, ast) {
         this.logger.debug("Error reported:", JSON.stringify(message));
-        const result = generateResult(message, node, ast);
-        this.errors.push(result);
+        const result = generateResult(message, "error", node, ast);
+        this.hasErrors = true;
+        this.messages.push(result);
     }
 
     /**
@@ -81,20 +83,9 @@ class Reporter extends EventEmitter {
      */
     warn(message, node, ast) {
         this.logger.debug("Warn reported:", JSON.stringify(message));
-        const result = generateResult(message, node, ast);
-        this.warns.push(result);
-    }
-
-    /**
-     * Shows a message to the user.
-     * @param {any[]|any} message The message of the result, in console.log format
-     * @param {Node} [node] If the message is related to a node, the related node
-     * @param {AST} [ast] If the message is related to a node, the AST of the file
-     */
-    log(message, node, ast) {
-        this.logger.debug("Log reported:", JSON.stringify(message));
-        const result = generateResult(message, node, ast);
-        this.logs.push(result);
+        const result = generateResult(message, "warn", node, ast);
+        this.hasWarns = true;
+        this.messages.push(result);
     }
 }
 module.exports = Reporter;

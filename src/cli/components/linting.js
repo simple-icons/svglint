@@ -1,7 +1,7 @@
 const chalk = require("chalk");
 const Linting = require("../../lib/linting");
-const nodeUtil = require("util");
 const utils = require("../util");
+const stripAnsi = require("strip-ansi");
 
 const Spinner = require("./spinner");
 
@@ -22,8 +22,31 @@ const MSG_META = Object.freeze({
     "error": Object.freeze({
         symbol: "x",
         color: chalk.red.bold,
-    })
+    }),
+    "exception": Object.freeze({
+        symbol: "!!!",
+        color: chalk.bgRed.bold,
+    }),
 });
+
+/**
+ * Turns a results object into a flat array of Reporters, in a stable-sorted manner.
+ * @param {Object<string,Reporter|Reporter[]>} results The results from the Linting
+ * @returns {Reporter[]}
+ */
+function flattenReporters(results) {
+    const outp = [];
+    Object.keys(results).sort().forEach(
+        reporterName => {
+            const reporter = results[reporterName];
+            const reporters = (reporter instanceof Array)
+                ? reporter
+                : [reporter];
+            outp.push(...reporters);
+        }
+    );
+    return outp;
+}
 
 /**
  * A display for a single linting.
@@ -58,11 +81,51 @@ module.exports = class LintingDisplay {
                     : meta.symbol);
             }
         }
-        return symbol + " " + chalk.bold(linting.name);
+        return symbol + " " + chalk.bold.underline(linting.name);
     }
 
+    /**
+     * Returns the string representing all of our reporters
+     * @returns {String}
+     */
+    renderReporters() {
+        const outp = flattenReporters(this.linting.results)
+            .map(reporter => new ReporterDisplay(reporter))
+            .join("\n");
+        if (outp.length) {
+            return "\n" + outp;
+        }
+        return "";
+    }
 
     toString() {
-        return this.renderHeader();
+        return this.renderHeader()
+            + this.renderReporters();
     }
 };
+
+class ReporterDisplay {
+    constructor(reporter) {
+        this.reporter = reporter;
+    }
+
+    formatMsg(msg) {
+        const type = msg.type;
+        const meta = MSG_META[type];
+        const prefix = `  ${meta.color(meta.symbol + " " + this.reporter.name)}${msg._node
+            ? ` ${msg._node.lineNum}:${msg._node.lineIndex}`
+            : ""
+        } `;
+        const prefixLength = stripAnsi(prefix).length;
+        return prefix
+            + utils.chunkString(msg.message.toString() || "", COLUMNS - prefixLength - 1)
+                .join("\n"+" ".repeat(prefixLength));
+    }
+
+    toString() {
+        const msgs = this.reporter.messages.map(
+            msg => this.formatMsg(msg)
+        );
+        return msgs.join("\n");
+    }
+}

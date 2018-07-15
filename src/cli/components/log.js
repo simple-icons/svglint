@@ -1,8 +1,6 @@
 const chalk = require("chalk");
 const nodeUtil = require("util");
-const utils = require("../util");
 
-const COLUMNS = process.stdout.columns || 80;
 const MSG_META = Object.freeze({
     "debug": Object.freeze({
         symbol: "d",
@@ -50,8 +48,7 @@ module.exports = class Log {
                 : `(${meta.symbol})`;
             const message = stringifyArgs(msg.args);
             return meta.color(prefix) + " "
-                + utils.chunkString(message, COLUMNS - prefix.length - 1)
-                    .join("\n" + " ".repeat(msg.prefix ? 0 : 3));
+                + message;
         }).join("\n");
     }
 };
