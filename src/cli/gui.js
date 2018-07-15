@@ -18,6 +18,9 @@ module.exports = class GUI {
         Logger.setCLI(true);
         logHistory.on("msg", () => this.update());
 
+        /** If true, we should only write to stdout once */
+        this.ci = false;
+
         // generate one-shot components
         this.$titles = {
             log: new Separator("Log"),
@@ -31,10 +34,22 @@ module.exports = class GUI {
     }
 
     /**
+     * Called when the linting is finished and we should finish up.
+     */
+    finish() {
+        if (this.ci) {
+            console.log(this.render());
+        } else {
+            this.update();
+        }
+    }
+
+    /**
      * Re-renders the GUI.
      * Should be called any time anything has changed.
      */
     update() {
+        if (this.ci) { return; }
         logUpdate(this.render());
 
         // animate if we should
@@ -92,5 +107,13 @@ module.exports = class GUI {
         this.$summary.addLinting(linting);
         linting.on("rule", () => this.update());
         linting.on("done", () => this.update());
+    }
+
+    /**
+     * Sets whether we should only output to STDOUT once.
+     * @param {Boolean} value If true, enable CI mode
+     */
+    setCI(value) {
+        this.ci = value;
     }
 };
