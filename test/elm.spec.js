@@ -1,5 +1,6 @@
-const expect = require("expect");
 const SVGLint = require("../src/svglint");
+const util = require("util");
+const chalk = require("chalk");
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console
@@ -22,7 +23,7 @@ If an element is permitted by one rule and rejected by another, it is overall pe
     "svg": true,         // the root svg element must exist
     "svg > title": true, // the title element must exist inside the root element
     "g": 2,              // exactly 2 groups must exist
-    "g > path": [0,2],   // up to two paths can be in each group
+    "g > path": [0,2],   // up to two paths can exist
     "*": false,          // nothing else can exist
 }
 ```
@@ -36,110 +37,131 @@ const testSVG = `<svg>
     </g>
     <g></g>
 </svg>`;
-const testConfig = {
-    "svg": true,         // the root svg element must exist
-    "svg > title": true, // the title element must exist inside the root element
-    "g": 2,              // exactly 2 groups must exist
-    "g > path": [0,2],   // up to two paths can be in each group
-    "*": false,          // nothing else can exist
-};
 
-describe("Rule elm", function(){
-    it("should succeed without config", function(done){
-        const linter = new SVGLint({
-            rules: {
-                "elm": undefined
+function inspect(obj) {
+    return chalk.reset(util.inspect(obj, false, 3, true));
+}
+
+/**
+ * Tests that a config succeeds when ran
+ * @param {Config} config The config to test
+ * @param {String} [svg=testSVG] The SVG to lint
+ * @returns {Promise<void>} Throws if linting fails
+ */
+function testSucceeds(config, svg=testSVG) {
+    return new Promise((res, rej) => {
+        const linting = SVGLint.lintSource(svg, config);
+        linting.on("done", () => {
+            if (linting.state === linting.STATES.success) {
+                res();
+            } else {
+                rej(new Error(`Linting failed (${linting.state}):
+        ${inspect(config)}`));
             }
         });
-        linter.lint(testSVG)
-            .then(value => expect(value).toBe(true))
-            .then(() => done())
-            .catch(done);
     });
-    it("should succeed with a matching config", async function(){
-        const linter = new SVGLint({
-            rules: {
-                "elm": testConfig
+}
+/**
+ * Tests that a config fails when ran
+ * @param {Config} config The config to test
+ * @param {String} svg The SVG to lint
+ * @returns {Promise<void>} Throws if the linting doesn't fail
+ */
+function testFails(config, svg=testSVG) {
+    const _config = {
+        rules: { elm: config },
+    };
+    return new Promise((res, rej) => {
+        const linting = SVGLint.lintSource(svg, _config);
+        linting.on("done", () => {
+            if (linting.state === linting.STATES.error) {
+                res();
+            } else {
+                rej(new Error(`Linting did not fail (${linting.state}):
+        ${inspect(_config)}`));
             }
         });
-
-        const value = await linter.lint(testSVG);
-        expect(value).toBe(true);
     });
-    it("should succeed with multiple configs", async function(){
-        const linter = new SVGLint({
-            rules: {
-                "elm": [
-                    testConfig,
-                    { "g > path": true }
-                ]
-            }
+}
+
+describe("Rule: elm", function(){
+    it("should succeed without config", function(){
+        return testSucceeds({});
+    });
+
+    it("should succeed with a required element", function(){
+        return testSucceeds({
+            "svg > title": true,
         });
-
-        const value = await linter.lint(testSVG);
-        expect(value).toBe(true);
     });
-
-    it("should fail with one failing out of multiple configs", async function(){
-        const linter = new SVGLint({
-            rules: {
-                "attr": [
-                    testConfig,
-                    { "g > path": false }
-                ]
-            }
+    it("should fail without a required element", function(){
+        return testFails({
+            "svg > foobar": true,
         });
-
-        let value;
-        try {
-            value = await linter.lint(testSVG);
-        } catch (e) {
-            // eslint-disable-line no-empty
-        }
-        expect(value).toBe(undefined);
     });
-    it("should fail with matching blacklist", function(){
+
+    it("should succeed without a blacklist element", function(){
+        return testSucceeds({
+            "g > foobar": false,
+        });
+    });
+    it("should fail with a blacklist element", function(){
         return testFails({
             "g > path": false
         });
     });
-    it("should fail with incorrect number", function(){
-        return testFails({
-            "g": 3
+
+    it("should succeed with a found number of elements", function(){
+        return testSucceeds({
+            "g": 2,
         });
     });
-    it("should fail with missing required elm", function(){
+    it("should fail with an exceeded number of elements", function(){
         return testFails({
-            "circle": true
+            "g": 1,
         });
     });
-    it("should fail with below range", function(){
+    it("should fail with a too low number of elements", function(){
         return testFails({
-            "g > path": [3,4]
+            "g": 3,
         });
     });
-    it("should fail with above range", function(){
+
+    it("should succeed with a found range of elements", function() {
+        return Promise.all([
+            testSucceeds({
+                "g > path": [1,2],
+            }),
+            testSucceeds({
+                "g > path": [1,2],
+            }, "<svg><g><path></path></g></svg>"),
+        ]);
+    });
+    it("should fail with an exceeded range of elements", function() {
         return testFails({
-            "g > path": [0,1]
+            "g > path": [0,1],
         });
+    });
+    it("should fail with a too low range of elements", function(){
+        return testFails({
+            "g > path": [3,5],
+        });
+    });
+
+    it("should succeed when a disallowed element is allowed by another rule", function(){
+        return Promise.all([
+            testSucceeds({
+                "path": false,
+                "g > path": true,
+            }),
+            testSucceeds({
+                "path": false,
+                "g > path": 2,
+            }),
+            testSucceeds({
+                "path": false,
+                "g > path": [1,2],
+            }),
+        ]);
     });
 });
-
-async function testFails(config) {
-    config = {
-        rules: {
-            "elm": Object.assign({},
-                testConfig,
-                config
-            )
-        }
-    };
-    const linter = new SVGLint(config);
-    let value;
-    try {
-        value = await linter.lint(testSVG);
-    } catch (e) {
-        // eslint-disable-line no-empty
-    }
-    expect(value).toBe(undefined);
-}
