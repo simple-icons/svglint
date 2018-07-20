@@ -93,7 +93,7 @@ const cli = meow({
                 });
             })
             .catch(e => {
-                logger.error("Failed to lint file", filePath, e.message);
+                logger.error("Failed to lint file", filePath, "\n", e);
             });
     });
 })();
