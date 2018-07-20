@@ -18,8 +18,10 @@ const logger = Logger("");
 console.error = logger.error.bind(logger); // used by meow's loud reject
 process.on("uncaughtException", err => {
     logger.error(err);
-    GUI.finish();
     process.exit(1);
+});
+process.on("exit", () => {
+    GUI.finish();
 });
 
 // Generates the CLI binding using meow
@@ -58,7 +60,6 @@ const cli = meow({
         configObj = require(configFile);
     } catch (e) {
         logger.error(`Failed to parse config: ${e.message}`);
-        GUI.finish();
         process.exit(1);
     }
 
@@ -70,7 +71,6 @@ const cli = meow({
         --activeLintings;
         logger.debug("Linting done,", activeLintings, "to go");
         if (activeLintings <= 0) {
-            GUI.finish();
             process.exit(hasErrors ? 1 : 0);
         }
     };
