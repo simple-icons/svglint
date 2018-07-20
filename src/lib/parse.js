@@ -76,8 +76,10 @@ module.exports = {
  * @property {String} [name] If type!=="text", the tag name
  */
 /**
- * @typedef {Node[]} AST
+ * @typedef ASTShape
  * @property {String} source The source that generated the AST
+ * 
+ * @typedef {Node[] & ASTShape} AST
  * An AST representing an SVG document (or a list of children).
  */
 

@@ -13,6 +13,10 @@ const parse = require("./parse");
 const Reporter = require("./reporter");
 const Logger = require("./logger");
 
+/** @typedef {import("./parse.js").AST} AST */
+/** @typedef {import("./parse.js").Node} Node */
+/** @typedef {import("../svglint.js").NormalizedRules} NormalizedRules */
+
 const STATES = Object.freeze({
     "ignored": "ignored",
     "linting": "linting",
@@ -83,10 +87,12 @@ class Linting extends EventEmitter {
         // start every rule
         ruleNames.forEach(ruleName => {
             const ast = parse.clone(this.ast);
-            const cheerioParsed = cheerio(
+            const cheerioParsed = cheerio.load(
                 "<root></root>",
-                { xml: { xmlMode: true } }
-            ).append(ast);
+                { xmlMode: true }
+            )("root")
+                // @ts-ignore
+                .append(ast);
             /**
              * Executes a rule function.
              * @param {Function} rule The loaded rule

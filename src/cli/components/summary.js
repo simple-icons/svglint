@@ -1,6 +1,8 @@
 const chalk = require("chalk");
 const { MSG_META } = require("../util");
 
+/** @typedef {import("../../lib/linting.js")} Linting */
+
 /**
  * A summary of all lintings.
  */

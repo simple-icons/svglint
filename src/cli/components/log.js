@@ -1,6 +1,8 @@
 const nodeUtil = require("util");
 const { MSG_META } = require("../util");
 
+/** @typedef {import("../../lib/logger.js").CliConsole} CliHistory */
+
 /**
  * Stringifies a list of data into a colorized single line
  * @param {Array} args The data to stringify

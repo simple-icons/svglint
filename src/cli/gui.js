@@ -12,6 +12,8 @@ const Log = require("./components/log");
 const LintingDisplay = require("./components/linting");
 const Summary = require("./components/summary");
 
+/** @typedef {import("../lib/linting.js")} Linting */
+
 module.exports = class GUI {
     constructor() {
         // subscribe to global logs
@@ -29,7 +31,7 @@ module.exports = class GUI {
         };
         this.$log = new Log(logHistory);
         this.$summary = new Summary();
-        /** @type {Linting[]} */
+        /** @type {LintingDisplay[]} */
         this.$lintings = [];
     }
 

@@ -10,6 +10,9 @@ const parse = require("./lib/parse");
 const loadRule = require("./lib/rule-loader");
 const logger = require("./lib/logger.js")("");
 
+/** @typedef {import("./lib/parse.js").AST} AST */
+/** @typedef {import("./lib/rule-loader.js").RuleModule} RuleModule */
+
 /**
  * @typedef {Object<string,Object<string,*>|false>} RulesConfig
  * An object with each key representing a rule name, and each value representing

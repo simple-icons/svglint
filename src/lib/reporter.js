@@ -5,6 +5,9 @@ const EventEmitter = require("events").EventEmitter;
 const chalk = require("chalk");
 const Logger = require("./logger");
 
+/** @typedef {import("./parse.js").AST} AST */
+/** @typedef {import("./parse.js").Node} Node */
+
 /**
  * @typedef {Object} Result
  * @property {String} message The message as a single string, suitable for human consumption
@@ -20,7 +23,7 @@ const Logger = require("./logger");
  * Mostly involves formatting the message that should be shown when logged.
  * @param {any[]|any} message The message of the result, in console.log format
  * @param {"error"|"warn"|"exception"} type The type of message
- * @param {Node} [node] If the error is related to a node, the related node
+ * @param {Node|Cheerio} [node] If the error is related to a node, the related node
  * @param {AST} [ast] If the error is related to a node, the related AST
  * @returns {Result}
  */
@@ -37,8 +40,10 @@ function generateResult(message, type, node, ast) {
         outp.message = message.stack || message.toString();
     }
     if (node) {
+        // @ts-ignore
         outp.message += `\n  At node ${chalk.bold("<"+node.name+">")} (${node.lineNum}:${node.columnNum})`;
     }
+    // @ts-ignore
     return outp;
 }
 
@@ -74,7 +79,7 @@ class Reporter extends EventEmitter {
     /**
      * Reports that an error was found during linting.
      * @param {any[]|any} message The message of the result, in console.log format
-     * @param {Node} [node] If the error is related to a node, the related node
+     * @param {Node|Cheerio} [node] If the error is related to a node, the related node
      * @param {AST} [ast] If the error is related to a node, the AST of the file
      */
     error(message, node, ast) {
@@ -87,7 +92,7 @@ class Reporter extends EventEmitter {
     /**
      * Reports that a warning was found during linting.
      * @param {any[]|any} message The message of the result, in console.log format
-     * @param {Node} [node] If the warning is related to a node, the related node
+     * @param {Node|Cheerio} [node] If the warning is related to a node, the related node
      * @param {AST} [ast] If the warning is related to a node, the AST of the file
      */
     warn(message, node, ast) {

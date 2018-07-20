@@ -1,5 +1,9 @@
 const logger = require("../lib/logger")("rule:elm");
 
+/** @typedef {import("../lib/reporter.js")} Reporter */
+/** @typedef {import("../lib/parse.js").AST} AST */
+/** @typedef {import("../lib/parse.js").Node} Node */
+
 /**
  * @typedef {Object<string,Boolean|Number|Array<Number>>} ElmConfig
  * The key is used as selector. The value has the following meanings:  

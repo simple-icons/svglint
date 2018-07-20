@@ -1,5 +1,9 @@
 const logger = require("../lib/logger")("rule:attr");
 
+/** @typedef {import("../lib/reporter.js")} Reporter */
+/** @typedef {import("../lib/parse.js").AST} AST */
+/** @typedef {import("../lib/parse.js").Node} Node */
+
 /**
  * @typedef {Object<string,string|string[]|boolean>} AttrConfig
  * The key represents the attribute name. The value has the following meanings:  
@@ -28,40 +32,14 @@ const logger = require("../lib/logger")("rule:attr");
 const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist"];
 
 /**
- * Executes on an attribute value.
- * @param {String} attrib The name of the attribute
- * @param {String} value The value of the attribute
- * @param {Boolean|String|Array<String>} rule The config value for the attribute
- * @param {Reporter} reporter The rule reporter
- * @param {AST} ast The AST we are executing on
- * @returns {false|true|undefined} `false`=disallowed, `true`=allowed, `undefined`=neither
- */
-function executeOnAttrib(attrib, value, rule, reporter, ast) {
-    switch (typeof rule) {
-        case "boolean":
-            // return true if the attrib must exist, false if it must not exist
-            const outp = (rule === true
-                ? true
-                : false);
-        case "string":
-            // return true if the attrib matches, false if it doesn't
-            return rule === value;
-        default:
-            if (rule instanceof Array) {
-                return rule.includes(value);
-            }
-            reporter.warn("Unknown rule config:", rule);
-    }
-}
-
-/**
  * Executes on a single element.
- * @param {Element} $elm The cheerio element to execute on
+ * @param {Cheerio} $elm The cheerio element to execute on
  * @param {AttrConfig} config The config to execute
  * @param {Reporter} reporter The rule reporter
  * @param {AST} ast The AST we are executing on
  */
 function executeOnElm($elm, config, reporter, ast) {
+    // @ts-ignore
     const attrs = Object.assign({}, $elm.attribs);
     // check that all attributes that must exist do so
     Object.keys(config).forEach(

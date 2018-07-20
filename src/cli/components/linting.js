@@ -4,6 +4,9 @@ const stripAnsi = require("strip-ansi");
 
 const Spinner = require("./spinner");
 
+/** @typedef {import("../../lib/reporter.js")} Reporter */
+/** @typedef {import("../../lib/linting.js")} Linting */
+
 /**
  * Turns a results object into a flat array of Reporters, in a stable-sorted manner.
  * @param {Object<string,Reporter|Reporter[]>} results The results from the Linting

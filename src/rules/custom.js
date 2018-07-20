@@ -1,7 +1,17 @@
 const logger = require("../lib/logger")("rule:elm");
 
+/** @typedef {import("../lib/reporter.js")} Reporter */
+/** @typedef {import("../lib/parse.js").AST} AST */
+/** @typedef {import("../lib/parse.js").Node} Node */
+
 /**
- * @typedef {Function} CustomConfig
+ * @callback CustomRule
+ * @param {Reporter} reporter The reporter to report to
+ * @param {Cheerio} $ A cheerio representation of the document
+ * @param {AST} ast The AST of the document, which we should pass to reporter
+ */
+/**
+ * @typedef {CustomRule} CustomConfig
  * The function will be executed as if though it was a rule.
  */
 
