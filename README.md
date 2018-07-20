@@ -19,3 +19,5 @@ x test/svgs/empty.svg
 ✓ 1 valid files.
 x 2 invalid files.
 ```
+
+![Example of a commandline execution](/example.png)
