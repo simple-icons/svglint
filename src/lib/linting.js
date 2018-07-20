@@ -84,9 +84,9 @@ class Linting extends EventEmitter {
         ruleNames.forEach(ruleName => {
             const ast = parse.clone(this.ast);
             const cheerioParsed = cheerio(
-                ast,
+                "<root></root>",
                 { xml: { xmlMode: true } }
-            );
+            ).append(ast);
             /**
              * Executes a rule function.
              * @param {Function} rule The loaded rule

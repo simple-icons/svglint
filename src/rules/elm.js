@@ -3,9 +3,9 @@ const logger = require("../lib/logger")("rule:elm");
 /**
  * @typedef {Object<string,Boolean|Number|Array<Number>>} ElmConfig
  * The key is used as selector. The value has the following meanings:  
- * - {Boolean} If true the selector must be matched. If false the selector must not be matched.  
- * - {Number} The number of elements the selector must resolve to. Must be exact.  
- * - {Array<Number>} The number of elements the selector resolves to must be between the first and the second number.
+ * - `{Boolean}` If true the selector must be matched. If false the selector must not be matched.  
+ * - `{Number}` The number of elements the selector must resolve to. Must be exact.  
+ * - `{Array<Number>}` The number of elements the selector resolves to must be between the first and the second number.
  * 
  * Note that if an element is disallowed by one rule, but allowed by another, it will be allowed.
  * This allows you to do e.g. `{ "title": false, "svg > title": true }`.

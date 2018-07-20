@@ -100,12 +100,12 @@ describe("Rule: elm", function(){
         });
     });
 
-    it("should succeed without a blacklist element", function(){
+    it("should succeed without a disallowed element", function(){
         return testSucceeds({
             "g > foobar": false,
         });
     });
-    it("should fail with a blacklist element", function(){
+    it("should fail with a disallowed element", function(){
         return testFails({
             "g > path": false
         });
