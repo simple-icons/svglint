@@ -118,6 +118,13 @@ class Linting extends EventEmitter {
                         }
                     });
                 });
+                if (rule.length === 0) {
+                    Promise.resolve()
+                        .then(() => {
+                            this._onRuleFinish(ruleName, this._generateReporter(ruleName));
+                        });
+                    this.logger.debug("Rule had no configs", Logger.colorize(ruleName));
+                }
             } else {
                 execute(rule, ruleName, result => {
                     this._onRuleFinish(ruleName, result);
