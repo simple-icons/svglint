@@ -107,7 +107,6 @@ class Linting extends EventEmitter {
             /** @type {Function|Function[]} */
             const rule = this.rules[ruleName];
             if (rule instanceof Array) {
-                // TODO: implement handling of multi-config rules
                 /** @type {Reporter[]} */
                 const results = [];
                 let activeRules = rule.length;

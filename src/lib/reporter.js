@@ -37,7 +37,7 @@ function generateResult(message, type, node, ast) {
         outp.message = message.stack || message.toString();
     }
     if (node) {
-        outp.message += `\n  At node ${chalk.bold("<"+node.name+">")} (${node.lineNum}:${node.lineIndex})`;
+        outp.message += `\n  At node ${chalk.bold("<"+node.name+">")} (${node.lineNum}:${node.columnNum})`;
     }
     return outp;
 }

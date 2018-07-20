@@ -60,7 +60,6 @@ function normalizeRules(rulesConfig) {
         // then convert each rule config into a rule func
         .forEach(
             ruleName => {
-                // TODO: error handling when invalid rule given
                 /** @type {RuleModule} */
                 let loadedRule;
                 try {
@@ -112,6 +111,7 @@ function normalizeConfig(config) {
  * @returns {Linting} The linting that represents the result
  */
 function lint(file, ast, config) {
+    logger.debug("AST:", ast);
     if (!ast.length && ast.source.trim() !== "") {
         throw new Error(`Unable to parse SVG from ${file || "API"}:
 ${ast.source}`);

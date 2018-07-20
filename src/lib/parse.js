@@ -68,7 +68,7 @@ module.exports = {
  * @property {Number} startIndex The string index at which the element starts
  * @property {Number} endIndex The string index at which the element ends
  * @property {Number} lineNum The line number at which the element starts
- * @property {Number} lineIndex The index in the line at which the element starts
+ * @property {Number} columnNum The index in the line at which the element starts
  * 
  * @property {Attributes} [attribs] An object of attributes on the Node
  * @property {AST} [children] The children of the Node
@@ -109,12 +109,12 @@ function normalizeNode(node, source) {
             // make sure newline text nodes are set to start on the proper line
             ((node.type === "text" && node.data.startsWith("\n")) ? -1 : 0))
     ) + 1;
-    node.lineIndex = node.startIndex - lineStart;
+    node.columnNum = node.startIndex - lineStart;
 
     // calculate the line number
     let numLines = 0;
-    let lineIndex = lineStart;
-    while ((lineIndex = source.lastIndexOf("\n", lineIndex - 1)) !== -1) {
+    let columnNum = lineStart;
+    while ((columnNum = source.lastIndexOf("\n", columnNum - 1)) !== -1) {
         ++numLines;
     }
     node.lineNum = numLines;

@@ -88,7 +88,7 @@ class ReporterDisplay {
         const type = msg.type;
         const meta = MSG_META[type];
         const prefix = `  ${meta.color(meta.symbol + " " + this.reporter.name)}${msg._node
-            ? chalk.gray.dim(` ${msg._node.lineNum}:${msg._node.lineIndex}`)
+            ? chalk.gray.dim(` ${msg._node.lineNum}:${msg._node.columnNum}`)
             : ""
         } `;
         const prefixLength = stripAnsi(prefix).length;
