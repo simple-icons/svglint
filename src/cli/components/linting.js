@@ -66,6 +66,7 @@ module.exports = class LintingDisplay {
     renderReporters() {
         const outp = flattenReporters(this.linting.results)
             .map(reporter => new ReporterDisplay(reporter))
+            .filter(display => display.shouldDisplay())
             .join("\n");
         if (outp.length) {
             return "\n" + outp;
@@ -82,6 +83,10 @@ module.exports = class LintingDisplay {
 class ReporterDisplay {
     constructor(reporter) {
         this.reporter = reporter;
+    }
+
+    shouldDisplay() {
+        return !!this.reporter.messages.length;
     }
 
     formatMsg(msg) {

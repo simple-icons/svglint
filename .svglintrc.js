@@ -1,5 +1,11 @@
 module.exports = {
     rules: {
-        custom: []
+        attr: {
+            "rule::selector": "path",
+            "d": true,
+        },
+        elm: {
+            "g": true,
+        }
     }
 };

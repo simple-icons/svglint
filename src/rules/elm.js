@@ -103,7 +103,6 @@ function executeRule(selector, config, $) {
             }
         ));
     }
-    logger.debug("outputting", outp);
     return outp;
 }
 

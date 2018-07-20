@@ -3,12 +3,19 @@
 Lints SVG files. Can be run as a commandline utility, or as a NodeJS library.
 
 ```
-$ svglint file.svg
+$ svglint test/svgs/*
 
-                                     FILES                                     
-✖ test/svgs/attr-root-1.svg
-    attr/root: Failed on "role"; expected one of [ 'img', 'progressbar' ]
-    attr/root: Failed on "foo"; unexpected attributes not allowed
-    attr/root: Failed on "xmlns": must be set
-    attr/root: Failed on "rule::whitelist": must be set
+------------------------------------ Files ------------------------------------
+✓ test/svgs/attr.test.svg
+x test/svgs/elm.test.svg
+   x attr 3:8 Expected attribute 'd', didn't find it
+                At node <path> (3:8)
+   x attr 4:8 Expected attribute 'd', didn't find it
+                At node <path> (4:8)
+x test/svgs/empty.svg
+   x elm Expected 'g', none found
+
+----------------------------------- Summary -----------------------------------
+✓ 1 valid files.
+x 2 invalid files.
 ```
