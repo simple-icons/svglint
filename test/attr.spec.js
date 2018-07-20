@@ -51,8 +51,11 @@ function inspect(obj) {
  * @returns {Promise<void>} Throws if linting fails
  */
 function testSucceeds(config, svg=testSVG) {
+    const _config = {
+        rules: { attr: config },
+    };
     return new Promise((res, rej) => {
-        const linting = SVGLint.lintSource(svg, config);
+        const linting = SVGLint.lintSource(svg, _config);
         linting.on("done", () => {
             if (linting.state === linting.STATES.success) {
                 res();
@@ -158,8 +161,8 @@ describe("Rule: attr", function(){
         return testSucceeds({
             "role": ["img", "progressbar"],
             "viewBox": true,
-            "id": "foo",
-            "d": true,
+            "rule::selector": "svg",
+            "rule::whitelist": true,
         });
     });
     it("should fail in whitelist-mode when not all attributes are allowed", function(){
@@ -167,6 +170,8 @@ describe("Rule: attr", function(){
             "role": ["img", "progressbar"],
             "viewBox": true,
             "id": "foo",
+            "rule::selector": "svg",
+            "rule::whitelist": true,
         });
     });
     it("should succeed in whitelist-mode without attributes", function(){
