@@ -1,6 +1,6 @@
 {
   "name": "svglint",
-  "version": "0.9.1-RC",
+  "version": "1.0.0",
   "description": "Linter for SVGs",
   "main": "src/svglint.js",
   "bin": {
