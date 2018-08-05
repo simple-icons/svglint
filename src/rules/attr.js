@@ -5,10 +5,11 @@ const logger = require("../lib/logger")("rule:attr");
 /** @typedef {import("../lib/parse.js").Node} Node */
 
 /**
- * @typedef {Object<string,string|string[]|boolean>} AttrConfig
+ * @typedef {Object<string,string|string[]|boolean|RegExp>} AttrConfig
  * The key represents the attribute name. The value has the following meanings:  
  * - `{Boolean}` If true, the attr must exist. If false, it must not exist.  
  * - `{String}` The attr value must match this exactly. It must also exist.
+ * - `{RegExp}` The attr value must match the regex.
  * - `{Array<String>}` The attr value must be one of these. It must also exist.
  * 
  * The following special configs are allowed:
@@ -95,6 +96,15 @@ function executeOnElm($elm, config, reporter, ast) {
                                 `Expected attribute '${attrib}' to be one of ${
                                     JSON.stringify(expected)
                                 }, was "${value}"`,
+                                $elm,
+                                ast
+                            );
+                        }
+                    } else if (expected instanceof RegExp) {
+                        handled = true;
+                        if (!expected.test(value)) {
+                            reporter.error(
+                                `Expected attribute '${attrib}' to match ${expected}, was "${value}"`,
                                 $elm,
                                 ast
                             );
