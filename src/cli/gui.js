@@ -42,16 +42,30 @@ module.exports = class GUI {
         if (this.ci) {
             console.log(this.render());
         } else {
-            this.update();
+            this.update(true);
         }
     }
 
     /**
      * Re-renders the GUI.
      * Should be called any time anything has changed.
+     * @param {Boolean} force If true, don't debounce
      */
-    update() {
+    update(force = false) {
         if (this.ci) { return; }
+        clearTimeout(this._updateDebounce);
+        if (force) {
+            this._update();
+        } else {
+            this._updateDebounce = setTimeout(() => this._update(), 50);
+        }
+    }
+
+    /**
+     * Actually re-renders the GUI, without debouncing.
+     * Shouldn't be called by an external user, unless they know what they're doing.
+     */
+    _update() {
         logUpdate(this.render());
 
         // animate if we should
@@ -75,10 +89,13 @@ module.exports = class GUI {
             );
         }
         if (this.$lintings.length) {
+            let $lintings = this.$lintings.filter(
+                $linting => $linting.linting.state !== $linting.linting.STATES.success
+            );
             outp.push(
                 "",
                 this.$titles.lints,
-                this.$lintings
+                $lintings
                     .join("\n"),
             );
         }

@@ -48,7 +48,7 @@ class Linting extends EventEmitter {
         this.path = file;
         /** The current state of the linting */
         this.state = STATES.linting;
-        /** If false, the linting has at least one rule that errored when executing */
+        /** If false, the linting has at least one rule that threw when executing */
         this.valid = true;
         /** The name used for logging/human consumption */
         this.name = file
