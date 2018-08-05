@@ -8,8 +8,8 @@ const fs = require("fs");
  * @param {String} folder The folder to look in
  * @returns {Promise<String,Boolean>} The path to the configuration file, or false
  */
-function getConfigurationFile(filename=".svglintrc.js", folder=__dirname) {
-    let resolved = path.isAbsolute(filename)
+function getConfigurationFile(filename=".svglintrc.js", folder=process.cwd()) {
+    const resolved = path.isAbsolute(filename)
         ? filename
         : path.resolve(folder, filename);
     return new Promise((res,rej)=>{
@@ -20,7 +20,7 @@ function getConfigurationFile(filename=".svglintrc.js", folder=__dirname) {
             } else {
                 const parent = path.resolve(folder, "..");
                 if (parent === folder) {
-                    return rej(new Error("Config file not found"));
+                    return rej(new Error(`Config file not found at '${resolved}'`));
                 }
                 // if not, get next folder
                 getConfigurationFile(
