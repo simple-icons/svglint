@@ -20,12 +20,6 @@ process.on("uncaughtException", err => {
     logger.error(err);
     process.exit(1);
 });
-let shouldFinishGUI = false;
-process.on("exit", () => {
-    if (shouldFinishGUI) {
-        GUI.finish();
-    }
-});
 
 // Generates the CLI binding using meow
 const cli = meow({
@@ -48,7 +42,10 @@ const cli = meow({
     }
 });
 
-shouldFinishGUI = true;
+process.on("exit", () => {
+    GUI.finish();
+});
+
 /** CLI main function */
 (async function(){
     if (cli.flags.debug) {
