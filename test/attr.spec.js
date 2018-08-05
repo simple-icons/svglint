@@ -141,6 +141,25 @@ describe("Rule: attr", function(){
         });
     });
 
+    it("should succeed with a valid value when given regex", function(){
+        return testSucceeds({
+            "role": /^im.$/,
+            "rule::selector": "svg",
+        });
+    });
+    it("should fail with an invalid value when given regex", function(){
+        return testFails({
+            "role": /^.im$/,
+            "rule::selector": "svg",
+        });
+    });
+    it("should fail with a non-existant attribute when given regex", function(){
+        return testFails({
+            "foo": /^img$/,
+            "rule::selector": "svg",
+        });
+    });
+
     it("should default to wildcard selector", function(){
         return testFails({
             "id": false,
