@@ -63,13 +63,13 @@ function executeOnElm($elm, config, reporter, ast) {
     Object.keys(attrs).forEach(
         attrib => {
             const value = attrs[attrib];
-            const conf = config[attrib];
+            const expected = config[attrib];
             let handled = false;
             // check each type
-            switch (typeof conf) {
+            switch (typeof expected) {
                 case "boolean":
                     handled = true;
-                    if (conf === false) {
+                    if (expected === false) {
                         reporter.error(
                             `Attribute '${attrib}' is disallowed`,
                             $elm,
@@ -79,21 +79,21 @@ function executeOnElm($elm, config, reporter, ast) {
                     break;
                 case "string":
                     handled = true;
-                    if (value !== config) {
+                    if (value !== expected) {
                         reporter.error(
-                            `Expected attribute '${attrib}' to be "${conf}", was "${value}"`,
+                            `Expected attribute '${attrib}' to be "${expected}", was "${value}"`,
                             $elm,
                             ast
                         );
                     }
                     break;
                 case "object":
-                    if (conf instanceof Array) {
+                    if (expected instanceof Array) {
                         handled = true;
-                        if (!conf.includes(value)) {
+                        if (!expected.includes(value)) {
                             reporter.error(
                                 `Expected attribute '${attrib}' to be one of ${
-                                    JSON.stringify(conf)
+                                    JSON.stringify(expected)
                                 }, was "${value}"`,
                                 $elm,
                                 ast
@@ -102,7 +102,7 @@ function executeOnElm($elm, config, reporter, ast) {
                     } else {
                         reporter.warn(
                             `Unknown config for attribute '${attrib}' (${
-                                JSON.stringify(conf)
+                                JSON.stringify(expected)
                             }), ignoring`,
                             $elm,
                             ast
