@@ -49,7 +49,10 @@ function executeOnElm($elm, config, reporter, ast) {
             if (SPECIAL_ATTRIBS.includes(attrib)) { return; }
             // if it must exist
             const conf = config[attrib];
-            if (conf === true || conf instanceof Array || typeof conf === "string") {
+            if (conf === true 
+                    || conf instanceof Array
+                    || typeof conf === "string"
+                    || conf instanceof RegExp) {
                 if (attrs[attrib] === undefined) {
                     reporter.error(
                         `Expected attribute '${attrib}', didn't find it`,
