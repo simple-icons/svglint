@@ -54,7 +54,10 @@ module.exports = class GUI {
     update(force = false) {
         if (this.ci) { return; }
         clearTimeout(this._updateDebounce);
-        if (force) {
+        this._lastUpdate = this._lastUpdate || 0;
+        const cur = Date.now();
+        const exceededTimeout = (cur - this._lastUpdate) > 50;
+        if (exceededTimeout || force) {
             this._update();
         } else {
             this._updateDebounce = setTimeout(() => this._update(), 50);
@@ -66,6 +69,7 @@ module.exports = class GUI {
      * Shouldn't be called by an external user, unless they know what they're doing.
      */
     _update() {
+        this._lastUpdate = Date.now();
         logUpdate(this.render());
 
         // animate if we should
