@@ -53,9 +53,9 @@ process.on("exit", () => {
         Logger.setLevel(Logger.LEVELS.debug);
     }
     GUI.setCI(cli.flags.ci);
-    const _files = cli.input.map(v => path.resolve(process.cwd(), v))
-                            .map(v => glob.sync(v));
-    const files = Array.prototype.concat(..._files); // flattens the array
+    const files = cli.input.map(v => glob.sync(v))
+                           .reduce((a, v) => a.concat(v), [])
+                           .map(v => path.resolve(process.cwd(), v));
 
     // load the config
     let configObj;
