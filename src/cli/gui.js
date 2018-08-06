@@ -96,12 +96,14 @@ module.exports = class GUI {
             let $lintings = this.$lintings.filter(
                 $linting => $linting.linting.state !== $linting.linting.STATES.success
             );
-            outp.push(
-                "",
-                this.$titles.lints,
-                $lintings
-                    .join("\n"),
-            );
+            if ($lintings.length) {
+                outp.push(
+                    "",
+                    this.$titles.lints,
+                    $lintings
+                        .join("\n"),
+                );
+            }
         }
         outp.push(
             "",

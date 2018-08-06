@@ -21,9 +21,6 @@ process.on("uncaughtException", err => {
     logger.error(err);
     process.exit(1);
 });
-process.on("exit", () => {
-    GUI.finish();
-});
 
 // Generates the CLI binding using meow
 const cli = meow({
@@ -44,6 +41,10 @@ const cli = meow({
         debug: { type: "boolean", alias: "d" },
         ci: { type: "boolean", alias: "C" }
     }
+});
+
+process.on("exit", () => {
+    GUI.finish();
 });
 
 /** CLI main function */
