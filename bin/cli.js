@@ -12,6 +12,7 @@ const meta = require("../package.json");
 const { getConfigurationFile } = require("../src/cli/config");
 const meow = require("meow");
 const chalk = require("chalk");
+const glob = require("glob");
 
 const logger = Logger("");
 // Pretty logs all errors, then exits
@@ -28,7 +29,7 @@ const cli = meow({
     help: `
         ${chalk.yellow("Usage:")}
             ${chalk.bold("svglint")} [--config config.js] [--ci] [--debug] ${chalk.bold("file1.svg file2.svg")}
-        
+
         ${chalk.yellow("Options:")}
             ${chalk.bold("--help")}        Display this help text
             ${chalk.bold("--version")}     Show the current SVGLint version
@@ -52,7 +53,9 @@ process.on("exit", () => {
         Logger.setLevel(Logger.LEVELS.debug);
     }
     GUI.setCI(cli.flags.ci);
-    const files = cli.input.map(v => path.resolve(process.cwd(), v));
+    const files = cli.input.map(v => glob.sync(v))
+                           .reduce((a, v) => a.concat(v), [])
+                           .map(v => path.resolve(process.cwd(), v));
 
     // load the config
     let configObj;
