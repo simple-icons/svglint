@@ -80,6 +80,9 @@ function executeRule(selector, config, $) {
             } else {
                 allowed = false;
                 message = `Found ${matches.length} elements for '${selector}', expected ${config}`;
+                if (!matches.length) {
+                    matches.push({ elm: null, message: "" });
+                }
             }
             break;
         default:
