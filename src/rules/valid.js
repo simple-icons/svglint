@@ -1,4 +1,4 @@
-const logger = require("../lib/logger")("rule:attr");
+const logger = require("../lib/logger")("rule:valid");
 const xmlParser = require("fast-xml-parser");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
@@ -29,7 +29,6 @@ module.exports = {
             if (!enabled) {
                 return;
             }
-            console.log('hoi', enabled)
             const result = xmlParser.validate(ast.source);
             if (result !== true) {
                 reporter.error(result.err.msg, ast[0], ast);
