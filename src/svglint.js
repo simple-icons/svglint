@@ -43,7 +43,7 @@ const logger = require("./lib/logger.js")("");
 /** @type Config */
 const DEFAULT_CONFIG = Object.freeze({
     useSvglintRc: true,
-    rules: {},
+    rules: {valid: true},
     ignore: [],
 });
 
