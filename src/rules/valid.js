@@ -14,7 +14,7 @@ const xmlParser = require("fast-xml-parser");
 module.exports = {
     /**
      * Generates a linting function from a config
-     * @param {boolean} config
+     * @param {Boolean} config
      */
     generate(enabled) {
         /**
@@ -31,7 +31,7 @@ module.exports = {
             }
             const result = xmlParser.validate(ast.source);
             if (result !== true) {
-                reporter.error(result.err.msg, ast[0], ast);
+                reporter.error(result.err.msg, null, ast);
             }
         };
     }
