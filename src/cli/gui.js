@@ -40,6 +40,7 @@ module.exports = class GUI {
      */
     finish() {
         if (this.ci) {
+            // eslint-disable-next-line no-console
             console.log(this.render());
         } else {
             this.update(true);
@@ -101,7 +102,7 @@ module.exports = class GUI {
                     "",
                     this.$titles.lints,
                     $lintings
-                        .join("\n"),
+                        .join("\n")
                 );
             }
         }

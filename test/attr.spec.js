@@ -88,14 +88,6 @@ function testFails(config, svg=testSVG) {
         });
     });
 }
-const testConfig = {
-    role: ["img", "progressbar"], // role must be one of ["img","progressbar"]
-    viewBox: "0 0 24 24",         // viewBox must be "0 0 24 24"
-    xmlns: true,                  // xmlns must be set
-    width: false,                 // width must not be set
-    // "rule::whitelist": true       // no other attributes can be set
-    "rule::selector": "svg"
-};
 
 describe("Rule: attr", function(){
     it("should succeed without config", function(){

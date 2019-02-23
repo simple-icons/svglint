@@ -58,5 +58,5 @@ describe(".lintFile()", function() {
                     expect(linting.state).toBe(linting.STATES.success);
                 });
             });
-    })
+    });
 });
