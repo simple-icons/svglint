@@ -19,16 +19,10 @@ function inspect(obj) {
 /**
  * Tests that a config succeeds when ran
  * @param {String} svg The SVG to lint
- * @param {Boolean} enabled Is validation enabled
+ * @param {Object} [config] The config to test
  * @returns {Promise<void>} Throws if linting fails
  */
-function testSucceeds(svg, enabled) {
-    let config = { };
-    if (enabled !== undefined) {
-        config = {
-            rules: { valid: enabled },
-        };
-    }
+function testSucceeds(svg, config=undefined) {
     return new Promise((res, rej) => {
         const linting = SVGLint.lintSource(svg, config);
         linting.on("done", () => {
@@ -44,16 +38,10 @@ function testSucceeds(svg, enabled) {
 /**
  * Tests that a config fails when ran
  * @param {String} svg The SVG to lint
- * @param {Boolean} enabled Is validation enabled
+ * @param {Object} [config] The config to test
  * @returns {Promise<void>} Throws if the linting doesn't fail
  */
-function testFails(svg, enabled) {
-    let config = { };
-    if (enabled !== undefined) {
-        config = {
-            rules: { valid: enabled },
-        };
-    }
+function testFails(svg, config=undefined) {
     return new Promise((res, rej) => {
         const linting = SVGLint.lintSource(svg, config);
         linting.on("done", () => {
@@ -75,13 +63,13 @@ describe("Rule: valid", function(){
             </g>
             <g></g>
             <circle></circle>
-        </svg>`);
+        </svg>`, { rules: {} });
     });
     it("should fail by default for an invalid SVG", function(){
         return testFails(`<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>
           <path "M20.013 10.726l.001-.028A6.346"/>
-        </svg>`);
+        </svg>`, { rules: {} });
     });
 
     it("should succeed when enabled for a valid SVG", function(){
@@ -91,13 +79,13 @@ describe("Rule: valid", function(){
             </g>
             <g></g>
             <circle></circle>
-        </svg>`, true);
+        </svg>`, { rules: { valid: true } });
     });
     it("should fail when enabled for an invalid SVG", function(){
         return testFails(`<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>
           <path "M20.013 10.726l.001-.028A6.346"/>
-        </svg>`, true);
+        </svg>`, { rules: { valid: true } });
     });
 
     it("should succeed when disabled for a valid SVG", function(){
@@ -107,12 +95,12 @@ describe("Rule: valid", function(){
             </g>
             <g></g>
             <circle></circle>
-        </svg>`, false);
+        </svg>`, { rules: { valid: false } });
     });
     it("should succeed when disabled for an invalid SVG", function(){
         return testSucceeds(`<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>
           <path "M20.013 10.726l.001-.028A6.346"/>
-        </svg>`, false);
+        </svg>`, { rules: { valid: false } });
     });
 });
