@@ -14,7 +14,7 @@ const logger = require("./lib/logger.js")("");
 /** @typedef {import("./lib/rule-loader.js").RuleModule} RuleModule */
 
 /**
- * @typedef {Object<string,Object<string,*>|false>} RulesConfig
+ * @typedef {Object<string,any>} RulesConfig
  * An object with each key representing a rule name, and each value representing
  *   a rule config.
  * If the rule config is set to `false`, then the rule is disabled (useful for
@@ -43,7 +43,7 @@ const logger = require("./lib/logger.js")("");
 /** @type Config */
 const DEFAULT_CONFIG = Object.freeze({
     useSvglintRc: true,
-    rules: {},
+    rules: { valid: true },
     ignore: [],
 });
 
@@ -98,6 +98,7 @@ function normalizeConfig(config) {
         DEFAULT_CONFIG,
         config,
     );
+    defaulted.rules = Object.assign({}, DEFAULT_CONFIG.rules, config.rules);
     /** @type NormalizedConfig */
     const outp = {
         rules: normalizeRules(defaulted.rules),
