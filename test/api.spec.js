@@ -35,22 +35,28 @@ describe(".lintSource()", function() {
 describe(".lintFile()", function() {
     it("should resolve with empty SVG", function() {
         return SVGLint.lintFile(path.join(__dirname, "./svgs/empty.svg"), {})
-            .then(result => {
-                expect(result.state).toBe(result.STATES.success);
+            .then(linting => {
+                linting.on("done", () => {
+                    expect(linting.state).toBe(linting.STATES.success);
+                });
             });
     });
 
     it("should resolve with relative path", function() {
         SVGLint.lintFile("./test/svgs/empty.svg", {})
-            .then(result => {
-                expect(result.state).toBe(result.STATES.success);
+            .then(linting => {
+                linting.on("done", () => {
+                    expect(linting.state).toBe(linting.STATES.success);
+                });
             });
     });
 
     it("should resolve with absolute path", function() {
         return SVGLint.lintFile(path.join(__dirname, "./svgs/empty.svg"), {})
-            .then(result => {
-                expect(result.state).toBe(result.STATES.success);
+            .then(linting => {
+                linting.on("done", () => {
+                    expect(linting.state).toBe(linting.STATES.success);
+                });
             });
     })
 });

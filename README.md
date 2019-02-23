@@ -30,8 +30,13 @@ The tool can also be used through the JS API.
 
 ```javascript
 const SVGLint = require("svglint");
-SVGLint.lintSource("<svg>...</svg>", {
+const linting = SVGLint.lintSource("<svg>...</svg>", {
     // ... config goes here
+});
+linting.on("done", () => {
+    if (!linting.valid) {
+        console.log("You've been a naughty boy!");
+    }
 });
 ```
 
