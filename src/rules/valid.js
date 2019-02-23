@@ -29,6 +29,10 @@ module.exports = {
             if (!enabled) {
                 return;
             }
+            if (!ast.source) {
+                logger.debug("Encountered empty SVG. Considering valid");
+                return;
+            }
             const result = xmlParser.validate(ast.source);
             if (result !== true) {
                 reporter.error(result.err.msg, null, ast);
