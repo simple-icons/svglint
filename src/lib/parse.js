@@ -136,7 +136,7 @@ function normalizeAST(ast, source) {
     const handleNode = node => {
         normalizeNode(node, source);
         if (node.children) {
-            node.children.forEach(node => handleNode);
+            node.children.forEach(handleNode);
         }
     };
     ast.forEach(handleNode);
