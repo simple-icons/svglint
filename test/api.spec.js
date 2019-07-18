@@ -25,6 +25,14 @@ describe(".lintSource()", function() {
         });
     });
 
+    it("should succeed with empty first line", function(done) {
+        const result = SVGLint.lintSource("\n" + svg, {});
+        result.on("done", () => {
+            expect(result.state).toBe(result.STATES.success);
+            done();
+        });
+    });
+
     it("should throw with malformed SVG", function() {
         expect(() => {
             SVGLint.lintSource("<svg<path", {});
