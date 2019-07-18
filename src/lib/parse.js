@@ -90,11 +90,12 @@ module.exports = {
  */
 function sourceToAST(source) {
     // @ts-ignore
-    return Parser.parseDOM(source, {
+    const outp = Parser.parseDOM(source, {
         withStartIndices: true,
         withEndIndices: true,
         xmlMode: true,
     });
+    return outp;
 }
 
 /**
@@ -116,7 +117,7 @@ function normalizeNode(node, source) {
     // calculate the line number
     let numLines = 0;
     let columnNum = lineStart;
-    while ((columnNum = source.lastIndexOf("\n", columnNum - 1)) !== -1) {
+    while ((columnNum = source.lastIndexOf("\n", columnNum - 1)) !== -1 && columnNum > 0) {
         ++numLines;
     }
     node.lineNum = numLines;
@@ -135,7 +136,7 @@ function normalizeAST(ast, source) {
     const handleNode = node => {
         normalizeNode(node, source);
         if (node.children) {
-            node.children.forEach(handleNode);
+            node.children.forEach(node => handleNode);
         }
     };
     ast.forEach(handleNode);
