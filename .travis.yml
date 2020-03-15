@@ -3,6 +3,7 @@ node_js:
   - "node"
 
 script:
+  - npm lint
   - npm test
 
 notifications:

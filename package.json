@@ -1,8 +1,9 @@
 {
   "name": "svglint",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Linter for SVGs",
   "main": "src/svglint.js",
+  "types": "lib/svglint.d.ts",
   "bin": {
     "svglint": "./bin/cli.js"
   },
@@ -15,9 +16,17 @@
   ],
   "author": "birjolaxew",
   "license": "CC0",
+  "files": [
+    "lib/**/*"
+  ],
   "scripts": {
-    "lint": "eslint src/**/*.js test/**/*.js",
-    "test": "mocha"
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
+    "lint": "prettier --check \"src/**/*.js\" \"test/**/*.js\" && tslint -p tsconfig.json",
+    "test": "mocha",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
     "ansi-regex": "^3.0.0",
@@ -31,8 +40,26 @@
     "strip-ansi": "^4.0.0"
   },
   "devDependencies": {
-    "eslint": "^5.14.1",
-    "expect": "^1.20.2",
-    "mocha": "^5.2.0"
+    "@types/jest": "^25.1.4",
+    "jest": "^25.1.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^25.2.1",
+    "tslint": "^6.1.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.8.3"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(t|j)sx?$": "ts-jest"
+    },
+    "testRegex": "\\.spec\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
   }
 }
