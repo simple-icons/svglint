@@ -7,7 +7,7 @@ import type { GuiComponent } from "../types";
  * A separator between sections.
  * Optionally includes a title which will be displayed centered in the separator.
  */
-module.exports = class Separator implements GuiComponent {
+export default class Separator implements GuiComponent {
     title: string;
     constructor(title="") {
         this.title = title;

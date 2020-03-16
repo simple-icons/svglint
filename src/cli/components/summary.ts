@@ -8,7 +8,7 @@ type Linting = any;
 /** @typedef {import("../../lib/linting.js")} Linting */
 
 /** A summary of all lintings. */
-module.exports = class Summary implements GuiComponent {
+export default class Summary implements GuiComponent {
     lintings: Linting[];
 
     constructor() {

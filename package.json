@@ -34,7 +34,7 @@
     "fast-xml-parser": "^3.12.13",
     "glob": "^7.1.2",
     "htmlparser2": "^3.9.1",
-    "log-update": "^2.3.0",
+    "log-update": "^4.0.0",
     "meow": "^3.7.0",
     "strip-ansi": "^6.0.0"
   },
