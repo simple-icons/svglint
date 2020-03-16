@@ -36,7 +36,7 @@
     "htmlparser2": "^3.9.1",
     "log-update": "^2.3.0",
     "meow": "^3.7.0",
-    "strip-ansi": "^4.0.0"
+    "strip-ansi": "^6.0.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",

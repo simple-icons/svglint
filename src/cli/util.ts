@@ -18,7 +18,7 @@ export const MSG_META = Object.freeze({
 
     // lintings
     linting: Object.freeze({
-        symbol: null,
+        symbol: "",
         color: chalk.gray.dim,
     }),
     success: Object.freeze({

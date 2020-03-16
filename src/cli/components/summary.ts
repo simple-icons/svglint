@@ -1,26 +1,27 @@
-const chalk = require("chalk");
-const { MSG_META } = require("../util");
+import chalk from "chalk";
+import { MSG_META } from "../util";
 
+import type { GuiComponent } from "../types";
+
+// TODO: remove once linting has been rewritten to TS
+type Linting = any;
 /** @typedef {import("../../lib/linting.js")} Linting */
 
-/**
- * A summary of all lintings.
- */
-module.exports = class Summary {
+/** A summary of all lintings. */
+module.exports = class Summary implements GuiComponent {
+    lintings: Linting[];
+
     constructor() {
         this.lintings = [];
     }
 
-    /** Adds a linting to the summary.
-     * @param {Linting} linting */
-    addLinting(linting) {
+    /** Adds a linting to the summary.  */
+    addLinting(linting: Linting) {
         this.lintings.push(linting);
     }
 
-    /** Gets the number of Listings with the given state
-     * @param {"linting"|"success"|"warn"|"error"} state The state to look for
-     */
-    getNumberWithState(state) {
+    /** Gets the number of Listings with the given state */
+    getNumberWithState(state: "linting"|"success"|"warn"|"error") {
         return this.lintings.filter(
             linting => linting.state === linting.STATES[state]
         ).length;
