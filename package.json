@@ -23,13 +23,12 @@
     "build": "tsc",
     "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\"",
     "lint": "prettier --check \"src/**/*.js\" \"test/**/*.js\" && tslint -p tsconfig.json",
-    "test": "mocha",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
+    "test": "jest",
+    "prepublishOnly": "npm test && npm run lint && npm run build",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
-    "ansi-regex": "^3.0.0",
+    "ansi-regex": "^5.0.0",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.2",
     "fast-xml-parser": "^3.12.13",
