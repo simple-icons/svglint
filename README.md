@@ -67,7 +67,7 @@ module.exports = {
 };
 ```
 
-For specifics on how the config for each rule should be formatted, see [their specific rule files](/src/rules/).
+For specifics on how the config for each rule should be formatted, see [their specific rule files](https://github.com/birjolaxew/svglint/tree/master/src/rules).
 
 If you are using the JS API, this configuration object is passed as the second parameter.
 
