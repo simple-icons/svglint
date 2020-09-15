@@ -31,8 +31,15 @@
     "strip-ansi": "^4.0.0"
   },
   "devDependencies": {
+    "commitizen": "^4.2.1",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^5.14.1",
     "expect": "^1.20.2",
     "mocha": "^5.2.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
