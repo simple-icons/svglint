@@ -7,6 +7,7 @@
 import chalk from "chalk";
 import { inspect } from "util";
 import { EventEmitter } from "events";
+import type { MSG_META } from "../cli/util";
 
 const COLORS = Object.freeze({
     debug: chalk.dim.gray,
@@ -20,11 +21,17 @@ export enum LEVELS {
     warn,
     error,
 }
+type TYPES = keyof typeof MSG_META;
 
 // WrappedConsole is used to collect a history of logs, and emit them as events
 class WrappedConsole extends EventEmitter {
     // the messages that have been emitted so far
-    messages: { prefix: string; args: any[]; level: LEVELS }[] = [];
+    messages: {
+        prefix: string;
+        args: any[];
+        level: LEVELS;
+        type: TYPES;
+    }[] = [];
     // indicates whether our logger is outputting to our CLI GUI
     isCLI = false;
     // indicates the minimum level that we'll actually log
@@ -39,9 +46,10 @@ class WrappedConsole extends EventEmitter {
             return;
         }
 
+        const levelName = LEVELS[level] as keyof typeof LEVELS;
+
         // if we don't have a CLI, just log (with color)
         if (!this.isCLI) {
-            const levelName = LEVELS[level] as keyof typeof LEVELS;
             const color = COLORS[levelName] || ((v: string) => v);
             console[levelName].apply(console, [color(`[${prefix}]`, ...args)]);
             return;
@@ -51,6 +59,7 @@ class WrappedConsole extends EventEmitter {
             prefix: prefix.replace(/^SVGLint ?/, ""),
             args,
             level,
+            type: LEVELS[level] as keyof typeof LEVELS,
         };
         this.messages.push(msg);
         this.emit("msg", msg);

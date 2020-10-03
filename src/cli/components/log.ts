@@ -2,9 +2,9 @@ import nodeUtil = require("util");
 import { MSG_META } from "../util";
 
 import type { GuiComponent, LintingMessage } from "../types";
+import { logger } from "../../lib/logger";
 // TODO: remove once logger has been rewritten to TS
-type CliHistory = any;
-/** @typedef {import("../../lib/logger.js").CliConsole} CliHistory */
+type CliHistory = typeof logger;
 
 /** Stringifies a list of data into a colorized single line */
 function stringifyArgs(args: any[] = []) {
@@ -27,13 +27,18 @@ export default class Log implements GuiComponent {
 
     toString() {
         return this.logs.messages
-            .map((msg: LintingMessage) => {
+            .map((msg) => {
                 const meta = MSG_META[msg.type];
-                const prefix = msg.prefix
-                    ? `[${meta.symbol}|${msg.prefix}]`
-                    : `(${meta.symbol})`;
-                const message = stringifyArgs(msg.args);
-                return meta.color(prefix) + " " + message;
+                try {
+                    const prefix = msg.prefix
+                        ? `[${meta.symbol}|${msg.prefix}]`
+                        : `(${meta.symbol})`;
+                    const message = stringifyArgs(msg.args);
+                    return meta.color(prefix) + " " + message;
+                } catch (e) {
+                    console.log("msg", msg);
+                    throw e;
+                }
             })
             .join("\n");
     }
