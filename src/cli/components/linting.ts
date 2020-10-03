@@ -2,22 +2,19 @@ import chalk from "chalk";
 import { chunkString, MSG_META, COLUMNS } from "../util";
 import stripAnsi = require("strip-ansi");
 
-import type { GuiComponent, LintingMessage } from "../types";
+import type { GuiComponent } from "../types";
 import Spinner from "./spinner";
 
-// TODO: remove once reporter has been rewritten in TS
-type Reporter = any;
-type Linting = any;
-/** @typedef {import("../../lib/reporter.js")} Reporter */
-/** @typedef {import("../../lib/linting.js")} Linting */
+import Reporter, { Result, TYPES } from "../../lib/reporter";
+import Linting from "../../lib/linting";
 
 /**
  * Turns a results object into a flat array of Reporters, in a stable-sorted manner.
  * @param results The results from the Linting
  */
 export function flattenReporters(results: {
-    [k: string]: string | Reporter | Reporter[];
-}): Reporter[] {
+    [k: string]: Reporter | Reporter[];
+}) {
     const outp = [] as Reporter[];
     Object.keys(results)
         .sort()
@@ -50,8 +47,9 @@ export default class LintingDisplay implements GuiComponent {
     renderHeader(): string {
         const linting = this.linting;
         let symbol: string = "";
-        type states = keyof typeof MSG_META
+        type states = keyof typeof linting.STATES;
         for (let state of Object.keys(MSG_META) as states[]) {
+            if (state === "ignored") { continue; }
             if (linting.state === linting.STATES[state]) {
                 const meta = MSG_META[state];
                 symbol = meta.color(
@@ -93,9 +91,9 @@ class ReporterDisplay implements GuiComponent {
     }
 
     /** Formats a specific message into a string we'd like to display */
-    formatMsg(msg: LintingMessage) {
+    formatMsg(msg: Result) {
         const type = msg.type;
-        const meta = MSG_META[type];
+        const meta = MSG_META[TYPES[type] as keyof typeof TYPES];
         const prefix = `  ${meta.color(
             meta.symbol + " " + this.reporter.name
         )}${
@@ -114,7 +112,7 @@ class ReporterDisplay implements GuiComponent {
     }
 
     toString() {
-        const msgs = this.reporter.messages.map((msg: LintingMessage) => this.formatMsg(msg));
+        const msgs = this.reporter.messages.map((msg: Result) => this.formatMsg(msg));
         return msgs.join("\n");
     }
 }

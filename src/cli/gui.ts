@@ -5,17 +5,14 @@
  */
 
 import logUpdate = require("log-update");
-import Logger from "../lib/logger";
-const logHistory = Logger.cliConsole;
+import { setCLI, logger } from "../lib/logger";
 
 import Separator from "./components/separator";
 import Log from "./components/log";
 import LintingDisplay from "./components/linting";
 import Summary from "./components/summary";
 
-// TODO: replace once linting has been rewritten to TS
-type Linting = any;
-/** @typedef {import("../lib/linting.js")} Linting */
+import Linting from "../lib/linting";
 
 /** GUI is the human-friendly CLI interface that displays the status of a linting */
 export default class GUI {
@@ -31,8 +28,8 @@ export default class GUI {
 
     constructor() {
         // subscribe to global logs
-        Logger.setCLI(true);
-        logHistory.on("msg", () => this.update());
+        setCLI(true);
+        logger.on("msg", () => this.update());
 
         // generate one-shot components
         this.$titles = {
@@ -40,7 +37,7 @@ export default class GUI {
             lints: new Separator("Files"),
             summary: new Separator("Summary"),
         };
-        this.$log = new Log(logHistory);
+        this.$log = new Log(logger);
         this.$summary = new Summary();
         this.$lintings = [];
     }
@@ -102,7 +99,7 @@ export default class GUI {
     render() {
         const outp = [];
         // if we have log messages, add them at the start
-        if (logHistory.messages.length) {
+        if (logger.messages.length) {
             outp.push("", this.$titles.log, this.$log);
         }
         // then add lintings that are currently running

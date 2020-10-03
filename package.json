@@ -28,12 +28,14 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
+    "@types/cheerio": "^0.22.16",
     "ansi-regex": "^5.0.0",
     "chalk": "^2.4.1",
-    "cheerio": "^1.0.0-rc.2",
-    "fast-xml-parser": "^3.12.13",
+    "cheerio": "^1.0.0-rc.3",
+    "domhandler": "^3.0.0",
+    "fast-xml-parser": "^3.16.0",
     "glob": "^7.1.2",
-    "htmlparser2": "^3.9.1",
+    "htmlparser2": "^4.1.0",
     "log-update": "^4.0.0",
     "meow": "^3.7.0",
     "strip-ansi": "^6.0.0"
