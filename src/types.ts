@@ -1,14 +1,19 @@
 import type Reporter from "./lib/reporter";
 import type { AST } from "./lib/parse";
+import CheerioAPI from "cheerio";
 
 import type { Config as AttrConfig } from "./rules/attr";
 import type { Config as CustomConfig } from "./rules/custom";
 import type { Config as ElmConfig } from "./rules/elm";
 import type { Config as ValidConfig } from "./rules/valid";
 
+// TODO: remove once @types/cheerio is updated to export this directly
+export type Cheerio = ReturnType<typeof CheerioAPI.root>;
+export type CheerioElement = Parameters<typeof CheerioAPI.contains>[0];
+
 export type Rule = (
     reporter: Reporter,
-    $: CheerioAPI | Cheerio,
+    $: typeof CheerioAPI | Cheerio,
     ast: AST
 ) => Promise<void> | void;
 

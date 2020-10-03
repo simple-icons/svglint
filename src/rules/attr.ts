@@ -3,6 +3,8 @@ import { AST } from "../lib/parse";
 import Logger from "../lib/logger";
 const logger = Logger("rule:attr");
 
+import type { Cheerio, CheerioElement } from "../types";
+
 /**
  * The key represents the attribute name. The value has the following meanings:
  * - `{Boolean}` If true, the attr must exist. If false, it must not exist.
@@ -47,7 +49,7 @@ function executeOnElm(
     // check that all attributes that must exist do so
     Object.keys(config).forEach(attrib => {
         // do nothing with special configs
-        if (SPECIAL_ATTRIBS.includes(attrib)) {
+        if (SPECIAL_ATTRIBS.indexOf(attrib) !== -1) {
             return;
         }
         // if it must exist
@@ -97,7 +99,7 @@ function executeOnElm(
             case "object":
                 if (expected instanceof Array) {
                     handled = true;
-                    if (!expected.includes(value)) {
+                    if (expected.indexOf(value) === -1) {
                         reporter.error(
                             `Expected attribute '${attrib}' to be one of ${JSON.stringify(
                                 expected

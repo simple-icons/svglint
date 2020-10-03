@@ -3,6 +3,8 @@ import { AST } from "../lib/parse";
 import Logger from "../lib/logger";
 const logger = Logger("rule:elm");
 
+import type { Cheerio, CheerioElement } from "../types";
+
 /**
  * The key is used as selector. The value has the following meanings:
  * - `{Boolean}` If true the selector must be matched. If false the selector must not be matched.
@@ -168,7 +170,7 @@ export default function generate(config: Config) {
             disallowed.push(
                 ...execution.disallowed.filter(
                     result =>
-                        !allowedElms.includes(result.elm as CheerioElement)
+                        allowedElms.indexOf(result.elm as CheerioElement) === -1
                 )
             );
         });

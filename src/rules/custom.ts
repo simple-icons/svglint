@@ -3,6 +3,8 @@ import { AST } from "../lib/parse";
 import Logger from "../lib/logger";
 const logger = Logger("rule:elm");
 
+import type { Cheerio } from "../types";
+
 type CustomRule = (reporter: Reporter, cheerio: Cheerio, ast: AST) => void;
 export type Config = CustomRule;
 

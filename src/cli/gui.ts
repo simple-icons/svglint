@@ -60,7 +60,7 @@ export default class GUI {
         if (this.isCI) {
             return;
         }
-        clearTimeout(this._updateDebounce);
+        clearTimeout(this._updateDebounce as any);
         this._lastUpdate = this._lastUpdate || 0;
         const cur = Date.now();
         const exceededTimeout = cur - this._lastUpdate > 50;
@@ -84,7 +84,7 @@ export default class GUI {
 
         // animate if we should
         if (this.shouldAnimate()) {
-            clearTimeout(this._animTimeout);
+            clearTimeout(this._animTimeout as any);
             this._animTimeout = (setTimeout(
                 () => this.update(),
                 100

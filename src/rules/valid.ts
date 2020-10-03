@@ -4,6 +4,8 @@ import { validate } from "fast-xml-parser";
 import Logger from "../lib/logger";
 const logger = Logger("rule:valid");
 
+import type { Cheerio } from "../types";
+
 export type Config = boolean;
 
 /**

@@ -6,7 +6,9 @@
         "outDir": "./lib",
         "strict": true,
         "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "lib": ["ES2015"]
     },
     "include": ["src/**/*", "bin/**/*"],
     "exclude": ["node_modules/**/*", "test/**/*"]
