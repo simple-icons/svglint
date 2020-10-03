@@ -2,7 +2,9 @@
 
 Lints SVG files. Can be run as a commandline utility, or as a NodeJS library.
 
-<p align="center"><img src="/example.png" alt="Example of a commandline execution"/></p>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/birjolaxew/svglint/master/example.png" alt="Example of a commandline execution"/>
+</p>
 
 ## Usage
 
@@ -67,7 +69,7 @@ module.exports = {
 };
 ```
 
-For specifics on how the config for each rule should be formatted, see [their specific rule files](/src/rules/).
+For specifics on how the config for each rule should be formatted, see [their specific rule files](https://github.com/birjolaxew/svglint/tree/master/src/rules).
 
 If you are using the JS API, this configuration object is passed as the second parameter.
 
