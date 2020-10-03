@@ -6,7 +6,7 @@ import { EventEmitter } from "events";
 import chalk from "chalk";
 import Logger from "./logger";
 
-import type {Cheerio} from "../types";
+import type { Cheerio } from "../types";
 
 // TODO: replace on parser has been rewritten to TS
 type AST = any;

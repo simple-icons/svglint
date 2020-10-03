@@ -17,7 +17,7 @@ export function getConfigurationFile(
         : path.resolve(folder, filename);
 
     return new Promise((res, rej) => {
-        fs.exists(resolved, exists => {
+        fs.exists(resolved, (exists) => {
             if (exists) {
                 // if file exists, finalize
                 res(resolved);

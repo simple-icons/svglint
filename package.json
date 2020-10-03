@@ -5,7 +5,7 @@
     "main": "lib/svglint.js",
     "types": "lib/svglint.d.ts",
     "bin": {
-        "svglint": "./bin/cli.js"
+        "svglint": "./lib/bin/cli.js"
     },
     "keywords": [
         "svg",
@@ -45,7 +45,7 @@
         "@types/jest": "^25.1.4",
         "@types/meow": "^5.0.0",
         "jest": "^25.1.0",
-        "prettier": "^1.19.1",
+        "prettier": "^2.1.2",
         "ts-jest": "^25.2.1",
         "tslint": "^6.1.0",
         "tslint-config-prettier": "^1.18.0",

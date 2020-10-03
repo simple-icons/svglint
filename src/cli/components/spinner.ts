@@ -10,11 +10,11 @@ export default class Spinner implements GuiComponent {
 
     constructor() {
         this.i = 0;
-        //this.frames = ["---", "=--", "==-", "===", "-==", "--=", "---"];
+        // this.frames = ["---", "=--", "==-", "===", "-==", "--=", "---"];
         this.frames = ["'", ":", ".", ".", ":", "'"];
     }
     toString() {
         this.i = (this.i + 1) % this.frames.length;
         return this.frames[this.i];
     }
-};
+}

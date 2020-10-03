@@ -47,7 +47,7 @@ function executeOnElm(
 ) {
     const attrs = Object.assign({}, $elm.attribs);
     // check that all attributes that must exist do so
-    Object.keys(config).forEach(attrib => {
+    Object.keys(config).forEach((attrib) => {
         // do nothing with special configs
         if (SPECIAL_ATTRIBS.indexOf(attrib) !== -1) {
             return;
@@ -70,7 +70,7 @@ function executeOnElm(
         }
     });
     // check that all configs are met
-    Object.keys(attrs).forEach(attrib => {
+    Object.keys(attrs).forEach((attrib) => {
         const value = attrs[attrib];
         const expected = config[attrib];
         let handled = false;
@@ -165,6 +165,6 @@ export default function generate(config: Config) {
         const selector = config["rule::selector"] || "*";
         const $elms = $.find(selector).toArray();
         logger.debug("Found elms for selector", selector, $elms.length);
-        $elms.forEach($elm => executeOnElm($elm, config, reporter, ast));
+        $elms.forEach(($elm) => executeOnElm($elm, config, reporter, ast));
     };
 }

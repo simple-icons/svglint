@@ -9,7 +9,7 @@ type CliHistory = any;
 /** Stringifies a list of data into a colorized single line */
 function stringifyArgs(args: any[] = []) {
     return args
-        .map(v =>
+        .map((v) =>
             (typeof v === "string"
                 ? v
                 : nodeUtil.inspect(v, { colors: true, depth: 3 })
@@ -37,4 +37,4 @@ export default class Log implements GuiComponent {
             })
             .join("\n");
     }
-};
+}

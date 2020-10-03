@@ -3,7 +3,7 @@ import { lintSource, lintFile } from "../svglint";
 import { inspect } from "../../test/shared";
 import { Config } from "./elm";
 
-process.on("unhandledRejection", error => {
+process.on("unhandledRejection", (error) => {
     console.error(error); // eslint-disable-line no-console
 });
 
@@ -73,50 +73,50 @@ function testFails(config?: Config | Config[], svg = testSVG) {
     });
 }
 
-describe("Rule: elm", function() {
-    it("should succeed without config", function() {
+describe("Rule: elm", function () {
+    it("should succeed without config", function () {
         return testSucceeds({});
     });
 
-    it("should succeed with a required element", function() {
+    it("should succeed with a required element", function () {
         return testSucceeds({
             "svg > title": true,
         });
     });
-    it("should fail without a required element", function() {
+    it("should fail without a required element", function () {
         return testFails({
             "svg > foobar": true,
         });
     });
 
-    it("should succeed without a disallowed element", function() {
+    it("should succeed without a disallowed element", function () {
         return testSucceeds({
             "g > foobar": false,
         });
     });
-    it("should fail with a disallowed element", function() {
+    it("should fail with a disallowed element", function () {
         return testFails({
             "g > path": false,
         });
     });
 
-    it("should succeed with a found number of elements", function() {
+    it("should succeed with a found number of elements", function () {
         return testSucceeds({
             g: 2,
         });
     });
-    it("should fail with an exceeded number of elements", function() {
+    it("should fail with an exceeded number of elements", function () {
         return testFails({
             g: 1,
         });
     });
-    it("should fail with a too low number of elements", function() {
+    it("should fail with a too low number of elements", function () {
         return testFails({
             g: 3,
         });
     });
 
-    it("should succeed with a found range of elements", function() {
+    it("should succeed with a found range of elements", function () {
         return Promise.all([
             testSucceeds({
                 "g > path": [1, 2],
@@ -129,18 +129,18 @@ describe("Rule: elm", function() {
             ),
         ]);
     });
-    it("should fail with an exceeded range of elements", function() {
+    it("should fail with an exceeded range of elements", function () {
         return testFails({
             "g > path": [0, 1],
         });
     });
-    it("should fail with a too low range of elements", function() {
+    it("should fail with a too low range of elements", function () {
         return testFails({
             "g > path": [3, 5],
         });
     });
 
-    it("should succeed when a disallowed element is allowed by another rule", function() {
+    it("should succeed when a disallowed element is allowed by another rule", function () {
         return Promise.all([
             testSucceeds({
                 path: false,

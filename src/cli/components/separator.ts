@@ -9,14 +9,14 @@ import type { GuiComponent } from "../types";
  */
 export default class Separator implements GuiComponent {
     title: string;
-    constructor(title="") {
+    constructor(title = "") {
         this.title = title;
     }
 
     toString() {
-        const padding = chalk.gray.dim("-".repeat(
-            Math.floor((COLUMNS - this.title.length - 2) / 2)
-        ));
+        const padding = chalk.gray.dim(
+            "-".repeat(Math.floor((COLUMNS - this.title.length - 2) / 2))
+        );
         return `${padding} ${chalk.bold.underline(this.title)} ${padding}`;
     }
-};
+}

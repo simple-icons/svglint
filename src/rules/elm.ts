@@ -55,7 +55,7 @@ function executeRule(
 
     const matches: RuleElmResult[] = $.find(selector)
         .toArray()
-        .map(elm => ({ elm, message: "" }));
+        .map((elm) => ({ elm, message: "" }));
     let allowed: boolean | null = null;
     let message: string = "";
     switch (typeof config) {
@@ -113,7 +113,7 @@ function executeRule(
         outp.allowed = outp.allowed.concat(matches);
     } else if (allowed === false) {
         outp.disallowed = outp.disallowed.concat(
-            matches.map(match => {
+            matches.map((match) => {
                 match.message = message;
                 return match;
             })
@@ -133,7 +133,7 @@ export default function generate(config: Config) {
         logger.debug("Called", config);
         // gather the result of every execution
         const executions = Object.keys(config)
-            .map(selector => {
+            .map((selector) => {
                 try {
                     return executeRule(selector, config[selector], $);
                 } catch (e) {
@@ -147,35 +147,35 @@ export default function generate(config: Config) {
                     return null;
                 }
             })
-            .filter(v => v);
+            .filter((v) => v);
         // then filter out the disallowed elms that are allowed elsewhere
         const allowedElms: CheerioElement[] = [];
         const disallowed: RuleElmResult[] = [];
         // first gather the allowed elms
-        executions.forEach(execution => {
+        executions.forEach((execution) => {
             if (!execution) {
                 return;
             }
             allowedElms.push(
                 ...(execution.allowed
-                    .map(result => result.elm)
-                    .filter(v => v) as CheerioElement[])
+                    .map((result) => result.elm)
+                    .filter((v) => v) as CheerioElement[])
             );
         });
         // the filter the disallowed elms by whether they are allowed elsewhere
-        executions.forEach(execution => {
+        executions.forEach((execution) => {
             if (!execution) {
                 return;
             }
             disallowed.push(
                 ...execution.disallowed.filter(
-                    result =>
+                    (result) =>
                         allowedElms.indexOf(result.elm as CheerioElement) === -1
                 )
             );
         });
         // finally report all the remaining disallowed elms
-        disallowed.forEach(result => {
+        disallowed.forEach((result) => {
             reporter.error(result.message, result.elm, ast);
         });
     };

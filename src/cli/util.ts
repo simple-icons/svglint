@@ -46,7 +46,7 @@ export const MSG_META = Object.freeze({
  * @param str The string to chunk
  * @param N The length to chunk into
  */
-export function chunkString(str: string, N: Number): string[] {
+export function chunkString(str: string, N: number): string[] {
     const outp = [] as string[];
     const zerolengthMatchers = [ansiRegex()];
     let current = "";
@@ -64,7 +64,7 @@ export function chunkString(str: string, N: Number): string[] {
         }
         // some characters are 0-length, e.g. ANSI color codes, which we don't count towards string length
         let blacklisted = false;
-        for (let regex of zerolengthMatchers) {
+        for (const regex of zerolengthMatchers) {
             const tester = new RegExp("^" + regex.source);
             const match = tester.exec(str.slice(i));
             if (match) {

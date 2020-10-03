@@ -95,7 +95,7 @@ export default class Linting extends EventEmitter {
         this.logger.debug("  Rules:", ruleNames);
 
         // start every rule
-        ruleNames.forEach(async ruleName => {
+        ruleNames.forEach(async (ruleName) => {
             const ast = await clone(this.ast);
             const cheerioParsed = cheerio
                 .load("<root></root>", { xmlMode: true })("root")
@@ -113,7 +113,7 @@ export default class Linting extends EventEmitter {
                 // also handles catching errors from the rule
                 Promise.resolve()
                     .then(() => rule(reporter, cheerioParsed, ast))
-                    .catch(e => reporter.exception(e))
+                    .catch((e) => reporter.exception(e))
                     .then(() => onDone(reporter));
             };
 
@@ -122,7 +122,7 @@ export default class Linting extends EventEmitter {
                 const results: Reporter[] = [];
                 let activeRules = rule.length;
                 rule.forEach((r, i) => {
-                    execute(r, `${ruleName}-${i + 1}`, result => {
+                    execute(r, `${ruleName}-${i + 1}`, (result) => {
                         results[i] = result;
                         if (--activeRules <= 0) {
                             this._onRuleFinish(ruleName, results);
@@ -142,7 +142,7 @@ export default class Linting extends EventEmitter {
                     );
                 }
             } else {
-                execute(rule, ruleName, result => {
+                execute(rule, ruleName, (result) => {
                     this._onRuleFinish(ruleName, result);
                 });
             }
@@ -172,13 +172,16 @@ export default class Linting extends EventEmitter {
     /** Calculates the current state from this.results. */
     _calculateState() {
         let state = STATES.success;
-        for (let k in this.results) {
+        for (const k in this.results) {
+            if (!this.results.hasOwnProperty(k)) {
+                continue;
+            }
             const result = this.results[k];
             if (result instanceof Array) {
-                if (result.some(res => res.hasErrors)) {
+                if (result.some((res) => res.hasErrors)) {
                     return STATES.error;
                 }
-                if (result.some(res => res.hasWarns)) {
+                if (result.some((res) => res.hasWarns)) {
                     state = STATES.warn;
                 }
             } else {

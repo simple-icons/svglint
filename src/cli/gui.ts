@@ -105,7 +105,7 @@ export default class GUI {
         // then add lintings that are currently running
         if (this.$lintings.length) {
             const $lintings = this.$lintings.filter(
-                $linting =>
+                ($linting) =>
                     $linting.linting.state !== $linting.linting.STATES.success
             );
             if ($lintings.length) {
@@ -122,7 +122,7 @@ export default class GUI {
 
     /** Returns whether we should animate actively (e.g. for a spinner) */
     shouldAnimate(): boolean {
-        return this.$lintings.some($linting => $linting.shouldAnimate());
+        return this.$lintings.some(($linting) => $linting.shouldAnimate());
     }
 
     /**

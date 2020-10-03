@@ -3,7 +3,7 @@ import { lintSource, lintFile } from "../svglint";
 import { inspect } from "../../test/shared";
 import { Config } from "../svglint";
 
-process.on("unhandledRejection", error => {
+process.on("unhandledRejection", (error) => {
     console.error(error); // eslint-disable-line no-console
 });
 
@@ -45,8 +45,8 @@ function testFails(svg: string, config?: Config) {
     });
 }
 
-describe("Rule: valid", function() {
-    it("should succeed by default for a valid SVG", function() {
+describe("Rule: valid", function () {
+    it("should succeed by default for a valid SVG", function () {
         return testSucceeds(
             `<svg role="img" viewBox="0 0 24 24">
             <g id="foo">
@@ -58,7 +58,7 @@ describe("Rule: valid", function() {
             { rules: {} }
         );
     });
-    it("should fail by default for an invalid SVG", function() {
+    it("should fail by default for an invalid SVG", function () {
         return testFails(
             `<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>
@@ -68,7 +68,7 @@ describe("Rule: valid", function() {
         );
     });
 
-    it("should succeed when enabled for a valid SVG", function() {
+    it("should succeed when enabled for a valid SVG", function () {
         return testSucceeds(
             `<svg role="img" viewBox="0 0 24 24">
             <g id="foo">
@@ -80,7 +80,7 @@ describe("Rule: valid", function() {
             { rules: { valid: true } }
         );
     });
-    it("should fail when enabled for an invalid SVG", function() {
+    it("should fail when enabled for an invalid SVG", function () {
         return testFails(
             `<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>
@@ -90,7 +90,7 @@ describe("Rule: valid", function() {
         );
     });
 
-    it("should succeed when disabled for a valid SVG", function() {
+    it("should succeed when disabled for a valid SVG", function () {
         return testSucceeds(
             `<svg role="img" viewBox="0 0 24 24">
             <g id="foo">
@@ -102,7 +102,7 @@ describe("Rule: valid", function() {
             { rules: { valid: false } }
         );
     });
-    it("should succeed when disabled for an invalid SVG", function() {
+    it("should succeed when disabled for an invalid SVG", function () {
         return testSucceeds(
             `<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>

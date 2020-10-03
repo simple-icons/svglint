@@ -1,3 +1,12 @@
 {
-    "extends": ["tslint:recommended", "tslint-config-prettier"]
+    "extends": ["tslint:recommended", "tslint-config-prettier"],
+    "rules": {
+        "no-console": false,
+        "only-arrow-functions": false,
+        "max-classes-per-file": false,
+        "no-shadowed-variable": false,
+        "no-conditional-assignment": false,
+        "jsdoc-format": false,
+        "no-string-throw": false
+    }
 }

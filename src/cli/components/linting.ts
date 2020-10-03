@@ -18,7 +18,7 @@ export function flattenReporters(results: {
     const outp = [] as Reporter[];
     Object.keys(results)
         .sort()
-        .forEach(reporterName => {
+        .forEach((reporterName) => {
             const reporter = results[reporterName];
             const reporters = reporter instanceof Array ? reporter : [reporter];
             outp.push(...reporters);
@@ -48,14 +48,14 @@ export default class LintingDisplay implements GuiComponent {
         const linting = this.linting;
         let symbol: string = "";
         type states = keyof typeof linting.STATES;
-        for (let state of Object.keys(MSG_META) as states[]) {
-            if (state === "ignored") { continue; }
+        for (const state of Object.keys(MSG_META) as states[]) {
+            if (state === "ignored") {
+                continue;
+            }
             if (linting.state === linting.STATES[state]) {
                 const meta = MSG_META[state];
                 symbol = meta.color(
-                    state === "linting"
-                        ? this.$spinner.toString()
-                        : meta.symbol
+                    state === "linting" ? this.$spinner.toString() : meta.symbol
                 );
             }
         }
@@ -65,10 +65,10 @@ export default class LintingDisplay implements GuiComponent {
     /** Returns the string representing all of our reporters */
     renderReporters(): string {
         const outp = flattenReporters(this.linting.results)
-            .map(reporter => new ReporterDisplay(reporter))
-            .filter(display => display.shouldDisplay())
+            .map((reporter) => new ReporterDisplay(reporter))
+            .filter((display) => display.shouldDisplay())
             .join("\n");
-        
+
         if (outp.length) {
             return "\n" + outp;
         }
@@ -78,7 +78,7 @@ export default class LintingDisplay implements GuiComponent {
     toString(): string {
         return this.renderHeader() + this.renderReporters();
     }
-};
+}
 
 class ReporterDisplay implements GuiComponent {
     reporter: Reporter;
@@ -112,7 +112,9 @@ class ReporterDisplay implements GuiComponent {
     }
 
     toString() {
-        const msgs = this.reporter.messages.map((msg: Result) => this.formatMsg(msg));
+        const msgs = this.reporter.messages.map((msg: Result) =>
+            this.formatMsg(msg)
+        );
         return msgs.join("\n");
     }
 }

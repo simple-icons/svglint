@@ -3,7 +3,7 @@ import { lintSource, lintFile } from "../svglint";
 import { inspect } from "../../test/shared";
 import { Config } from "./custom";
 
-process.on("unhandledRejection", error => {
+process.on("unhandledRejection", (error) => {
     console.error(error); // eslint-disable-line no-console
 });
 
@@ -84,33 +84,34 @@ function testFails(config?: Config | Config[], svg = testSVG) {
     });
 }
 
-describe("Rule: custom", function() {
-    it("should succeed without config", function() {
+describe("Rule: custom", function () {
+    it("should succeed without config", function () {
         return testSucceeds([]);
     });
 
-    it("should succeed with a void function", function() {
+    it("should succeed with a void function", function () {
+        // tslint:disable-next-line:no-empty
         return testSucceeds([() => {}]);
     });
-    it("should succeed with an async void function", function() {
+    it("should succeed with an async void function", function () {
         return testSucceeds([
             () =>
-                new Promise(res => {
+                new Promise((res) => {
                     setTimeout(() => res(), 250);
                 }),
         ]);
     });
-    it("should fail with an erroring function", function() {
+    it("should fail with an erroring function", function () {
         return testFails([
             (reporter, $, ast) => {
                 reporter.error("Fails", $.find("svg")[0], ast);
             },
         ]);
     });
-    it("should fail with an async erroring function", function() {
+    it("should fail with an async erroring function", function () {
         return testFails([
             (reporter, $, ast) =>
-                new Promise(res => {
+                new Promise((res) => {
                     setTimeout(() => {
                         reporter.error("Fails", $.find("svg")[0], ast);
                         res();

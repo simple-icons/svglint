@@ -42,9 +42,9 @@ function normalizeRules(rulesConfig: RulesConfig): NormalizedRules {
     const outp: NormalizedRules = {};
     (Object.keys(rulesConfig) as (keyof RulesConfig)[])
         // make sure no disabled rules are allowed in
-        .filter(k => rulesConfig[k] !== false)
+        .filter((k) => rulesConfig[k] !== false)
         // then convert each rule config into a rule func
-        .forEach(ruleName => {
+        .forEach((ruleName) => {
             let loadedRule: RuleModule;
             try {
                 loadedRule = loadRule(ruleName);
@@ -57,7 +57,7 @@ function normalizeRules(rulesConfig: RulesConfig): NormalizedRules {
             const config = rulesConfig[ruleName];
             if (config instanceof Array) {
                 // @ts-ignore
-                outp[ruleName] = config.map(config => loadedRule(config));
+                outp[ruleName] = config.map((config) => loadedRule(config));
             } else {
                 // @ts-ignore
                 outp[ruleName] = loadedRule(config);

@@ -16,7 +16,7 @@ export default function generate(config: Config) {
         logger.debug("Called", config);
         let wait = config.wait;
         // return a promise so caller knows when we're done
-        return new Promise(res => {
+        return new Promise((res) => {
             const intervalID = setInterval(() => {
                 if (--wait <= 0) {
                     clearInterval(intervalID);
