@@ -3,18 +3,19 @@
  * @fileoverview The CLI that is executed from a terminal.
  * Acts as an interface to the JS API
  */
-const path = require("path");
-const GUI = new (require("../src/cli/gui"));
-const Logger = require("../src/lib/logger");
-const SVGLint = require("../src/svglint");
-// @ts-ignore
-const meta = require("../package.json");
-const { getConfigurationFile } = require("../src/cli/config");
-const meow = require("meow");
-const chalk = require("chalk");
-const glob = require("glob");
+import path from "path";
+import Gui from "../src/cli/gui";
+import LoggerGenerator, { setLevel, LEVELS } from "../src/lib/logger";
+import { lintFile, Config } from "../src/svglint";
+import meta from "../package.json";
+import { getConfigurationFile } from "../src/cli/config";
+import meow from "meow";
+import chalk from "chalk";
+import glob from "glob";
 
-const logger = Logger("");
+const logger = LoggerGenerator("");
+const GUI = new Gui();
+
 // Pretty logs all errors, then exits
 console.error = logger.error.bind(logger); // used by meow's loud reject
 process.on("uncaughtException", err => {
@@ -28,19 +29,27 @@ const cli = meow({
     version: meta.version,
     help: `
         ${chalk.yellow("Usage:")}
-            ${chalk.bold("svglint")} [--config config.js] [--ci] [--debug] ${chalk.bold("file1.svg file2.svg")}
+            ${chalk.bold(
+                "svglint"
+            )} [--config config.js] [--ci] [--debug] ${chalk.bold(
+        "file1.svg file2.svg"
+    )}
 
         ${chalk.yellow("Options:")}
             ${chalk.bold("--help")}        Display this help text
             ${chalk.bold("--version")}     Show the current SVGLint version
-            ${chalk.bold("--config, -c")}  Specify the config file. Defaults to '.svglintrc.js'
+            ${chalk.bold(
+                "--config, -c"
+            )}  Specify the config file. Defaults to '.svglintrc.js'
             ${chalk.bold("--debug,  -d")}  Show debug logs
-            ${chalk.bold("--ci, -C")}      Only output to stdout once, when linting is finished`,
+            ${chalk.bold(
+                "--ci, -C"
+            )}      Only output to stdout once, when linting is finished`,
     flags: {
-        config: { type: "string", alias: "c", },
+        config: { type: "string", alias: "c" },
         debug: { type: "boolean", alias: "d" },
-        ci: { type: "boolean", alias: "C" }
-    }
+        ci: { type: "boolean", alias: "C" },
+    },
 });
 
 process.on("exit", () => {
@@ -48,20 +57,23 @@ process.on("exit", () => {
 });
 
 /** CLI main function */
-(async function(){
+(async function() {
     if (cli.flags.debug) {
-        Logger.setLevel(Logger.LEVELS.debug);
+        setLevel(LEVELS.debug);
     }
     GUI.setCI(cli.flags.ci);
-    const files = cli.input.map(v => glob.sync(v))
-                           .reduce((a, v) => a.concat(v), [])
-                           .map(v => path.resolve(process.cwd(), v));
+    const files = cli.input
+        .map(v => glob.sync(v))
+        .reduce((a, v) => a.concat(v), [])
+        .map(v => path.resolve(process.cwd(), v));
 
     // load the config
-    let configObj;
+    let configObj: Config = {};
     try {
         const configFile = await getConfigurationFile(cli.flags.config);
-        configObj = require(configFile);
+        if (typeof configFile === "string") {
+            configObj = require(configFile);
+        }
     } catch (e) {
         logger.error(`Failed to parse config: ${e.message}`);
         process.exit(1);
@@ -79,7 +91,7 @@ process.on("exit", () => {
         }
     };
     files.forEach(filePath => {
-        SVGLint.lintFile(filePath, configObj)
+        lintFile(filePath, configObj)
             .then(linting => {
                 // handle case where linting failed (e.g. invalid file)
                 if (!linting) {
