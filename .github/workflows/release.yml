@@ -1,24 +1,23 @@
 name: Release
-on:
-  workflow_dispatch
+on: workflow_dispatch
 
 jobs:
-  release:
-    name: Semantic release
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Node.js setup
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - name: Install dependencies
-        run: npm ci
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+    release:
+        name: Semantic release
+        runs-on: ubuntu-18.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+            - name: Node.js setup
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+            - name: Install dependencies
+              run: yarn install --frozen-lockfile
+            - name: Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              run: yarn semantic-release
