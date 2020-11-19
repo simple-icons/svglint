@@ -171,14 +171,14 @@ class Linting extends EventEmitter {
         for (let k in this.results) {
             const result = this.results[k];
             if (result instanceof Array) {
-                if (result.some(res => res.hasErrors)) {
+                if (result.some(res => res.hasErrors) || result.some(res => res.hasExceptions)) {
                     return STATES.error;
                 }
                 if (result.some(res => res.hasWarns)) {
                     state = STATES.warn;
                 }
             } else {
-                if (result.hasErrors) {
+                if (result.hasErrors || result.hasExceptions) {
                     return STATES.error;
                 }
                 if (result.hasWarns) {
