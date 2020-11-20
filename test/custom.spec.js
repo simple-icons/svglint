@@ -111,6 +111,13 @@ describe("Rule: custom", function(){
             })
         ]);
     });
+    it("should fail with an exception inside function", function(){
+        return testFails([
+            () => {
+                throw new Error("Foo");
+            }
+        ]);
+    });
     it("should fail with an erroring function", function(){
         return testFails([
             (reporter, $, ast) => {
