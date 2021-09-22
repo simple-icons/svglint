@@ -20,7 +20,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "ansi-regex": "^3.0.0",
+    "ansi-regex": "^5.0.1",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.6",
     "fast-xml-parser": "^3.12.13",
