@@ -63,7 +63,7 @@ process.on("exit", () => {
         const configFile = await getConfigurationFile(cli.flags.config);
         configObj = require(configFile);
     } catch (e) {
-        logger.error(`Failed to parse config: ${e.message}`);
+        logger.error(`Failed to parse config:\n${e.stack}`);
         process.exit(1);
     }
 
