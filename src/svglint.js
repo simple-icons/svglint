@@ -129,10 +129,10 @@ module.exports = {
      * The function returns before the Linting is finished.
      * You should listen to Linting.on("done") to wait for the result.
      * @param {String} source The SVG to lint
-     * @param {Config} config The config to lint by
+     * @param {Config} [config={}] The config to lint by
      * @return {Linting} The Linting that represents the result
      */
-    lintSource(source, config) {
+    lintSource(source, config={}) {
         const ast = parse.parseSource(source);
         return lint(null, ast, config);
     },
@@ -142,10 +142,10 @@ module.exports = {
      * The returned Promise resolves before the Linting is finished.
      * You should listen to Linting.on("done") to wait for the result.
      * @param {String} file The file path to lint
-     * @param {Config} config The config to lint by
+     * @param {Config} [config={}] The config to lint by
      * @returns {Promise<Linting>} Resolves to the Linting that represents the result
      */
-    async lintFile(file, config) {
+    async lintFile(file, config={}) {
         const ast = await parse.parseFile(file);
         return lint(file, ast, config);
     }
