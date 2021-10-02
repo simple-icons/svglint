@@ -9,6 +9,14 @@ process.on("unhandledRejection", error => {
 const svg = "<svg></svg>";
 
 describe(".lintSource()", function() {
+    it("should succeed without config", function(done) {
+        const result = SVGLint.lintSource(svg);
+        result.on("done", () => {
+            expect(result.state).toBe(result.STATES.success);
+            done();
+        });
+    });
+
     it("should succeed with empty config", function(done) {
         const result = SVGLint.lintSource(svg, {});
         result.on("done", () => {
@@ -67,4 +75,14 @@ describe(".lintFile()", function() {
                 });
             });
     });
+
+    it("should succeed without config", function() {
+        return SVGLint.lintFile(path.join(__dirname, "./svgs/empty.svg"))
+            .then(linting => {
+                linting.on("done", () => {
+                    expect(linting.state).toBe(linting.STATES.success);
+                });
+            });
+    });
+
 });
