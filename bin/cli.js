@@ -63,6 +63,12 @@ process.on("exit", () => {
         const configFile = await getConfigurationFile(cli.flags.config);
         if (configFile) {
             configObj = require(configFile);
+        } else {
+            logger.debug("No configuration file found")
+            if (cli.flags.config) {
+                logger.error("Configuration file not found");
+                process.exit(1);
+            }
         }
     } catch (e) {
         logger.error(`Failed to parse config: ${e.stack}`);
