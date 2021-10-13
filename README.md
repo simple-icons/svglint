@@ -73,3 +73,5 @@ For specifics on how the config for each rule should be formatted, see [their sp
 
 If you are using the JS API, this configuration object is passed as the second parameter.
 
+If no configuration is found or provided, a default configuration object is used.
+This default configuration may be changed such that previously valid SVGs become invalid in minor releases and patches.

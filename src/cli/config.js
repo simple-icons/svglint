@@ -3,7 +3,6 @@ const fs = require("fs");
 
 /**
  * Gets the configuration file to use
- * Throws if file isn't found
  * @param {String} filename The filename to look for
  * @param {String} folder The folder to look in
  * @returns {Promise<String,Boolean>} The path to the configuration file, or false
@@ -20,7 +19,7 @@ function getConfigurationFile(filename=".svglintrc.js", folder=process.cwd()) {
             } else {
                 const parent = path.resolve(folder, "..");
                 if (parent === folder) {
-                    return rej(new Error(`Config file not found at '${resolved}'`));
+                    return res(false);
                 }
                 // if not, get next folder
                 getConfigurationFile(
