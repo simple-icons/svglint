@@ -1,5 +1,5 @@
-const nodeUtil = require("util");
-const { MSG_META } = require("../util");
+import nodeUtil from "util";
+import { MSG_META } from "../util.js";
 
 /** @typedef {import("../../lib/logger.js").CliConsole} CliHistory */
 
@@ -20,7 +20,7 @@ function stringifyArgs(args=[]) {
 /**
  * A display for a log history.
  */
-module.exports = class Log {
+export default class Log {
     /** @param {CliHistory} logHistory */
     constructor(logHistory) { this.logs = logHistory; }
     toString() {

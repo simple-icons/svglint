@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+import path from "path";
+import fs from "fs";
 
 /**
  * Gets the configuration file to use
@@ -31,6 +31,6 @@ function getConfigurationFile(filename=".svglintrc.js", folder=process.cwd()) {
     });
 }
 
-module.exports = {
+export default {
     getConfigurationFile,
 };

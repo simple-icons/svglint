@@ -1,8 +1,8 @@
-const chalk = require("chalk");
-const { chunkString, MSG_META, COLUMNS } = require("../util");
-const stripAnsi = require("strip-ansi");
+import chalk from "chalk";
+import { chunkString, MSG_META, COLUMNS } from "../util.js";
+import stripAnsi from "strip-ansi";
 
-const Spinner = require("./spinner");
+import Spinner from "./spinner.js";
 
 /** @typedef {import("../../lib/reporter.js")} Reporter */
 /** @typedef {import("../../lib/linting.js")} Linting */
@@ -29,7 +29,7 @@ function flattenReporters(results) {
 /**
  * A display for a single linting.
  */
-module.exports = class LintingDisplay {
+export default class LintingDisplay {
     /** @param {Linting} linting */
     constructor(linting) {
         this.linting = linting;

@@ -4,11 +4,11 @@
  * It uses htmlparser2 to parse the source, which it gathers from either
  *   a string or a file.
  */
-const Parser = require("htmlparser2");
-const fs = require("fs");
-const path = require("path");
+import Parser from "htmlparser2";
+import fs from "fs";
+import path from "path";
 
-module.exports = {
+export default {
     /**
      * Clones an AST by re-parsing it's source
      * @param {AST} ast The AST to clone

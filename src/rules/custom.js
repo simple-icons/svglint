@@ -1,4 +1,5 @@
-const logger = require("../lib/logger")("rule:elm");
+import Logger from "../lib/logger.js";
+const logger = Logger("rule:elm");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
@@ -15,7 +16,7 @@ const logger = require("../lib/logger")("rule:elm");
  * The function will be executed as if though it was a rule.
  */
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
      * @param {CustomConfig} config 

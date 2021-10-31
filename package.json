@@ -2,6 +2,7 @@
   "name": "svglint",
   "version": "1.0.5",
   "description": "Linter for SVGs",
+  "type": "module",
   "main": "src/svglint.js",
   "bin": {
     "svglint": "./bin/cli.js"

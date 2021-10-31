@@ -3,16 +3,18 @@
  * @fileoverview The CLI that is executed from a terminal.
  * Acts as an interface to the JS API
  */
-const path = require("path");
-const GUI = new (require("../src/cli/gui"));
-const Logger = require("../src/lib/logger");
-const SVGLint = require("../src/svglint");
+import path from "path";
+import gui from "../src/cli/gui.js";
+import Logger from "../src/lib/logger.js";
+import SVGLint from "../src/svglint.js";
 // @ts-ignore
-const meta = require("../package.json");
-const { getConfigurationFile } = require("../src/cli/config");
-const meow = require("meow");
-const chalk = require("chalk");
-const glob = require("glob");
+import config from "../src/cli/config.js";
+import meow from "meow";
+import chalk from "chalk";
+import glob from "glob";
+
+const GUI = new gui();
+const { getConfigurationFile } = config;
 
 const logger = Logger("");
 // Pretty logs all errors, then exits
@@ -62,7 +64,6 @@ process.on("exit", () => {
     try {
         const configFile = await getConfigurationFile(cli.flags.config);
         if (configFile) {
-            configObj = require(configFile);
         } else {
             logger.debug("No configuration file found")
             if (cli.flags.config) {

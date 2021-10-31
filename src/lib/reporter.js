@@ -1,9 +1,9 @@
 /**
  * @fileoverview The object that rules use to report errors, warnings and messages.
  */
-const EventEmitter = require("events").EventEmitter;
-const chalk = require("chalk");
-const Logger = require("./logger");
+import { EventEmitter } from "events";
+import chalk from "chalk";
+import Logger from "./logger.js";
 
 /** @typedef {import("./parse.js").AST} AST */
 /** @typedef {import("./parse.js").Node} Node */
@@ -102,4 +102,4 @@ class Reporter extends EventEmitter {
         this.messages.push(result);
     }
 }
-module.exports = Reporter;
+export default Reporter;

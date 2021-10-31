@@ -1,11 +1,12 @@
-const logger = require("../lib/logger")("rule:throws");
+import Logger from "../lib/logger.js";
+const logger = Logger("rule:throws");
 
 /**
  * @typedef ThrowsConfig
  * @property {String} message The message to throw
  */
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
      * @param {ThrowsConfig} config 

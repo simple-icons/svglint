@@ -1,4 +1,5 @@
-const logger = require("../lib/logger")("rule:attr");
+import Logger from "../lib/logger.js";
+const logger = Logger("rule:attr");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
@@ -144,7 +145,7 @@ function executeOnElm($elm, config, reporter, ast) {
     }
 }
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
      * @param {AttrConfig} config 

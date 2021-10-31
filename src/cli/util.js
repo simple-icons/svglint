@@ -1,8 +1,8 @@
 /**
  * @fileoverview Utilities for the CLI.
  */
-const chalk = require("chalk");
-const ansiRegex = require("ansi-regex");
+import chalk from "chalk";
+import ansiRegex from "ansi-regex";
 
 const COLUMNS = process.stdout.columns || 80;
 const MSG_META = Object.freeze({
@@ -39,7 +39,7 @@ const MSG_META = Object.freeze({
     }),
 });
 
-module.exports = {
+export {
     chunkString,
     MSG_META,
     COLUMNS,

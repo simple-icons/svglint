@@ -3,18 +3,18 @@
  * Handles formatting the state of a (multifile) linting in a human-friendly way.
  * Expects a terminal to be present as process.stdout.
  */
-const logUpdate = require("log-update");
-const Logger = require("../lib/logger");
+import logUpdate from "log-update";
+import Logger from "../lib/logger.js";
 const logHistory = Logger.cliConsole;
 
-const Separator = require("./components/separator");
-const Log = require("./components/log");
-const LintingDisplay = require("./components/linting");
-const Summary = require("./components/summary");
+import Separator from "./components/separator.js";
+import Log from "./components/log.js";
+import LintingDisplay from "./components/linting.js";
+import Summary from "./components/summary.js";
 
 /** @typedef {import("../lib/linting.js")} Linting */
 
-module.exports = class GUI {
+export default class GUI {
     constructor() {
         // subscribe to global logs
         Logger.setCLI(true);

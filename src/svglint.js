@@ -5,10 +5,11 @@
  * Main responsibility is handling the consumer<->Linting communication,
  *   and converting the user-provided config into an object of rules.
  */
-const Linting = require("./lib/linting");
-const parse = require("./lib/parse");
-const loadRule = require("./lib/rule-loader");
-const logger = require("./lib/logger.js")("");
+import Linting from "./lib/linting.js";
+import parse from "./lib/parse.js";
+import loadRule from "./lib/rule-loader.js";
+import Logger from "./lib/logger.js";
+const logger = Logger("");
 
 /** @typedef {import("./lib/parse.js").AST} AST */
 /** @typedef {import("./lib/rule-loader.js").RuleModule} RuleModule */
@@ -123,7 +124,7 @@ ${ast.source}`);
     return new Linting(file, ast, conf.rules);
 }
 
-module.exports = {
+export default {
     /**
      * Lints a single SVG string.
      * The function returns before the Linting is finished.

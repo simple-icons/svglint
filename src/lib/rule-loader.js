@@ -4,7 +4,7 @@
  *   loading a rule.
  * Currently NodeJS' import cache is just fine.
  */
-const path = require("path");
+import path from "path";
 
 /**
  * @typedef RuleModule
@@ -30,4 +30,4 @@ function ruleLoader(ruleName, dir="../rules") {
         ? "svglint-plugin-" + ruleName
         : path.join(dir, fileName));
 }
-module.exports = ruleLoader;
+export default ruleLoader;
