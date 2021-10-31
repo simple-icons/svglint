@@ -25,10 +25,7 @@ process.on("uncaughtException", err => {
 });
 
 // Generates the CLI binding using meow
-const cli = meow({
-    description: meta.description,
-    version: meta.version,
-    help: `
+const cli = meow(`
         ${chalk.yellow("Usage:")}
             ${chalk.bold("svglint")} [--config config.js] [--ci] [--debug] ${chalk.bold("file1.svg file2.svg")}
 
@@ -37,7 +34,8 @@ const cli = meow({
             ${chalk.bold("--version")}     Show the current SVGLint version
             ${chalk.bold("--config, -c")}  Specify the config file. Defaults to '.svglintrc.js'
             ${chalk.bold("--debug,  -d")}  Show debug logs
-            ${chalk.bold("--ci, -C")}      Only output to stdout once, when linting is finished`,
+            ${chalk.bold("--ci, -C")}      Only output to stdout once, when linting is finished`, {
+    importMeta: import.meta,
     flags: {
         config: { type: "string", alias: "c", },
         debug: { type: "boolean", alias: "d" },
