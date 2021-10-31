@@ -24,6 +24,7 @@
     "ansi-regex": "^5.0.1",
     "chalk": "^2.4.1",
     "cheerio": "^1.0.0-rc.6",
+    "cosmiconfig": "^7.0.1",
     "fast-xml-parser": "^3.12.13",
     "glob": "^7.1.2",
     "htmlparser2": "^3.9.1",
