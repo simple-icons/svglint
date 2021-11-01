@@ -1,8 +1,9 @@
-const logger = require("../lib/logger")("rule:elm");
+const logger = require("../lib/logger")("rule:custom");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
 /** @typedef {import("../lib/parse.js").Node} Node */
+/** @typedef {{ path: string }} Info */
 
 /**
  * @callback CustomRule
@@ -27,10 +28,11 @@ module.exports = {
          * @param {Cheerio} $ A cheerio representation of the document
          * @param {AST} ast The underlying AST representation of the document.
          *                  This should be given to Reporter when warning/erroring with a node.
+         * @param {Info} info Info related to the current file being linted.
          */
-        return function CustomRule(reporter, $, ast) {
+        return function CustomRule(reporter, $, ast, info) {
             logger.debug("Called", config);
-            return config(reporter, $, ast);
+            return config(reporter, $, ast, info);
         };
     }
 };
