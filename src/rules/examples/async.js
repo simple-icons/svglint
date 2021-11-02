@@ -1,4 +1,4 @@
-const logger = require("../lib/logger")("rule:async");
+const logger = require("../../lib/logger")("rule:async");
 
 /**
  * @typedef AsyncConfig

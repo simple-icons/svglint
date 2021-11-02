@@ -1,4 +1,4 @@
-const logger = require("../lib/logger")("rule:identity");
+const logger = require("../../lib/logger")("rule:identity");
 
 /**
  * @typedef IdentityConfig

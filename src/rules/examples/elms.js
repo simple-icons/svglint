@@ -1,4 +1,4 @@
-const logger = require("../lib/logger")("rule:elms");
+const logger = require("../../lib/logger")("rule:elms");
 
 /**
  * @typedef ElmsConfig

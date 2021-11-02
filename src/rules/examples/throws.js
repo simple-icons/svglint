@@ -1,4 +1,4 @@
-const logger = require("../lib/logger")("rule:throws");
+const logger = require("../../lib/logger")("rule:throws");
 
 /**
  * @typedef ThrowsConfig
