@@ -89,7 +89,7 @@ describe("Rule: valid", function(){
         </svg>`, { rules: { valid: true } });
     });
 
-    it("should succeed when disabled for a valid SVG", function(){
+    it.skip("should succeed when disabled for a valid SVG", function(){
         return testSucceeds(`<svg role="img" viewBox="0 0 24 24">
             <g id="foo">
                 <path d="bar"></path>
@@ -98,7 +98,7 @@ describe("Rule: valid", function(){
             <circle></circle>
         </svg>`, { rules: { valid: false } });
     });
-    it("should succeed when disabled for an invalid SVG", function(){
+    it.skip("should succeed when disabled for an invalid SVG", function(){
         return testSucceeds(`<svg viewBox="0 0 24 24" role="img">
           <title>BadOne icon</title>
           <path "M20.013 10.726l.001-.028A6.346"/>

@@ -19,15 +19,21 @@ import path from "path";
  *   built-in SVGLint rules.
  * @param {String} ruleName The name of the rule
  * @param {String} [dir] The dir to load the rules from if not from a package
- * @returns {RuleModule} The function exported by the rule if found.
+ * @returns {Promise<RuleModule>} Resolves to the function exported by the rule if found.
  */
-function ruleLoader(ruleName, dir="../rules") {
+async function ruleLoader(ruleName, dir="../rules") {
     const fileName = ruleName.endsWith(".js")
         ? ruleName
         : ruleName + ".js";
     const isExternal = ruleName.includes("/");
-    return require(isExternal
+    const importPath = isExternal
         ? "svglint-plugin-" + ruleName
-        : path.join(dir, fileName));
+        : path.join(dir, fileName);
+    try {
+        const module = await import(importPath);
+        return module.default;
+    } catch(_) {
+        return require(importPath);
+    }
 }
 export default ruleLoader;
