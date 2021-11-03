@@ -1,4 +1,4 @@
-import Logger from "../lib/logger.js";
+import Logger from "../../lib/logger.js";
 const logger = Logger("rule:async");
 
 /**
@@ -11,7 +11,7 @@ const logger = Logger("rule:async");
 export default {
     /**
      * Generates a linting function from a config
-     * @param {AsyncConfig} config 
+     * @param {AsyncConfig} config
      */
     generate(config) {
         return function AsyncRule(reporter) {

@@ -1,4 +1,4 @@
-import Logger from "../lib/logger.js";
+import Logger from "../../lib/logger.js";
 const logger = Logger("rule:identity");
 
 /**
@@ -10,7 +10,7 @@ const logger = Logger("rule:identity");
 export default {
     /**
      * Generates a linting function from a config
-     * @param {IdentityConfig} config 
+     * @param {IdentityConfig} config
      */
     generate(config) {
         return function IdentityRule(reporter) {

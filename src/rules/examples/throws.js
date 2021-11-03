@@ -1,4 +1,4 @@
-import Logger from "../lib/logger.js";
+import Logger from "../../lib/logger.js";
 const logger = Logger("rule:throws");
 
 /**
@@ -9,7 +9,7 @@ const logger = Logger("rule:throws");
 export default {
     /**
      * Generates a linting function from a config
-     * @param {ThrowsConfig} config 
+     * @param {ThrowsConfig} config
      */
     generate(config) {
         return function ThrowsRule(reporter) {
