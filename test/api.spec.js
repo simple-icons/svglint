@@ -1,6 +1,11 @@
-const expect = require("expect");
-const path = require("path");
-const SVGLint = require("../src/svglint");
+import expect from "expect";
+import * as path from "path";
+import * as url from "url";
+
+import SVGLint from "../src/svglint.js";
+
+const currentFilePath = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(currentFilePath);
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console
@@ -10,41 +15,48 @@ const svg = "<svg></svg>";
 
 describe(".lintSource()", function() {
     it("should succeed without config", function(done) {
-        const result = SVGLint.lintSource(svg);
-        result.on("done", () => {
-            expect(result.state).toBe(result.STATES.success);
-            done();
-        });
+        SVGLint.lintSource(svg)
+            .then(result => {
+                result.on("done", () => {
+                    expect(result.state).toBe(result.STATES.success);
+                    done();
+                });
+            });
     });
 
     it("should succeed with empty config", function(done) {
-        const result = SVGLint.lintSource(svg, {});
-        result.on("done", () => {
-            expect(result.state).toBe(result.STATES.success);
-            done();
-        });
+        SVGLint.lintSource(svg, {})
+            .then(result => {
+                result.on("done", () => {
+                    expect(result.state).toBe(result.STATES.success);
+                    done();
+                });
+            });
     });
 
     it("should succeed with empty SVG", function(done) {
-        const result = SVGLint.lintSource(svg, {});
-        result.on("done", () => {
-            expect(result.state).toBe(result.STATES.success);
-            done();
-        });
+        SVGLint.lintSource(svg, {})
+            .then(result => {
+                result.on("done", () => {
+                    expect(result.state).toBe(result.STATES.success);
+                    done();
+                });
+            });
     });
 
     it("should succeed with empty first line", function(done) {
-        const result = SVGLint.lintSource("\n" + svg, {});
-        result.on("done", () => {
-            expect(result.state).toBe(result.STATES.success);
-            done();
-        });
+        SVGLint.lintSource("\n" + svg, {})
+            .then(result => {
+                result.on("done", () => {
+                    expect(result.state).toBe(result.STATES.success);
+                    done();
+                });
+            });
     });
 
-    it("should throw with malformed SVG", function() {
-        expect(() => {
-            SVGLint.lintSource("<svg<path", {});
-        }).toThrow();
+    it("should throw with malformed SVG", function(done) {
+        SVGLint.lintSource("<svg<path", {})
+            .catch(() => done());
     });
 });
 

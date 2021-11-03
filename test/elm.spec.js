@@ -1,6 +1,7 @@
-const SVGLint = require("../src/svglint");
-const util = require("util");
-const chalk = require("chalk");
+import chalk from "chalk";
+import util from "util";
+
+import SVGLint from "../src/svglint.js";
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console
@@ -49,8 +50,8 @@ function inspect(obj) {
  * @returns {Promise<void>} Throws if linting fails
  */
 function testSucceeds(config, svg=testSVG) {
-    return new Promise((res, rej) => {
-        const linting = SVGLint.lintSource(svg, config);
+    return new Promise(async (res, rej) => {
+        const linting = await SVGLint.lintSource(svg, config);
         linting.on("done", () => {
             if (linting.state === linting.STATES.success) {
                 res();
@@ -71,8 +72,8 @@ function testFails(config, svg=testSVG) {
     const _config = {
         rules: { elm: config },
     };
-    return new Promise((res, rej) => {
-        const linting = SVGLint.lintSource(svg, _config);
+    return new Promise(async (res, rej) => {
+        const linting = await SVGLint.lintSource(svg, _config);
         linting.on("done", () => {
             if (linting.state === linting.STATES.error) {
                 res();
