@@ -10,7 +10,7 @@ process.on("unhandledRejection", error => {
  * ### `custom`
 
 Specifies a custom rule.
-Used as a quick-and-dirty way of adding rules when you don't want to write an 
+Used as a quick-and-dirty way of adding rules when you don't want to write an
 entire NPM package.
 
 ```javascript
@@ -97,6 +97,19 @@ function testFails(config, svg=testSVG) {
 describe("Rule: custom", function(){
     it("should succeed without config", function(){
         return testSucceeds([]);
+    });
+
+    it("should provide file information", function(){
+        return testSucceeds([
+            (_reporter, _$, _ast, info) => {
+                if(!info) {
+                    throw new Error("no info provided");
+                }
+                if(!info.hasOwnProperty("filepath")) {
+                    throw new Error("no filepath provided on info");
+                }
+            }
+        ]);
     });
 
     it("should succeed with a void function", function(){
