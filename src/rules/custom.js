@@ -3,7 +3,7 @@ const logger = require("../lib/logger")("rule:custom");
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
 /** @typedef {import("../lib/parse.js").Node} Node */
-/** @typedef {{ path: string }} Info */
+/** @typedef {{ filepath: string }} Info */
 
 /**
  * @callback CustomRule
