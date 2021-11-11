@@ -105,7 +105,7 @@ class Linting extends EventEmitter {
                 // execute the rule, potentially waiting for async rules
                 // also handles catching errors from the rule
                 Promise.resolve()
-                    .then(() => rule(reporter, cheerioParsed, ast))
+                    .then(() => rule(reporter, cheerioParsed, ast, { filepath: this.path }))
                     .catch(e => reporter.exception(e))
                     .then(() => onDone(reporter));
             };
