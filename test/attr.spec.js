@@ -216,4 +216,31 @@ describe("Rule: attr", function(){
             "rule::order": ["height", "width"],
         });
     });
+    it("should succeed enforcing soft ordering of some attributes", function() {
+        return testSucceeds({
+            "rule::selector": "rect",
+            "rule::order": ["height", "style"],
+        });
+    });
+    it("should succeed enforcing alphabetical ordering with true", function() {
+        return testSucceeds({
+            "rule::selector": "svg",
+            "rule::order": true,
+        });
+    });
+    it("should fail enforcing alphabetical ordering", function() {
+        return testFails({
+            "rule::selector": "rect",
+            "rule::order": true,
+        });
+    });
+    it("should succeed enforcing hard ordering with whitelist", function() {
+        return testSucceeds({
+            "role": true,
+            "viewBox": true,
+            "rule::selector": "svg",
+            "rule::whitelist": true,
+            "rule::order": true,
+        });
+    });
 });

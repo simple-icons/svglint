@@ -15,7 +15,7 @@ const logger = require("../lib/logger")("rule:attr");
  * The following special configs are allowed:
  * - `{ "rule::selector": {String} }` Default "*". The matching elements must fulfill the other configs.
  * - `{ "rule::whitelist": {Boolean} }` Default `false`. If true, no other attributes can exist than those specified by the other configs.
- * - `{ "rule::order": {Array<String>} }` Default null. If not null, attributes must be defined in the provided order.
+ * - `{ "rule::order": {Array<String> | Boolean} }` Default `null`. As array, attributes must be defined in the provided order. As `true`, attributes must be defined in alphabetical order.
  */
 
 /**
@@ -64,6 +64,37 @@ function executeOnElm($elm, config, reporter, ast) {
             }
         }
     );
+
+    if (config["rule::order"]) {
+        const attributes = Object.keys(attrs);
+        let order, prevIndex = -1;
+        if (config["rule::order"] === true) {
+            // alphabetical ordering
+            order = attributes.slice();
+            order.sort();
+        } else {
+            order = config["rule::order"];
+        }
+
+        attributes.forEach(attr => {
+            const index = order.indexOf(attr);
+            if (index === -1) {
+                // this attribute doesn't need ordering, ignore it
+                return;
+            }
+
+            if (prevIndex !== -1 && index < prevIndex) {
+                reporter.error(
+                    `Wrong ordering of attributes, found "${
+                        attributes.join(", ")}", expected "${order.join(', ')}"`,
+                    $elm,
+                    ast
+                );
+            }
+            prevIndex = index;
+        });
+    }
+
     // check that all configs are met
     Object.keys(attrs).forEach(
         attrib => {
@@ -142,29 +173,6 @@ function executeOnElm($elm, config, reporter, ast) {
                 ast
             );
         }
-    }
-
-    if (config["rule::order"]) {
-        let remaining = Object.keys(attrs);
-        const order = config["rule::order"];
-        if (order.length > remaining.length) {
-            reporter.warn(
-                `Ordering defines ${order.length} attributes, more than ${remaining.length} found`,
-                $elm,
-                ast
-            );
-        } else {
-            remaining = remaining.slice(0, config["rule::order"].length);
-        }
-        remaining.forEach((attr, i) => {
-            if (attr !== order[i]) {
-                reporter.error(
-                    `Wrong ordering of '${attr}' attribute, expected '${order[i]}' at position ${i + 1}`,
-                    $elm,
-                    ast
-                );
-            }
-        });
     }
 }
 
