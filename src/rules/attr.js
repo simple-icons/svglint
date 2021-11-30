@@ -15,6 +15,7 @@ const logger = require("../lib/logger")("rule:attr");
  * The following special configs are allowed:
  * - `{ "rule::selector": {String} }` Default "*". The matching elements must fulfill the other configs.
  * - `{ "rule::whitelist": {Boolean} }` Default `false`. If true, no other attributes can exist than those specified by the other configs.
+ * - `{ "rule::order": {Array<String>} }` Default null. If not null, attributes must be defined in the provided order.
  */
 
 /**
@@ -30,7 +31,7 @@ const logger = require("../lib/logger")("rule:attr");
  *   - If whitelist is true, error if there are attributes left
  */
 
-const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist"];
+const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist", "rule::order"];
 
 /**
  * Executes on a single element.
@@ -141,6 +142,29 @@ function executeOnElm($elm, config, reporter, ast) {
                 ast
             );
         }
+    }
+
+    if (config["rule::order"]) {
+        let remaining = Object.keys(attrs);
+        const order = config["rule::order"];
+        if (order.length > remaining.length) {
+            reporter.warn(
+                `Ordering defines ${order.length} attributes, more than ${remaining.length} found`,
+                $elm,
+                ast
+            );
+        } else {
+            remaining = remaining.slice(0, config["rule::order"].length);
+        }
+        remaining.forEach((attr, i) => {
+            if (attr !== order[i]) {
+                reporter.error(
+                    `Wrong ordering of '${attr}' attribute, expected '${order[i]}' at position ${i + 1}`,
+                    $elm,
+                    ast
+                );
+            }
+        });
     }
 }
 
