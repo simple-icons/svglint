@@ -86,7 +86,7 @@ function executeOnElm($elm, config, reporter, ast) {
             if (prevIndex !== -1 && index < prevIndex) {
                 reporter.error(
                     `Wrong ordering of attributes, found "${
-                        attributes.join(", ")}", expected "${order.join(', ')}"`,
+                        attributes.join(", ")}", expected "${order.join(", ")}"`,
                     $elm,
                     ast
                 );
