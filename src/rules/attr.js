@@ -67,32 +67,36 @@ function executeOnElm($elm, config, reporter, ast) {
 
     if (config["rule::order"]) {
         const attributes = Object.keys(attrs);
-        let order, prevIndex = -1;
-        if (config["rule::order"] === true) {
-            // alphabetical ordering
-            order = attributes.slice();
-            order.sort();
-        } else {
-            order = config["rule::order"];
+        if (attributes.length > 0) {
+            let order;
+            if (config["rule::order"] === true) {
+                // alphabetical ordering
+                order = attributes.slice();
+                order.sort();
+            } else {
+                order = config["rule::order"];
+            }
+
+            let prevIndex = order.indexOf(attributes[0]);
+            for (let i = 1; i < attributes.length; i++) {
+                const index = order.indexOf(attributes[i]);
+                if (index === -1) {
+                    // this attribute doesn't need ordering, ignore it
+                    return;
+                }
+
+                if (prevIndex !== -1 && index < prevIndex) {
+                    reporter.error(
+                        `Wrong ordering of attributes, found "${
+                            attributes.join(", ")}", expected "${order.join(", ")}"`,
+                        $elm,
+                        ast
+                    );
+                    break;
+                }
+                prevIndex = index;
+            }
         }
-
-        attributes.forEach(attr => {
-            const index = order.indexOf(attr);
-            if (index === -1) {
-                // this attribute doesn't need ordering, ignore it
-                return;
-            }
-
-            if (prevIndex !== -1 && index < prevIndex) {
-                reporter.error(
-                    `Wrong ordering of attributes, found "${
-                        attributes.join(", ")}", expected "${order.join(", ")}"`,
-                    $elm,
-                    ast
-                );
-            }
-            prevIndex = index;
-        });
     }
 
     // check that all configs are met
