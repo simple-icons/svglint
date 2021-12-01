@@ -38,6 +38,7 @@ const testSVG = `<svg role="img" viewBox="0 0 24 24">
     </g>
     <g></g>
     <circle></circle>
+    <rect height="100" width="300" style="fill:black;" />
 </svg>`;
 
 function inspect(obj) {
@@ -195,6 +196,51 @@ describe("Rule: attr", function(){
         return testFails({
             "rule::selector": "svg",
             "rule::whitelist": true,
+        });
+    });
+    it("should succeed enforcing right attributes ordering", function() {
+        return testSucceeds({
+            "rule::selector": "rect",
+            "rule::order": ["height", "width", "style"],
+        });
+    });
+    it("should fail enforcing wrong attributes ordering", function() {
+        return testFails({
+            "rule::selector": "rect",
+            "rule::order": ["width", "style", "height"],
+        });
+    });
+    it("should succeed enforcing ordering of first attributes", function() {
+        return testSucceeds({
+            "rule::selector": "rect",
+            "rule::order": ["height", "width"],
+        });
+    });
+    it("should succeed enforcing soft ordering of some attributes", function() {
+        return testSucceeds({
+            "rule::selector": "rect",
+            "rule::order": ["height", "style"],
+        });
+    });
+    it("should succeed enforcing alphabetical ordering with true", function() {
+        return testSucceeds({
+            "rule::selector": "svg",
+            "rule::order": true,
+        });
+    });
+    it("should fail enforcing alphabetical ordering", function() {
+        return testFails({
+            "rule::selector": "rect",
+            "rule::order": true,
+        });
+    });
+    it("should succeed enforcing hard ordering with whitelist", function() {
+        return testSucceeds({
+            "role": true,
+            "viewBox": true,
+            "rule::selector": "svg",
+            "rule::whitelist": true,
+            "rule::order": true,
         });
     });
 });
