@@ -5,6 +5,9 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        node-version: [12, 14, 16]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -13,7 +16,7 @@ jobs:
       - name: Node.js setup
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: npm ci
       - name: Lint
