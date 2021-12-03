@@ -62,11 +62,8 @@ process.on("exit", () => {
     try {
         const configFile = await getConfigurationFile(cli.flags.config);
         if (configFile) {
-            try {
-                configObj = await import(configFile);
-            } catch(_) {
-                configObj = require(configFile);
-            }
+            const module = await import(configFile);
+            configObj = module.default;
         } else {
             logger.debug("No configuration file found")
             if (cli.flags.config) {

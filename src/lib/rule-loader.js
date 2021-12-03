@@ -29,11 +29,7 @@ async function ruleLoader(ruleName, dir="../rules") {
     const importPath = isExternal
         ? "svglint-plugin-" + ruleName
         : path.join(dir, fileName);
-    try {
-        const module = await import(importPath);
-        return module.default;
-    } catch(_) {
-        return require(importPath);
-    }
+    const module = await import(importPath);
+    return module.default;
 }
 export default ruleLoader;
