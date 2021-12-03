@@ -10,13 +10,11 @@ import SVGLint from "../src/svglint.js";
 // @ts-ignore
 import config from "../src/cli/config.js";
 import meow from "meow";
-import { cosmiconfig } from "cosmiconfig";
 import chalk from "chalk";
 import glob from "glob";
 
 const GUI = new gui();
 const { getConfigurationFile } = config;
-const configExplorer = cosmiconfig("svglint");
 
 const logger = Logger("");
 // Pretty logs all errors, then exits
@@ -64,7 +62,11 @@ process.on("exit", () => {
     try {
         const configFile = await getConfigurationFile(cli.flags.config);
         if (configFile) {
-            configObj = await configExplorer.load(configFile);
+            try {
+                configObj = await import(configFile);
+            } catch(_) {
+                configObj = require(configFile);
+            }
         } else {
             logger.debug("No configuration file found")
             if (cli.flags.config) {
