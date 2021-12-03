@@ -4,6 +4,10 @@ module.exports = {
         "es6": true,
         "jasmine": true
     },
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2020,
+    },
     "extends": "eslint:recommended",
     "rules": {
         "indent": ["error", 4, { "SwitchCase": 1 }],

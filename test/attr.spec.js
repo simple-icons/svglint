@@ -52,20 +52,15 @@ function inspect(obj) {
  * @param {String} [svg=testSVG] The SVG to lint
  * @returns {Promise<void>} Throws if linting fails
  */
-function testSucceeds(config, svg=testSVG) {
+async function testSucceeds(config, svg=testSVG) {
     const _config = {
         rules: { attr: config },
     };
-    return new Promise(async (res, rej) => {
-        const linting = await SVGLint.lintSource(svg, _config);
-        linting.on("done", () => {
-            if (linting.state === linting.STATES.success) {
-                res();
-            } else {
-                rej(new Error(`Linting failed (${linting.state}):
-        ${inspect(config)}`));
-            }
-        });
+    const linting = await SVGLint.lintSource(svg, _config);
+    linting.on("done", () => {
+        if (linting.state !== linting.STATES.success) {
+            throw new Error(`Linting failed (${linting.state}): ${inspect(config)}`);
+        }
     });
 }
 /**
@@ -74,20 +69,15 @@ function testSucceeds(config, svg=testSVG) {
  * @param {String} svg The SVG to lint
  * @returns {Promise<void>} Throws if the linting doesn't fail
  */
-function testFails(config, svg=testSVG) {
+async function testFails(config, svg=testSVG) {
     const _config = {
         rules: { attr: config },
     };
-    return new Promise(async (res, rej) => {
-        const linting = await SVGLint.lintSource(svg, _config);
-        linting.on("done", () => {
-            if (linting.state === linting.STATES.error) {
-                res();
-            } else {
-                rej(new Error(`Linting did not fail (${linting.state}):
-        ${inspect(_config)}`));
-            }
-        });
+    const linting = await SVGLint.lintSource(svg, _config);
+    linting.on("done", () => {
+        if (linting.state !== linting.STATES.error) {
+            throw new Error(`Linting did not fail (${linting.state}): ${inspect(_config)}`);
+        }
     });
 }
 

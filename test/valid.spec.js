@@ -23,17 +23,12 @@ function inspect(obj) {
  * @param {Object} [config] The config to test
  * @returns {Promise<void>} Throws if linting fails
  */
-function testSucceeds(svg, config=undefined) {
-    return new Promise(async (res, rej) => {
-        const linting = await SVGLint.lintSource(svg, config);
-        linting.on("done", () => {
-            if (linting.state === linting.STATES.success) {
-                res();
-            } else {
-                rej(new Error(`Linting failed (${linting.state}),:
-        ${inspect(config)}`));
-            }
-        });
+async function testSucceeds(svg, config=undefined) {
+    const linting = await SVGLint.lintSource(svg, config);
+    linting.on("done", () => {
+        if (linting.state !== linting.STATES.success) {
+            throw new Error(`Linting failed (${linting.state}),: ${inspect(config)}`);
+        }
     });
 }
 /**
@@ -42,17 +37,12 @@ function testSucceeds(svg, config=undefined) {
  * @param {Object} [config] The config to test
  * @returns {Promise<void>} Throws if the linting doesn't fail
  */
-function testFails(svg, config=undefined) {
-    return new Promise(async (res, rej) => {
-        const linting = await SVGLint.lintSource(svg, config);
-        linting.on("done", () => {
-            if (linting.state === linting.STATES.error) {
-                res();
-            } else {
-                rej(new Error(`Linting did not fail (${linting.state}):
-        ${inspect(config)}`));
-            }
-        });
+async function testFails(svg, config=undefined) {
+    const linting = await SVGLint.lintSource(svg, config);
+    linting.on("done", () => {
+        if (linting.state !== linting.STATES.error) {
+            throw new Error(`Linting did not fail (${linting.state}): ${inspect(config)}`);
+        }
     });
 }
 

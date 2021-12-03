@@ -142,4 +142,4 @@ export default class GUI {
     setCI(value) {
         this.ci = value;
     }
-};
+}
