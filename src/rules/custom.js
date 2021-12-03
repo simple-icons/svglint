@@ -1,9 +1,10 @@
 import Logger from "../lib/logger.js";
-const logger = Logger("rule:elm");
+const logger = Logger("rule:custom");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
 /** @typedef {import("../lib/parse.js").Node} Node */
+/** @typedef {{ filepath: string }} Info */
 
 /**
  * @callback CustomRule
@@ -19,7 +20,7 @@ const logger = Logger("rule:elm");
 export default {
     /**
      * Generates a linting function from a config
-     * @param {CustomConfig} config 
+     * @param {CustomConfig} config
      */
     generate(config) {
         /**
@@ -28,10 +29,11 @@ export default {
          * @param {Cheerio} $ A cheerio representation of the document
          * @param {AST} ast The underlying AST representation of the document.
          *                  This should be given to Reporter when warning/erroring with a node.
+         * @param {Info} info Info related to the current file being linted.
          */
-        return function CustomRule(reporter, $, ast) {
+        return function CustomRule(reporter, $, ast, info) {
             logger.debug("Called", config);
-            return config(reporter, $, ast);
+            return config(reporter, $, ast, info);
         };
     }
 };

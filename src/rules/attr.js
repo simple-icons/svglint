@@ -16,6 +16,7 @@ const logger = Logger("rule:attr");
  * The following special configs are allowed:
  * - `{ "rule::selector": {String} }` Default "*". The matching elements must fulfill the other configs.
  * - `{ "rule::whitelist": {Boolean} }` Default `false`. If true, no other attributes can exist than those specified by the other configs.
+ * - `{ "rule::order": {Array<String> | Boolean} }` Default `null`. As array, attributes must be defined in the provided order. As `true`, attributes must be defined in alphabetical order.
  */
 
 /**
@@ -31,7 +32,7 @@ const logger = Logger("rule:attr");
  *   - If whitelist is true, error if there are attributes left
  */
 
-const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist"];
+const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist", "rule::order"];
 
 /**
  * Executes on a single element.
@@ -64,6 +65,41 @@ function executeOnElm($elm, config, reporter, ast) {
             }
         }
     );
+
+    if (config["rule::order"]) {
+        const attributes = Object.keys(attrs);
+        if (attributes.length > 0) {
+            let order;
+            if (config["rule::order"] === true) {
+                // alphabetical ordering
+                order = attributes.slice();
+                order.sort();
+            } else {
+                order = config["rule::order"];
+            }
+
+            let prevIndex = order.indexOf(attributes[0]);
+            for (let i = 1; i < attributes.length; i++) {
+                const index = order.indexOf(attributes[i]);
+                if (index === -1) {
+                    // this attribute doesn't need ordering, ignore it
+                    return;
+                }
+
+                if (prevIndex !== -1 && index < prevIndex) {
+                    reporter.error(
+                        `Wrong ordering of attributes, found "${
+                            attributes.join(", ")}", expected "${order.join(", ")}"`,
+                        $elm,
+                        ast
+                    );
+                    break;
+                }
+                prevIndex = index;
+            }
+        }
+    }
+
     // check that all configs are met
     Object.keys(attrs).forEach(
         attrib => {
