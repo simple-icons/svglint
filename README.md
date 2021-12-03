@@ -31,8 +31,9 @@ $ svglint --help
 The tool can also be used through the JS API.
 
 ```javascript
-const SVGLint = require("svglint");
-const linting = SVGLint.lintSource("<svg>...</svg>", {
+import SVGLint from "svglint";
+
+const linting = await SVGLint.lintSource("<svg>...</svg>", {
     // ... config goes here
 });
 linting.on("done", () => {
