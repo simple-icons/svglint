@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     rules: {
         attr: {
             "rule::selector": "path",
