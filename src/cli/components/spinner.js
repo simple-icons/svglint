@@ -12,4 +12,4 @@ export default class Spinner {
         this.i = (this.i + 1) % this.frames.length;
         return this.frames[this.i];
     }
-};
+}

@@ -13,4 +13,4 @@ export default class Separator {
         ));
         return `${padding} ${chalk.bold.underline(this.title)} ${padding}`;
     }
-};
+}

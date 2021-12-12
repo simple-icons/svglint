@@ -81,7 +81,7 @@ export default class LintingDisplay {
         return this.renderHeader()
             + this.renderReporters();
     }
-};
+}
 
 class ReporterDisplay {
     constructor(reporter) {

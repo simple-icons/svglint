@@ -34,4 +34,4 @@ export default class Log {
                 + message;
         }).join("\n");
     }
-};
+}

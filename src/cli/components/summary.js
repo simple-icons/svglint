@@ -40,4 +40,4 @@ export default class Summary {
             (active + successes + warns + errors) ? null : chalk.gray.dim("- No files linted"),
         ].filter(v => v).join("\n");
     }
-};
+}
