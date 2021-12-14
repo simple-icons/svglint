@@ -4,8 +4,6 @@
  *   loading a rule.
  * Currently NodeJS' import cache is just fine.
  */
-import path from "path";
-import { fileURLToPath } from "url";
 
 /**
  * @typedef RuleModule
@@ -19,19 +17,19 @@ import { fileURLToPath } from "url";
  * If the rule name does not contain a slash then it will be loaded from the
  *   built-in SVGLint rules.
  * @param {String} ruleName The name of the rule
- * @param {String} [dir] The dir to load the rules from if not from a package
  * @returns {Promise<RuleModule>} Resolves to the function exported by the rule if found.
  */
-async function ruleLoader(ruleName, dir="../rules") {
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+async function ruleLoader(ruleName) {
     const fileName = ruleName.endsWith(".js")
         ? ruleName
         : ruleName + ".js";
     const isExternal = ruleName.includes("/");
-    const importPath = isExternal
-        ? "svglint-plugin-" + ruleName
-        : `file://${path.resolve(__dirname, dir, fileName)}`;
-    const module = await import(importPath);
+    let module;
+    if (isExternal) {
+        module = await import(`svglint-plugin-${ruleName}`);
+    } else {
+        module = await import(`../rules/${fileName.slice(0, -3)}.js`);
+    }
     return module.default;
 }
 export default ruleLoader;
