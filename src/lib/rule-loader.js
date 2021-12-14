@@ -5,6 +5,7 @@
  * Currently NodeJS' import cache is just fine.
  */
 import path from "path";
+import { fileURLToPath } from "url";
 
 /**
  * @typedef RuleModule
@@ -22,13 +23,14 @@ import path from "path";
  * @returns {Promise<RuleModule>} Resolves to the function exported by the rule if found.
  */
 async function ruleLoader(ruleName, dir="../rules") {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const fileName = ruleName.endsWith(".js")
         ? ruleName
         : ruleName + ".js";
     const isExternal = ruleName.includes("/");
     const importPath = isExternal
         ? "svglint-plugin-" + ruleName
-        : path.join(dir, fileName);
+        : `file://${path.resolve(__dirname, dir, fileName)}`;
     const module = await import(importPath);
     return module.default;
 }
