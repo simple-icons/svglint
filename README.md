@@ -31,8 +31,9 @@ $ svglint --help
 The tool can also be used through the JS API.
 
 ```javascript
-const SVGLint = require("svglint");
-const linting = SVGLint.lintSource("<svg>...</svg>", {
+import SVGLint from "svglint";
+
+const linting = await SVGLint.lintSource("<svg>...</svg>", {
     // ... config goes here
 });
 linting.on("done", () => {
@@ -50,7 +51,7 @@ If you are using the CLI, this configuration object is read from the file specif
 This configuration file should export a single object, of the format:
 
 ```javascript
-module.exports = {
+export default {
     // additional configuration may go here in the future
     // for now, "rules" is the only useful key
     rules: {
@@ -66,7 +67,7 @@ module.exports = {
             function() { // config 1 for the "custom" rule }
         ]
     }
-};
+}
 ```
 
 For specifics on how the config for each rule should be formatted, see [their specific rule files](https://github.com/birjolaxew/svglint/tree/master/src/rules).

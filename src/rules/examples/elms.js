@@ -1,4 +1,5 @@
-const logger = require("../../lib/logger")("rule:elms");
+import Logger from "../../lib/logger.js";
+const logger = Logger("rule:elms");
 
 /**
  * @typedef ElmsConfig
@@ -8,10 +9,10 @@ const logger = require("../../lib/logger")("rule:elms");
  *                             The first of all matching elements will be used.
  */
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
-     * @param {ElmsConfig} config 
+     * @param {ElmsConfig} config
      */
     generate(config) {
         /**

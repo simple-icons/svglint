@@ -1,4 +1,5 @@
-const logger = require("../../lib/logger")("rule:async");
+import Logger from "../../lib/logger.js";
+const logger = Logger("rule:async");
 
 /**
  * @typedef AsyncConfig
@@ -7,10 +8,10 @@ const logger = require("../../lib/logger")("rule:async");
  * @property {Number} wait The number of seconds to wait
  */
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
-     * @param {AsyncConfig} config 
+     * @param {AsyncConfig} config
      */
     generate(config) {
         return function AsyncRule(reporter) {

@@ -1,12 +1,12 @@
-const chalk = require("chalk");
-const { MSG_META } = require("../util");
+import chalk from "chalk";
+import { MSG_META } from "../util.js";
 
 /** @typedef {import("../../lib/linting.js")} Linting */
 
 /**
  * A summary of all lintings.
  */
-module.exports = class Summary {
+export default class Summary {
     constructor() {
         this.lintings = [];
     }
@@ -40,4 +40,4 @@ module.exports = class Summary {
             (active + successes + warns + errors) ? null : chalk.gray.dim("- No files linted"),
         ].filter(v => v).join("\n");
     }
-};
+}

@@ -4,11 +4,23 @@
  * It uses htmlparser2 to parse the source, which it gathers from either
  *   a string or a file.
  */
-const Parser = require("htmlparser2");
-const fs = require("fs");
-const path = require("path");
+import Parser from "htmlparser2";
+import fs from "fs";
+import path from "path";
 
-module.exports = {
+/**
+ * Parses an SVG source into an AST
+ * @param {String} source The source to parse
+ * @returns {AST} The parsed AST
+ */
+function parseSource(source) {
+    return normalizeAST(
+        sourceToAST(source),
+        source
+    );
+}
+
+export default {
     /**
      * Clones an AST by re-parsing it's source
      * @param {AST} ast The AST to clone
@@ -16,20 +28,10 @@ module.exports = {
      */
     clone(ast) {
         // @ts-ignore
-        return module.exports.parseSource(ast.source);
+        return parseSource(ast.source);
     },
 
-    /**
-     * Parses an SVG source into an AST
-     * @param {String} source The source to parse
-     * @returns {AST} The parsed AST
-     */
-    parseSource(source) {
-        return normalizeAST(
-            sourceToAST(source),
-            source
-        );
-    },
+    parseSource,
 
     /**
      * Parses the content of a file into an AST
@@ -48,7 +50,7 @@ module.exports = {
                     if (err) {
                         return rej(err);
                     }
-                    try { return res(module.exports.parseSource(data)); }
+                    try { return res(parseSource(data)); }
                     catch (e) { return rej(e); }
                 }
             );

@@ -1,6 +1,7 @@
-const chalk = require("chalk");
-const SVGLint = require("../src/svglint");
-const util = require("util");
+import chalk from "chalk";
+import util from "util";
+
+import SVGLint from "../src/svglint.js";
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console
@@ -55,20 +56,15 @@ function inspect(obj) {
  * @param {String} [svg=testSVG] The SVG to lint
  * @returns {Promise<void>} Throws if linting fails
  */
-function testSucceeds(config, svg=testSVG) {
+async function testSucceeds(config, svg=testSVG) {
     const _config = {
         rules: { custom: config },
     };
-    return new Promise((res, rej) => {
-        const linting = SVGLint.lintSource(svg, _config);
-        linting.on("done", () => {
-            if (linting.state === linting.STATES.success) {
-                res();
-            } else {
-                rej(new Error(`Linting failed (${linting.state}):
-        ${inspect(config)}`));
-            }
-        });
+    const linting = await SVGLint.lintSource(svg, _config);
+    linting.on("done", () => {
+        if (linting.state !== linting.STATES.success) {
+            throw new Error(`Linting failed (${linting.state}): ${inspect(config)}`);
+        }
     });
 }
 /**
@@ -77,20 +73,15 @@ function testSucceeds(config, svg=testSVG) {
  * @param {String} svg The SVG to lint
  * @returns {Promise<void>} Throws if the linting doesn't fail
  */
-function testFails(config, svg=testSVG) {
+async function testFails(config, svg=testSVG) {
     const _config = {
         rules: { custom: config },
     };
-    return new Promise((res, rej) => {
-        const linting = SVGLint.lintSource(svg, _config);
-        linting.on("done", () => {
-            if (linting.state === linting.STATES.error) {
-                res();
-            } else {
-                rej(new Error(`Linting did not fail (${linting.state}):
-        ${inspect(_config)}`));
-            }
-        });
+    const linting = await SVGLint.lintSource(svg, _config);
+    linting.on("done", () => {
+        if (linting.state !== linting.STATES.error) {
+            throw new Error(`Linting did not fail (${linting.state}): ${inspect(_config)}`);
+        }
     });
 }
 
@@ -105,7 +96,7 @@ describe("Rule: custom", function(){
                 if(!info) {
                     throw new Error("no info provided");
                 }
-                if(!info.hasOwnProperty("filepath")) {
+                if(!Object.prototype.hasOwnProperty.call(info, "filepath")) {
                     throw new Error("no filepath provided on info");
                 }
             }

@@ -5,10 +5,11 @@
  * Main responsibility is handling the consumer<->Linting communication,
  *   and converting the user-provided config into an object of rules.
  */
-const Linting = require("./lib/linting");
-const parse = require("./lib/parse");
-const loadRule = require("./lib/rule-loader");
-const logger = require("./lib/logger.js")("");
+import Linting from "./lib/linting.js";
+import parse from "./lib/parse.js";
+import loadRule from "./lib/rule-loader.js";
+import Logger from "./lib/logger.js";
+const logger = Logger("");
 
 /** @typedef {import("./lib/parse.js").AST} AST */
 /** @typedef {import("./lib/rule-loader.js").RuleModule} RuleModule */
@@ -52,21 +53,21 @@ const DEFAULT_CONFIG = Object.freeze({
  * Figures out which rules should be kept, and calls their generator with the
  *   user-provided config. The returned function is the actual linting func.
  * @param {RulesConfig} rulesConfig The user-provided config
- * @returns {NormalizedRules} The normalized rules
+ * @returns {Promise<NormalizedRules>} Resolves to the normalized rules
  */
-function normalizeRules(rulesConfig) {
+async function normalizeRules(rulesConfig) {
     /** @type {NormalizedRules} */
     const outp = {};
-    Object.keys(rulesConfig)
+    const promises = Object.keys(rulesConfig)
         // make sure no disabled rules are allowed in
         .filter(k => rulesConfig[k] !== false)
         // then convert each rule config into a rule func
-        .forEach(
-            ruleName => {
+        .map(
+            async (ruleName) => {
                 /** @type {RuleModule} */
                 let loadedRule;
                 try {
-                    loadedRule = loadRule(ruleName);
+                    loadedRule = await loadRule(ruleName);
                 } catch (e) {
                     logger.warn(`Unknown rule "${ruleName}".`);
                     return;
@@ -84,6 +85,7 @@ function normalizeRules(rulesConfig) {
                 }
             }
         );
+    await Promise.all(promises);
     return outp;
 }
 
@@ -91,9 +93,9 @@ function normalizeRules(rulesConfig) {
  * Normalizes a user-provided config to make sure it has every property we need.
  * Also handles merging with defaults.
  * @param {Config} config The user-provided config
- * @returns {NormalizedConfig} The normalized config
+ * @returns {Promise<NormalizedConfig>} Resolves to the normalized config
  */
-function normalizeConfig(config) {
+async function normalizeConfig(config) {
     const defaulted = Object.assign({},
         DEFAULT_CONFIG,
         config,
@@ -101,7 +103,7 @@ function normalizeConfig(config) {
     defaulted.rules = Object.assign({}, DEFAULT_CONFIG.rules, config.rules);
     /** @type NormalizedConfig */
     const outp = {
-        rules: normalizeRules(defaulted.rules),
+        rules: await normalizeRules(defaulted.rules),
         ignore: defaulted.ignore,
     };
     return outp;
@@ -112,27 +114,27 @@ function normalizeConfig(config) {
  * @param {String} file The file we are linting
  * @param {AST} ast The AST to lint
  * @param {Config} config The user-provided config to lint by
- * @returns {Linting} The linting that represents the result
+ * @returns {Promise<Linting>} Resolves to the linting that represents the result
  */
-function lint(file, ast, config) {
+async function lint(file, ast, config) {
     if (!ast.length && ast.source.trim() !== "") {
         throw new Error(`Unable to parse SVG from ${file || "API"}:
 ${ast.source}`);
     }
-    const conf = normalizeConfig(config);
+    const conf = await normalizeConfig(config);
     return new Linting(file, ast, conf.rules);
 }
 
-module.exports = {
+export default {
     /**
      * Lints a single SVG string.
      * The function returns before the Linting is finished.
      * You should listen to Linting.on("done") to wait for the result.
      * @param {String} source The SVG to lint
      * @param {Config} [config={}] The config to lint by
-     * @return {Linting} The Linting that represents the result
+     * @return {Promise<Linting>} Resolves to the Linting that represents the result
      */
-    lintSource(source, config={}) {
+    async lintSource(source, config={}) {
         const ast = parse.parseSource(source);
         return lint(null, ast, config);
     },

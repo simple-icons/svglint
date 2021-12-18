@@ -1,5 +1,6 @@
-const logger = require("../lib/logger")("rule:valid");
-const xmlParser = require("fast-xml-parser");
+import Logger from "../lib/logger.js";
+import xmlParser from "fast-xml-parser";
+const logger = Logger("rule:valid");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
@@ -11,7 +12,7 @@ const xmlParser = require("fast-xml-parser");
 * 2. If the SVG is not valid, report an error
 */
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
      * @param {Boolean} config

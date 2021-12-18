@@ -6,12 +6,12 @@
  * It receives the parsed AST and rules from ../svglint.js, and then runs each
  *   rule and gathers the results.
  */
-const EventEmitter = require("events").EventEmitter;
-const path = require("path");
-const cheerio = require("cheerio");
-const parse = require("./parse");
-const Reporter = require("./reporter");
-const Logger = require("./logger");
+import { EventEmitter } from "events";
+import path from "path";
+import cheerio from "cheerio";
+import parse from "./parse.js";
+import Reporter from "./reporter.js";
+import Logger from "./logger.js";
 
 /** @typedef {import("./parse.js").AST} AST */
 /** @typedef {import("./parse.js").Node} Node */
@@ -206,4 +206,4 @@ class Linting extends EventEmitter {
 }
 Linting.STATES = Linting.prototype.STATES = STATES;
 
-module.exports = Linting;
+export default Linting;

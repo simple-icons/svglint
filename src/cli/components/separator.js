@@ -1,11 +1,11 @@
-const chalk = require("chalk");
+import chalk from "chalk";
 const columns = process.stdout.columns || 80;
 
 /**
  * A separator between sections.
  * Optionally includes a title which will be displayed centered in the separator.
  */
-module.exports = class Separator {
+export default class Separator {
     constructor(title="") { this.title = title; }
     toString() {
         const padding = chalk.gray.dim("-".repeat(
@@ -13,4 +13,4 @@ module.exports = class Separator {
         ));
         return `${padding} ${chalk.bold.underline(this.title)} ${padding}`;
     }
-};
+}

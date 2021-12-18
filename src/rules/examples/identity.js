@@ -1,4 +1,5 @@
-const logger = require("../../lib/logger")("rule:identity");
+import Logger from "../../lib/logger.js";
+const logger = Logger("rule:identity");
 
 /**
  * @typedef IdentityConfig
@@ -6,10 +7,10 @@ const logger = require("../../lib/logger")("rule:identity");
  * @property {String} message The message to warn/error with
  */
 
-module.exports = {
+export default {
     /**
      * Generates a linting function from a config
-     * @param {IdentityConfig} config 
+     * @param {IdentityConfig} config
      */
     generate(config) {
         return function IdentityRule(reporter) {

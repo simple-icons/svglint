@@ -3,9 +3,9 @@
  * If called using the JS API, this will be `console` with prefixes.
  * If called using the CLI, this will be our own custom logger.
  */
-const chalk = require("chalk");
-const inspect = require("util").inspect;
-const EventEmitter = require("events").EventEmitter;
+import chalk from "chalk";
+import { inspect } from "util";
+import { EventEmitter } from "events";
 
 const CONSOLE_COLORS = Object.freeze({
     debug: chalk.dim.gray,
@@ -60,7 +60,7 @@ class CliConsole extends EventEmitter {
 CliConsole.prototype.EVENTS = METHODS;
 const cliConsole = new CliConsole();
 
-module.exports = function(prefix) {
+const Logger = function(prefix) {
     prefix = "SVGLint" + (prefix ? " " + prefix : "");
     const logger = {};
     METHODS.forEach(method => {
@@ -75,8 +75,9 @@ module.exports = function(prefix) {
     });
     return logger;
 };
-module.exports.cliConsole = cliConsole;
-module.exports.setCLI = value => { isCLI = value; };
-module.exports.setLevel = value => { level = value; };
-module.exports.LEVELS = LEVELS;
-module.exports.colorize = value => inspect(value, true, 2, true);
+Logger.cliConsole = cliConsole;
+Logger.setCLI = value => { isCLI = value; };
+Logger.setLevel = value => { level = value; };
+Logger.LEVELS = LEVELS;
+Logger.colorize = value => inspect(value, true, 2, true);
+export default Logger;
