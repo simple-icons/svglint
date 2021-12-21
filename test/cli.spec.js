@@ -11,7 +11,11 @@ process.on("unhandledRejection", error => {
  * @returns {Promise<Object>} The CLI output
  */
 async function execCliWith(args) {
-    return await execa("./bin/cli.js", args);
+    try {
+        return await execa("./bin/cli.js", args);
+    } catch (error) {
+        return error;
+    }
 }
 
 describe("CLI", function(){
@@ -25,5 +29,18 @@ describe("CLI", function(){
         const { failed, stdout } = await execCliWith(["--help"]);
         expect(failed).toBeFalsy();
         expect(stdout).toNotEqual("");
+    });
+
+    it("should succeed with a valid SVG", async function(){
+        const validSvg = "./test/svgs/attr.test.svg";
+        const { failed } = await execCliWith([validSvg]);
+        expect(failed).toBeFalsy();
+    });
+
+    it("should fail with an invalid SVG", async function(){
+        const invalidSvg = "./test/svgs/elm.test.svg";
+        const { failed, exitCode } = await execCliWith([invalidSvg]);
+        expect(failed).toBeTruthy();
+        expect(exitCode).toBe(1);
     });
 });
