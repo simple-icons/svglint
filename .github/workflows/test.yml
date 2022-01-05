@@ -51,5 +51,3 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
-      - name: Run CLI
-        run: node ./bin/cli.js test/svgs/attr.test.svg
