@@ -37,7 +37,7 @@
     "htmlparser2": "^3.9.1",
     "log-update": "^2.3.0",
     "meow": "^10.1.1",
-    "strip-ansi": "^4.0.0"
+    "strip-ansi": "^7.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-dynamic-import-vars": "^1.4.1",
