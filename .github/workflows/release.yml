@@ -9,7 +9,9 @@ jobs:
     name: Semantic release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # to create a GitHub Release
+      issues: write # to comment on issues included in a release
+      pulls: write # to comment on Pull Requests included in a release
     steps:
       - name: Checkout
         uses: actions/checkout@v2
