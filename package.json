@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "ansi-regex": "^5.0.1",
-    "chalk": "^2.4.1",
+    "chalk": "^5.0.0",
     "cheerio": "^1.0.0-rc.6",
     "fast-xml-parser": "^3.12.13",
     "glob": "^7.1.2",
@@ -58,15 +58,26 @@
     }
   },
   "release": {
-    "branches": ["master"],
+    "branches": [
+      "master"
+    ],
     "plugins": [
-      ["@semantic-release/commit-analyzer", {
-        "preset": "angular",
-        "releaseRules": [
-          { "type": "docs", "release": "patch" },
-          { "type": "chore", "release": "patch" }
-        ]
-      }],
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "angular",
+          "releaseRules": [
+            {
+              "type": "docs",
+              "release": "patch"
+            },
+            {
+              "type": "chore",
+              "release": "patch"
+            }
+          ]
+        }
+      ],
       "@semantic-release/release-notes-generator",
       "@semantic-release/npm",
       "@semantic-release/github"

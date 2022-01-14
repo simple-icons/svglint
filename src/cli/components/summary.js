@@ -1,5 +1,4 @@
-import chalk from "chalk";
-import { MSG_META } from "../util.js";
+import { chalk, MSG_META } from "../util.js";
 
 /** @typedef {import("../../lib/linting.js")} Linting */
 

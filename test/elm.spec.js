@@ -1,7 +1,7 @@
-import chalk from "chalk";
 import util from "util";
 
 import SVGLint from "../src/svglint.js";
+import { chalk } from "../src/cli/util.js";
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console

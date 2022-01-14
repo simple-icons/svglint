@@ -1,5 +1,4 @@
-import chalk from "chalk";
-import { chunkString, MSG_META, COLUMNS } from "../util.js";
+import { chalk, chunkString, MSG_META, COLUMNS } from "../util.js";
 import stripAnsi from "strip-ansi";
 
 import Spinner from "./spinner.js";

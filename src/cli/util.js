@@ -1,8 +1,19 @@
 /**
  * @fileoverview Utilities for the CLI.
  */
-import chalk from "chalk";
+import { Chalk, supportsColor as chalkSupportsColor } from "chalk";
 import ansiRegex from "ansi-regex";
+
+const supportsColor = chalkSupportsColor &&
+    !("NO_COLOR" in process.env) &&
+    !("SVGLINT_NO_COLOR" in process.env);
+
+let chalk;
+if (supportsColor) {
+    chalk = new Chalk();
+} else {
+    chalk = new Chalk({level: 0});
+}
 
 const COLUMNS = process.stdout.columns || 80;
 const MSG_META = Object.freeze({
@@ -40,7 +51,9 @@ const MSG_META = Object.freeze({
 });
 
 export {
+    chalk,
     chunkString,
+    supportsColor,
     MSG_META,
     COLUMNS,
 };
