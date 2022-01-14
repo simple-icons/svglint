@@ -8,12 +8,7 @@ const supportsColor = chalkSupportsColor &&
     !("NO_COLOR" in process.env) &&
     !("SVGLINT_NO_COLOR" in process.env);
 
-let chalk;
-if (supportsColor) {
-    chalk = new Chalk();
-} else {
-    chalk = new Chalk({level: 0});
-}
+let chalk = supportsColor ? new Chalk() : new Chalk({level: 0});
 
 const COLUMNS = process.stdout.columns || 80;
 const MSG_META = Object.freeze({
