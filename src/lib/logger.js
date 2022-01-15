@@ -3,9 +3,9 @@
  * If called using the JS API, this will be `console` with prefixes.
  * If called using the CLI, this will be our own custom logger.
  */
-import chalk from "chalk";
 import { inspect } from "util";
 import { EventEmitter } from "events";
+import { chalk, supportsColor } from "../cli/util.js";
 
 const CONSOLE_COLORS = Object.freeze({
     debug: chalk.dim.gray,
@@ -79,5 +79,6 @@ Logger.cliConsole = cliConsole;
 Logger.setCLI = value => { isCLI = value; };
 Logger.setLevel = value => { level = value; };
 Logger.LEVELS = LEVELS;
-Logger.colorize = value => inspect(value, true, 2, true);
+Logger.colorize = supportsColor ?
+    value => inspect(value, true, 2, true) : value => value;
 export default Logger;

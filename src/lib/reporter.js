@@ -2,7 +2,7 @@
  * @fileoverview The object that rules use to report errors, warnings and messages.
  */
 import { EventEmitter } from "events";
-import chalk from "chalk";
+import { chalk } from "../cli/util.js";
 import Logger from "./logger.js";
 
 /** @typedef {import("./parse.js").AST} AST */

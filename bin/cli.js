@@ -10,7 +10,7 @@ import SVGLint from "../src/svglint.js";
 // @ts-ignore
 import config from "../src/cli/config.js";
 import meow from "meow";
-import chalk from "chalk";
+import { chalk } from "../src/cli/util.js";
 import glob from "glob";
 
 const GUI = new gui();

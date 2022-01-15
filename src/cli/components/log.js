@@ -1,5 +1,5 @@
 import nodeUtil from "util";
-import { MSG_META } from "../util.js";
+import { MSG_META, supportsColor } from "../util.js";
 
 /** @typedef {import("../../lib/logger.js").CliConsole} CliHistory */
 
@@ -12,7 +12,7 @@ function stringifyArgs(args=[]) {
         v => (
             typeof v === "string"
                 ? v
-                : nodeUtil.inspect(v, { colors: true, depth: 3 })
+                : nodeUtil.inspect(v, { colors: supportsColor, depth: 3 })
         ).replace(/^Error: /, "")
     ).join(" ");
 }
@@ -30,7 +30,7 @@ export default class Log {
                 ? `[${meta.symbol}|${msg.prefix}]`
                 : `(${meta.symbol})`;
             const message = stringifyArgs(msg.args);
-            return meta.color(prefix) + " "
+            return (supportsColor ? meta.color(prefix) : prefix) + " "
                 + message;
         }).join("\n");
     }

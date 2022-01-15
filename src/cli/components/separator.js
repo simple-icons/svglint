@@ -1,4 +1,4 @@
-import chalk from "chalk";
+import { chalk } from "../util.js";
 const columns = process.stdout.columns || 80;
 
 /**
