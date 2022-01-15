@@ -14,7 +14,7 @@ async function execCliWith(args, env) {
     }
     argv.push([...args]);
 
-    return await new Promise(function(resolve){
+    return await new Promise(resolve => {
         const child = spawn(
             "node",
             argv,
@@ -26,7 +26,7 @@ async function execCliWith(args, env) {
 
         const stdoutChunks = [], stderrChunks = [];
         let stdout, stderr;
-        child.on("exit", (code) => {
+        child.on("exit", code => {
             resolve({
                 stdout,
                 stderr,
@@ -35,14 +35,14 @@ async function execCliWith(args, env) {
             });
         });
 
-        child.stdio[1].on("data", (data) => {
+        child.stdio[1].on("data", data => {
             stdoutChunks.push(data.toString());
         });
         child.stdio[1].on("end", () => {
             stdout = stdoutChunks.join("");
         });
 
-        child.stdio[2].on("data", (data) => {
+        child.stdio[2].on("data", data => {
             stderrChunks.push(data.toString());
         });
         child.stdio[2].on("end", () => {
