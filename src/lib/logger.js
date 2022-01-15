@@ -25,11 +25,12 @@ const METHODS = ["debug", "log", "warn", "error"];
 let isCLI = false;
 let level = LEVELS.log;
 
-
 // create a prefixing & colorizing wrapper around console for use in non-CLIs
 const wrappedConsole = Object.create(console);
 METHODS.forEach(method => {
-    const color = CONSOLE_COLORS[method];
+    const color = CONSOLE_COLORS[method]
+        ? CONSOLE_COLORS[method]
+        : v => v;
     wrappedConsole[method] = (prefix, args) => {
         // eslint-disable-next-line no-console
         console[method].apply(console, [color("["+prefix+"]"), ...args]);
