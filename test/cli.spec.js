@@ -1,21 +1,54 @@
-import { execa } from "execa";
+import { spawn } from "child_process";
+import path from "path";
+import ansiRegex from "ansi-regex";
 import expect from "expect";
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console
 });
 
-/**
- * Run the CLI with a given list of arguments
- * @param {String[]} args The list of args
- * @returns {Promise<Object>} The CLI output
- */
-async function execCliWith(args) {
-    try {
-        return await execa("./bin/cli.js", args);
-    } catch (error) {
-        return error;
+async function execCliWith(args, env) {
+    const argv = [path.resolve("./bin/cli.js")];
+    if (!args.includes("--version") && !args.includes("--help")) {
+        argv.push(...["--colors", "--ci"]);
     }
+    argv.push([...args]);
+
+    return await new Promise(function(resolve){
+        const child = spawn(
+            "node",
+            argv,
+            {
+                stdio: [0, "pipe", "pipe"],
+                env,
+            }
+        );
+
+        const stdoutChunks = [], stderrChunks = [];
+        let stdout, stderr;
+        child.on("exit", (code) => {
+            resolve({
+                stdout,
+                stderr,
+                failed: code != 0,
+                exitCode: code,
+            });
+        });
+
+        child.stdio[1].on("data", (data) => {
+            stdoutChunks.push(data.toString());
+        });
+        child.stdio[1].on("end", () => {
+            stdout = stdoutChunks.join("");
+        });
+
+        child.stdio[2].on("data", (data) => {
+            stderrChunks.push(data.toString());
+        });
+        child.stdio[2].on("end", () => {
+            stderr = stderrChunks.join("");
+        });
+    });
 }
 
 describe("CLI", function(){
@@ -42,5 +75,29 @@ describe("CLI", function(){
         const { failed, exitCode } = await execCliWith([invalidSvg]);
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(1);
+    });
+
+    it("colors in output passing '--colors' option", async function(){
+        const svg = "./test/svgs/elm.test.svg";
+        const { stdout } = await execCliWith([svg]);
+        expect(ansiRegex().test(stdout)).toBeTruthy();
+    });
+
+    it("no colors in output passing '--no-colors' option", async function(){
+        const svg = "./test/svgs/elm.test.svg";
+        const { stdout } = await execCliWith([svg, "--no-colors"]);
+        expect(ansiRegex().test(stdout)).toBeTruthy();
+    });
+
+    it("no colors in output with NO_COLOR environment variable", async function(){
+        const svg = "./test/svgs/elm.test.svg";
+        const { stdout } = await execCliWith([svg], {NO_COLOR: 1});
+        expect(ansiRegex().test(stdout)).toBeFalsy();
+    });
+
+    it("no colors in output with SVGLINT_NO_COLOR environment variable", async function(){
+        const svg = "./test/svgs/elm.test.svg";
+        const { stdout } = await execCliWith([svg], {SVGLINT_NO_COLOR: 1});
+        expect(ansiRegex().test(stdout)).toBeFalsy();
     });
 });
