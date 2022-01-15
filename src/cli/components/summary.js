@@ -36,7 +36,7 @@ export default class Summary {
             successes ? MSG_META.success.color.bold(`${MSG_META.success.symbol} ${successes} valid files.`) : null,
             warns ? MSG_META.warn.color.bold(`${MSG_META.warn.symbol} ${warns} files with warnings.`) : null,
             errors ? MSG_META.error.color.bold(`${MSG_META.error.symbol} ${errors} invalid files.`) : null,
-            (active + successes + warns + errors) ? null : chalk.gray.dim("- No files linted"),
+            (active + successes + warns + errors === 0) ? chalk.gray.dim("- No files linted") : null,
         ].filter(v => v).join("\n");
     }
 }
