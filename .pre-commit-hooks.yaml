@@ -5,3 +5,4 @@
   language: node
   types:
     - svg
+  minimum_pre_commit_version: 1.5.0
