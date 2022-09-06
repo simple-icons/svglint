@@ -1,6 +1,6 @@
 - id: svglint
   name: svglint
-  entry: svglint
+  entry: svglint -C
   description: Linter for SVGs
   language: node
   types:
