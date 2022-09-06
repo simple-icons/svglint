@@ -1,0 +1,7 @@
+- id: svglint
+  name: svglint
+  entry: svglint
+  description: Linter for SVGs
+  language: node
+  types:
+    - svg
