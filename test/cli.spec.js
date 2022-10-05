@@ -22,7 +22,7 @@ describe("CLI", function(){
     it("should succeed with --version", async function(){
         const { failed, stdout } = await execCliWith(["--version"]);
         expect(failed).toBeFalsy();
-        expect(stdout).toMatch(/[0-9]+\.[0-9]+\.[0-9]+/);
+        expect(stdout).toMatch(/^[0-9]+\.[0-9]+\.[0-9]+$/);
     });
 
     it("should succeed with --help", async function(){
