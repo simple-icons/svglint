@@ -12,8 +12,8 @@ function getConfigurationFile(filename=".svglintrc.js", folder=process.cwd()) {
         ? filename
         : path.resolve(folder, filename);
     return new Promise((res,rej)=>{
-        fs.exists(resolved, exists=>{
-            if (exists) {
+        fs.access(resolved, fs.constants.F_OK, err=>{
+            if (!err) {
                 // if file exists, finalize
                 res(resolved);
             } else {
