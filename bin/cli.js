@@ -8,13 +8,12 @@ import gui from "../src/cli/gui.js";
 import Logger from "../src/lib/logger.js";
 import SVGLint from "../src/svglint.js";
 // @ts-ignore
-import config from "../src/cli/config.js";
+import { getConfigurationFile } from "../src/cli/config.js";
 import meow from "meow";
 import { chalk } from "../src/cli/util.js";
 import glob from "glob";
 
 const GUI = new gui();
-const { getConfigurationFile } = config;
 
 const logger = Logger("");
 // Pretty logs all errors, then exits

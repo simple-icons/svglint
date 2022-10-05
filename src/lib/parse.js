@@ -13,50 +13,46 @@ import path from "path";
  * @param {String} source The source to parse
  * @returns {AST} The parsed AST
  */
-function parseSource(source) {
+export function parseSource(source) {
     return normalizeAST(
         sourceToAST(source),
         source
     );
 }
 
-export default {
-    /**
-     * Clones an AST by re-parsing it's source
-     * @param {AST} ast The AST to clone
-     * @returns {AST} The cloned AST
-     */
-    clone(ast) {
-        // @ts-ignore
-        return parseSource(ast.source);
-    },
+/**
+ * Clones an AST by re-parsing it's source
+ * @param {AST} ast The AST to clone
+ * @returns {AST} The cloned AST
+ */
+export function clone(ast) {
+    // @ts-ignore
+    return parseSource(ast.source);
+}
 
-    parseSource,
-
-    /**
-     * Parses the content of a file into an AST
-     * @param {String} file The path of the file in question
-     * @returns {Promise<AST>} The parsed AST
-     */
-    parseFile(file) {
-        const filePath = path.isAbsolute(file)
-            ? file
-            : path.join(process.cwd(), file);
-        return new Promise((res, rej) => {
-            fs.readFile(
-                filePath,
-                "utf8",
-                (err, data) => {
-                    if (err) {
-                        return rej(err);
-                    }
-                    try { return res(parseSource(data)); }
-                    catch (e) { return rej(e); }
+/**
+ * Parses the content of a file into an AST
+ * @param {String} file The path of the file in question
+ * @returns {Promise<AST>} The parsed AST
+ */
+export function parseFile(file) {
+    const filePath = path.isAbsolute(file)
+        ? file
+        : path.join(process.cwd(), file);
+    return new Promise((res, rej) => {
+        fs.readFile(
+            filePath,
+            "utf8",
+            (err, data) => {
+                if (err) {
+                    return rej(err);
                 }
-            );
-        });
-    }
-};
+                try { return res(parseSource(data)); }
+                catch (e) { return rej(e); }
+            }
+        );
+    });
+}
 
 /**
  * @typedef {Object<string,string>} Attributes
