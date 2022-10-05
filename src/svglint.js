@@ -6,7 +6,7 @@
  *   and converting the user-provided config into an object of rules.
  */
 import Linting from "./lib/linting.js";
-import parse from "./lib/parse.js";
+import * as parse from "./lib/parse.js";
 import loadRule from "./lib/rule-loader.js";
 import Logger from "./lib/logger.js";
 const logger = Logger("");

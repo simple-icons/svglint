@@ -31,6 +31,6 @@ function getConfigurationFile(filename=".svglintrc.js", folder=process.cwd()) {
     });
 }
 
-export default {
+export {
     getConfigurationFile,
 };

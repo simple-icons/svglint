@@ -8,8 +8,8 @@
  */
 import { EventEmitter } from "events";
 import path from "path";
-import cheerio from "cheerio";
-import parse from "./parse.js";
+import * as cheerio from "cheerio";
+import * as parse from "./parse.js";
 import Reporter from "./reporter.js";
 import Logger from "./logger.js";
 
