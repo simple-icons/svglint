@@ -16,8 +16,12 @@ import glob from "glob";
 const GUI = new gui();
 
 const logger = Logger("");
+
+// used by meow's loud reject
+// eslint-disable-next-line no-console
+console.error = logger.error.bind(logger);
+
 // Pretty logs all errors, then exits
-console.error = logger.error.bind(logger); // used by meow's loud reject
 process.on("uncaughtException", err => {
     logger.error(err);
     process.exit(1);
@@ -52,9 +56,10 @@ process.on("exit", () => {
         Logger.setLevel(Logger.LEVELS.debug);
     }
     GUI.setCI(cli.flags.ci);
-    const files = cli.input.map(v => glob.sync(v))
-                           .reduce((a, v) => a.concat(v), [])
-                           .map(v => path.resolve(process.cwd(), v));
+    const files = cli.input
+        .map(v => glob.sync(v))
+        .reduce((a, v) => a.concat(v), [])
+        .map(v => path.resolve(process.cwd(), v));
 
     // load the config
     let configObj;
@@ -64,7 +69,7 @@ process.on("exit", () => {
             const module = await import(`file://${configFile}`);
             configObj = module.default;
         } else {
-            logger.debug("No configuration file found")
+            logger.debug("No configuration file found");
             if (cli.flags.config) {
                 logger.error("Configuration file not found");
                 process.exit(1);

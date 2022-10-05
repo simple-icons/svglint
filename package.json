@@ -24,7 +24,7 @@
   "author": "birjolaxew",
   "license": "MIT",
   "scripts": {
-    "lint": "eslint src/**/*.js test/**/*.js",
+    "lint": "eslint bin/cli.js src/**/*.js test/**/*.js",
     "prepublishOnly": "rollup -c",
     "test": "mocha"
   },
