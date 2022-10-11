@@ -8,7 +8,7 @@ import gui from "../src/cli/gui.js";
 import Logger from "../src/lib/logger.js";
 import SVGLint from "../src/svglint.js";
 // @ts-ignore
-import { getConfigurationFile } from "../src/cli/config.js";
+import { loadConfigurationFile } from "../src/cli/config.js";
 import meow from "meow";
 import { chalk } from "../src/cli/util.js";
 import glob from "glob";
@@ -64,16 +64,13 @@ process.on("exit", () => {
     // load the config
     let configObj;
     try {
-        const configFile = await getConfigurationFile(cli.flags.config);
-        if (configFile) {
-            const module = await import(`file://${configFile}`);
-            configObj = module.default;
-        } else {
+        configObj = await loadConfigurationFile(cli.flags.config);
+        if (configObj === null) {
             logger.debug("No configuration file found");
             if (cli.flags.config) {
                 logger.error("Configuration file not found");
-                process.exit(1);
             }
+            process.exit(1);
         }
     } catch (e) {
         logger.error(`Failed to parse config: ${e.stack}`);
