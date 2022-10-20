@@ -87,4 +87,9 @@ describe("Configuration", function() {
         const { failed } = await execCliWith([VALID_SVG], "test/projects/esm/bar");
         expect(failed).toBeFalsy();
     });
+
+    it("should suceed in a nested folder inside a project with a root config file", async function() {
+        const { failed } = await execCliWith([VALID_SVG], "test/projects/cjs/bar/a/b/c");
+        expect(failed).toBeFalsy();
+    });
 });

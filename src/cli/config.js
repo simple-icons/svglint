@@ -41,6 +41,18 @@ async function getDefaultConfigurationFile(folder) {
     if (await fileExists(filepath)) {
         return filepath;
     }
+
+    const packageJsonPath = path.resolve(folder, "package.json");
+    if (await fileExists(packageJsonPath)) {
+        filepath = path.resolve(
+            folder,
+            isEsmPackageJson(packageJsonPath) ? ".svglintrc.cjs" : ".svglintrc.mjs",
+        );
+        if (await fileExists(filepath)) {
+            return filepath;
+        }
+    }
+
     return false;
 }
 
@@ -86,22 +98,7 @@ async function getConfigurationFile(filename, folder) {
         return filepath;
     }
 
-    const packageJsonPath = path.resolve(folder, "package.json");
-    if (await fileExists(packageJsonPath)) {
-        filepath = path.resolve(
-            folder,
-            isEsmPackageJson(packageJsonPath) ? ".svglintrc.cjs" : ".svglintrc.mjs",
-        );
-        if (await fileExists(filepath)) {
-            return filepath;
-        }
-    }
-
-    const parent = path.resolve(folder, "..");
-    if (parent === folder) {
-        return false;
-    }
-    return await getDefaultConfigurationFileTraversingParents(parent);
+    return await getDefaultConfigurationFileTraversingParents(folder);
 }
 
 /**
