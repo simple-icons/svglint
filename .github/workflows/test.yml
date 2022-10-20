@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Node.js setup
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           cache: npm
           node-version: 18
@@ -31,20 +31,22 @@ jobs:
           - 12.22.0
           - 14.17.0
           - 16.0.0
+          - 18.0.0
           - 12
           - 14
           - 16
-          - 17
+          - 18
+          - 19
         include:
           - os: macos-latest
-            node-version: 16
+            node-version: 18
           - os: windows-latest
-            node-version: 16
+            node-version: 18
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Node.js setup
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           cache: npm
           node-version: ${{ matrix.node-version }}
