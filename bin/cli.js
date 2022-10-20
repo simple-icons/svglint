@@ -24,7 +24,7 @@ console.error = logger.error.bind(logger);
 // Pretty logs all errors, then exits
 process.on("uncaughtException", err => {
     logger.error(err);
-    process.exit(1);
+    process.exit(2);
 });
 
 // Generates the CLI binding using meow
@@ -72,12 +72,12 @@ process.on("exit", () => {
             logger.debug("No configuration file found");
             if (cli.flags.config) {
                 logger.error("Configuration file not found");
-                process.exit(1);
+                process.exit(3);
             }
         }
     } catch (e) {
         logger.error(`Failed to parse config: ${e.stack}`);
-        process.exit(1);
+        process.exit(4);
     }
 
     // lint all the files
