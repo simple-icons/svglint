@@ -34,6 +34,7 @@ jobs:
           - 14
           - 16
           - 18
+          - 19
         include:
           - os: macos-latest
             node-version: 18
