@@ -30,15 +30,17 @@ jobs:
           - 12.20.0
           - 14.13.1
           - 16.0.0
+          - 18.0.0
           - 12
           - 14
           - 16
-          - 17
+          - 18
+          - 19
         include:
           - os: macos-latest
-            node-version: 16
+            node-version: 18
           - os: windows-latest
-            node-version: 16
+            node-version: 18
     steps:
       - name: Checkout
         uses: actions/checkout@v2
