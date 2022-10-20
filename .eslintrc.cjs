@@ -24,5 +24,8 @@ module.exports = {
             "always"
         ],
         "no-console": "warn",
-    }
+    },
+    "ignorePatterns": [
+        "test/configs/*.js"
+    ]
 };
