@@ -1,10 +1,10 @@
-import path from "path";
+import path from "node:path";
 import fs from "fs";
 
 /**
  * Check if a file exists
  * @param {String} filepath The file to check for existence
- * @returns {Promise<String,Boolean>} true if the file exists, false otherwise
+ * @returns {Promise<Boolean>} true if the file exists, false otherwise
  */
 function fileExists(filepath) {
     return new Promise((res)=>{
@@ -18,9 +18,9 @@ function fileExists(filepath) {
 }
 
 /**
- * Check if a package.json file is defining the property "type" to "module".
- * @param {String} filepath The package.json file to check
- * @returns {Boolean} true if `"type": "module"` is defined, false otherwise
+ * Check if the package is an ESM project
+ * @param {String} filepath The package.json file path
+ * @returns {Boolean} true if the package is ESM based, false otherwise
  **/
 function isEsmPackageJson(filename) {
     try {
@@ -93,18 +93,13 @@ async function getConfigurationFile(filename, folder) {
         }
     }
 
-    filepath = await getDefaultConfigurationFile(folder);
-    if (filepath) {
-        return filepath;
-    }
-
     return await getDefaultConfigurationFileTraversingParents(folder);
 }
 
 /**
- * Load the configuration object discovered by `getConfigurationFile`
+ * Load the configuration object from the SVGLint configuration file
  * @param {String} folder The folder to start looking in
- * @returns {Promise<Object,null>} The configuration object, or null if no SVGLint configuration files found
+ * @returns {Promise<Object,null>} The configuration object, or null if no SVGLint configuration file is found
  */
 async function loadConfigurationFile(filename, folder=process.cwd()) {
     const filepath = await getConfigurationFile(filename, folder);
@@ -117,6 +112,5 @@ async function loadConfigurationFile(filename, folder=process.cwd()) {
 }
 
 export {
-    getConfigurationFile,
     loadConfigurationFile,
 };

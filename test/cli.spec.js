@@ -53,8 +53,8 @@ describe("CLI", function(){
     });
 });
 
-describe("Configuration", function() {
-    it("should fail passing an unexistent file path to --config", async function() {
+describe("Configuration files", function() {
+    it("should fail passing an non-existent file path to --config", async function() {
         const { failed, exitCode } = await execCliWith(
             [VALID_SVG, "--config", "./this/file/does/not-exist.js"],
         );
@@ -64,7 +64,8 @@ describe("Configuration", function() {
 
     it("should succeed passing an existent file path to --config", async function() {
         const { failed } = await execCliWith(
-            [VALID_SVG, "--config", "test/projects/esm/foo/custom-svglint-config.js"]);
+            [VALID_SVG, "--config", "test/projects/esm/foo/custom-svglint-config.js"]
+        );
         expect(failed).toBeFalsy();
     });
 
@@ -88,7 +89,7 @@ describe("Configuration", function() {
         expect(failed).toBeFalsy();
     });
 
-    it("should suceed in a nested folder inside a project with a root config file", async function() {
+    it("should succeed in a nested folder inside a project with a root config file", async function() {
         const { failed } = await execCliWith([VALID_SVG], "test/projects/cjs/bar/a/b/c");
         expect(failed).toBeFalsy();
     });
