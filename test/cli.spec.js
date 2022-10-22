@@ -70,14 +70,6 @@ describe("Configuration files", function() {
         expect(exitCode).toBe(4);
     });
 
-    it("should fail passing an non-existent file path to --config", async function() {
-        const { failed, exitCode } = await execCliWith(
-            [VALID_SVG, "--config", "./this/file/does/not-exist.js"],
-        );
-        expect(failed).toBeTruthy();
-        expect(exitCode).toBe(1);
-    });
-
     it("should succeed passing an existent file path to --config", async function() {
         const { failed } = await execCliWith(
             [VALID_SVG, "--config", "test/projects/esm/foo/custom-svglint-config.js"]
