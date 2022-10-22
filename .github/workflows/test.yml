@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Node.js setup
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           cache: npm
-          node-version: 14
+          node-version: 18
       - name: Install dependencies
         run: npm ci
       - name: Lint
@@ -23,30 +23,35 @@ jobs:
     name: Run tests
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - ubuntu-latest
         node-version:
-          - 12.20.0
-          - 14.13.1
+          - 12.22.0
+          - 14.17.0
           - 16.0.0
+          - 18.0.0
           - 12
           - 14
           - 16
-          - 17
+          - 18
+          - 19
         include:
           - os: macos-latest
-            node-version: 16
+            node-version: 18
           - os: windows-latest
-            node-version: 16
+            node-version: 18
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Node.js setup
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           cache: npm
           node-version: ${{ matrix.node-version }}
+      - name: Install compatible npm version
+        run: npm install --global npm@8.1.2
       - name: Install dependencies
         run: npm ci
       - name: Test
