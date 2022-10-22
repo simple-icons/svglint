@@ -51,7 +51,9 @@ describe("CLI", function(){
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(1);
     });
+});
 
+describe("Configuration files", function() {
     it("should fail with an non-existent configuration file", async function(){
         const { failed, exitCode } = await execCliWith([
             "--config", "./this/file/does/not-exist.js"
@@ -62,14 +64,12 @@ describe("CLI", function(){
 
     it("should fail with an invalid configuration file", async function(){
         const { failed, exitCode } = await execCliWith([
-            "--config", "./test/configs/invalid-svglint-config.js"
+            "--config", "./test/projects/broken/invalid-svglint-config.js"
         ]);
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(4);
     });
-});
 
-describe("Configuration files", function() {
     it("should fail passing an non-existent file path to --config", async function() {
         const { failed, exitCode } = await execCliWith(
             [VALID_SVG, "--config", "./this/file/does/not-exist.js"],

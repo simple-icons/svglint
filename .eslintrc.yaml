@@ -22,4 +22,4 @@ rules:
     - always
   no-console: warn
 ignorePatterns:
-  - test/configs/*.js
+  - test/projects/broken/*.js
