@@ -62,9 +62,9 @@ describe("Configuration files", function() {
         expect(exitCode).toBe(3);
     });
 
-    it("should fail with an invalid configuration file", async function(){
+    it("should fail with an broken configuration file", async function(){
         const { failed, exitCode } = await execCliWith([
-            "--config", "./test/projects/broken/invalid-svglint-config.js"
+            "--config", "./test/projects/broken/broken-svglint-config.js"
         ]);
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(4);
