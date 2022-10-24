@@ -55,17 +55,17 @@ describe("CLI", function(){
 
 describe("Configuration files", function() {
     it("should fail with an non-existent configuration file", async function(){
-        const { failed, exitCode } = await execCliWith([
-            "--config", "./this/file/does/not-exist.js"
-        ]);
+        const { failed, exitCode } = await execCliWith(
+            ["--config", "./this/file/does/not-exist.js"]
+        );
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(4);
     });
 
-    it("should fail with an broken configuration file", async function(){
-        const { failed, exitCode } = await execCliWith([
-            "--config", "./test/projects/broken/broken-svglint-config.js"
-        ]);
+    it("should fail with a broken configuration file", async function(){
+        const { failed, exitCode } = await execCliWith(
+            ["--config", "./test/projects/broken/broken-svglint-config.js"]
+        );
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(4);
     });
