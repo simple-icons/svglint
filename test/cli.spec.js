@@ -59,7 +59,7 @@ describe("Configuration files", function() {
             "--config", "./this/file/does/not-exist.js"
         ]);
         expect(failed).toBeTruthy();
-        expect(exitCode).toBe(3);
+        expect(exitCode).toBe(4);
     });
 
     it("should fail with an broken configuration file", async function(){
