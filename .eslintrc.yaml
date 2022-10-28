@@ -21,3 +21,5 @@ rules:
     - error
     - always
   no-console: warn
+ignorePatterns:
+  - test/projects/broken/*.js

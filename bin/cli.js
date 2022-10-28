@@ -17,6 +17,14 @@ const GUI = new gui();
 
 const logger = Logger("");
 
+const EXIT_CODES = Object.freeze({
+    success: 0,
+    violations: 1,
+    unexpected: 2,
+    interrupted: 3,
+    configuration: 4,
+});
+
 // used by meow's loud reject
 // eslint-disable-next-line no-console
 console.error = logger.error.bind(logger);
@@ -24,7 +32,12 @@ console.error = logger.error.bind(logger);
 // Pretty logs all errors, then exits
 process.on("uncaughtException", err => {
     logger.error(err);
-    process.exit(1);
+    process.exit(EXIT_CODES.unexpected);
+});
+
+// Handle SIGINT
+process.on("SIGINT", () => {
+    process.exit(EXIT_CODES.interrupted);
 });
 
 // Generates the CLI binding using meow
@@ -69,12 +82,12 @@ process.on("exit", () => {
             logger.debug("No configuration file found");
             if (cli.flags.config) {
                 logger.error("Configuration file not found");
-                process.exit(1);
+                process.exit(EXIT_CODES.configuration);
             }
         }
     } catch (e) {
         logger.error(`Failed to parse config: ${e.stack}`);
-        process.exit(1);
+        process.exit(EXIT_CODES.configuration);
     }
 
     // lint all the files
@@ -85,7 +98,9 @@ process.on("exit", () => {
         --activeLintings;
         logger.debug("Linting done,", activeLintings, "to go");
         if (activeLintings <= 0) {
-            process.exit(hasErrors ? 1 : 0);
+            process.exit(
+                hasErrors ? EXIT_CODES.violations : EXIT_CODES.success
+            );
         }
     };
     files.forEach(filePath => {
