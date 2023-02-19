@@ -34,6 +34,10 @@ const logger = Logger("rule:attr");
 
 const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist", "rule::order"];
 
+const OPTIONAL_SUFFIX = "?";
+
+const isAttrOptional = (attr) => attr.endsWith(OPTIONAL_SUFFIX);
+
 /**
  * Executes on a single element.
  * @param {Cheerio} $elm The cheerio element to execute on
@@ -55,7 +59,10 @@ function executeOnElm($elm, config, reporter, ast) {
                     || conf instanceof Array
                     || typeof conf === "string"
                     || conf instanceof RegExp) {
-                if (attrs[attrib] === undefined) {
+                const optional = isAttrOptional(attrib);
+                const attr = optional ? attrib.substring(0, -1) : attrib;
+            
+                if (attrs[attr] === undefined && !optional) {
                     reporter.error(
                         `Expected attribute '${attrib}', didn't find it`,
                         $elm,
@@ -104,7 +111,7 @@ function executeOnElm($elm, config, reporter, ast) {
     Object.keys(attrs).forEach(
         attrib => {
             const value = attrs[attrib];
-            const expected = config[attrib];
+            const expected = config[attrib] ?? config[`${attrib}${OPTIONAL_SUFFIX}`];
             let handled = false;
             // check each type
             switch (typeof expected) {
@@ -170,7 +177,8 @@ function executeOnElm($elm, config, reporter, ast) {
     );
 
     if (config["rule::whitelist"]) {
-        const remaining = Object.keys(attrs);
+        const remaining = Object.keys(attrs).filter((attr) => !isAttrOptional(attr));
+
         if (remaining.length) {
             reporter.error(
                 `Found extra attributes ${JSON.stringify(remaining)} with whitelisting enabled`,
