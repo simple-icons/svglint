@@ -111,7 +111,7 @@ function executeOnElm($elm, config, reporter, ast) {
     Object.keys(attrs).forEach(
         attrib => {
             const value = attrs[attrib];
-            const expected = config[attrib] ?? config[`${attrib}${OPTIONAL_SUFFIX}`];
+            const expected = typeof config[attrib] !== "undefined" ? config[attrib] : config[`${attrib}${OPTIONAL_SUFFIX}`];
             let handled = false;
             // check each type
             switch (typeof expected) {
