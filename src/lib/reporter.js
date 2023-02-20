@@ -64,10 +64,10 @@ class Reporter extends EventEmitter {
     }
 
     /**
-     * Reports that an exception occured during rule processing.
+     * Reports that an exception occurred during rule processing.
      * This doesn't change the current linting result, but is important to show
      *   to users as it indicates that the linting result cannot be trusted.
-     * @param {Error} e The exception that occured.
+     * @param {Error} e The exception that occurred.
      */
     exception(e) {
         this.logger.debug("Exception reported:", e);
