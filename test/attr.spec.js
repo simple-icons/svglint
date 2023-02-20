@@ -137,7 +137,7 @@ describe("Rule: attr", function(){
             "rule::selector": "svg",
         });
     });
-    it("should fail with a non-existant attribute when given regex", function(){
+    it("should fail with a non-existent attribute when given regex", function(){
         return testFails({
             "foo": /^img$/,
             "rule::selector": "svg",
