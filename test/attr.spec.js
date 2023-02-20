@@ -200,7 +200,7 @@ describe("Rule: attr", function(){
         });
     });
 
-    it("should fail in whitelist-mode when all required attributes are allowed but optional are not", function(){
+    it("should fail in whitelist-mode with an invalid value for an optional attribute", function(){
         return testFails({
             "role": ["img", "progressbar"],
             "viewBox?": "0 0 25 25",
