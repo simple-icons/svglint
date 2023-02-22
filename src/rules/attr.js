@@ -53,22 +53,15 @@ function executeOnElm($elm, config, reporter, ast) {
         attrib => {
             // do nothing with special configs
             if (SPECIAL_ATTRIBS.includes(attrib)) { return; }
-            // if it must exist
-            const conf = config[attrib];
-            if (conf === true 
-                    || conf instanceof Array
-                    || typeof conf === "string"
-                    || conf instanceof RegExp) {
-                const optional = isAttrOptional(attrib);
-                const attr = optional ? attrib.substring(0, -1) : attrib;
-            
-                if (attrs[attr] === undefined && !optional) {
-                    reporter.error(
-                        `Expected attribute '${attrib}', didn't find it`,
-                        $elm,
-                        ast
-                    );
-                }
+            // do nothing with optional attributes
+            if (isAttrOptional(attrib)) { return; }
+            // if defined and not false it must exist
+            if (attrib in config && config[attrib] && !(attrib in attrs)) {
+                reporter.error(
+                    `Expected attribute '${attrib}', didn't find it`,
+                    $elm,
+                    ast
+                );
             }
         }
     );
