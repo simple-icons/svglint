@@ -23,6 +23,13 @@
   ],
   "author": "birjolaxew",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/birjj/svglint"
+  },
+  "bugs": {
+    "url": "https://github.com/birjj/svglint/issues"
+  },
   "scripts": {
     "lint": "eslint .",
     "prepublishOnly": "rollup -c",
