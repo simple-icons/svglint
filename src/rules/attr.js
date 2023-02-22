@@ -56,7 +56,7 @@ function executeOnElm($elm, config, reporter, ast) {
             // do nothing with optional attributes
             if (isAttrOptional(attrib)) { return; }
             // if defined and not false it must exist
-            if (attrib in config && config[attrib] && !(attrib in attrs)) {
+            if (config[attrib] && !(attrib in attrs)) {
                 reporter.error(
                     `Expected attribute '${attrib}', didn't find it`,
                     $elm,
