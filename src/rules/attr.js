@@ -18,7 +18,7 @@ const logger = Logger("rule:attr");
  * - `{ "rule::selector": {String} }` Default "*". The matching elements must fulfill the other configs.
  * - `{ "rule::whitelist": {Boolean} }` Default `false`. If true, no other attributes can exist than those specified by the other configs.
  * - `{ "rule::order": {Array<String> | Boolean} }` Default `null`. As array, attributes must be defined in the provided order. As `true`, attributes must be defined in alphabetical order.
- * - `{ "<attribute>?": {Boolean|String|RegExp|Array<String>} }` Appending a `?` to an attribute name will make that attribute as optional, and it will not error if it is missing when `rule::whitelist` is set.
+ * - `{ "<attribute>?": {Boolean|String|RegExp|Array<String>} }` Appending a `?` to an attribute name will make that attribute optional, and it will not error if it is missing when `rule::whitelist` is set.
  */
 
 /**
