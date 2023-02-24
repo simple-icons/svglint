@@ -7,6 +7,7 @@ const logger = Logger("rule:attr");
 
 /**
  * @typedef {Object<string,string|string[]|boolean|RegExp>} AttrConfig
+ *
  * The key represents the attribute name. The value has the following meanings:  
  * - `{Boolean}` If true, the attr must exist. If false, it must not exist.  
  * - `{String}` The attr value must match this exactly. It must also exist.
@@ -17,6 +18,7 @@ const logger = Logger("rule:attr");
  * - `{ "rule::selector": {String} }` Default "*". The matching elements must fulfill the other configs.
  * - `{ "rule::whitelist": {Boolean} }` Default `false`. If true, no other attributes can exist than those specified by the other configs.
  * - `{ "rule::order": {Array<String> | Boolean} }` Default `null`. As array, attributes must be defined in the provided order. As `true`, attributes must be defined in alphabetical order.
+ * - `{ "<attribute>?": {Boolean|String|RegExp|Array<String>} }` Appending a `?` to an attribute name will make that attribute optional, and it will not error if it is missing when `rule::whitelist` is set.
  */
 
 /**
@@ -29,10 +31,14 @@ const logger = Logger("rule:attr");
  *     - If it has a config:
  *       - If allowed, remove it from the attr list
  *       - If disallowed, error and remove it from the attr list
- *   - If whitelist is true, error if there are attributes left
+ *   - If whitelist is true, error if there are non-optional attributes left
  */
 
 const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist", "rule::order"];
+
+const OPTIONAL_SUFFIX = "?";
+
+const isAttrOptional = (attr) => attr.endsWith(OPTIONAL_SUFFIX);
 
 /**
  * Executes on a single element.
@@ -49,19 +55,15 @@ function executeOnElm($elm, config, reporter, ast) {
         attrib => {
             // do nothing with special configs
             if (SPECIAL_ATTRIBS.includes(attrib)) { return; }
-            // if it must exist
-            const conf = config[attrib];
-            if (conf === true 
-                    || conf instanceof Array
-                    || typeof conf === "string"
-                    || conf instanceof RegExp) {
-                if (attrs[attrib] === undefined) {
-                    reporter.error(
-                        `Expected attribute '${attrib}', didn't find it`,
-                        $elm,
-                        ast
-                    );
-                }
+            // do nothing with optional attributes
+            if (isAttrOptional(attrib)) { return; }
+            // if defined and not false it must exist
+            if (config[attrib] && !(attrib in attrs)) {
+                reporter.error(
+                    `Expected attribute '${attrib}', didn't find it`,
+                    $elm,
+                    ast
+                );
             }
         }
     );
@@ -104,7 +106,7 @@ function executeOnElm($elm, config, reporter, ast) {
     Object.keys(attrs).forEach(
         attrib => {
             const value = attrs[attrib];
-            const expected = config[attrib];
+            const expected = typeof config[attrib] !== "undefined" ? config[attrib] : config[`${attrib}${OPTIONAL_SUFFIX}`];
             let handled = false;
             // check each type
             switch (typeof expected) {
@@ -170,7 +172,8 @@ function executeOnElm($elm, config, reporter, ast) {
     );
 
     if (config["rule::whitelist"]) {
-        const remaining = Object.keys(attrs);
+        const remaining = Object.keys(attrs).filter((attr) => !isAttrOptional(attr));
+
         if (remaining.length) {
             reporter.error(
                 `Found extra attributes ${JSON.stringify(remaining)} with whitelisting enabled`,

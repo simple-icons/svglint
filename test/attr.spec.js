@@ -168,6 +168,28 @@ describe("Rule: attr", function(){
             "rule::whitelist": true,
         });
     });
+    
+    it("should succeed in whitelist-mode when all required attributes match", function(){
+        return testSucceeds({
+            "width": true,
+            "height": true,
+            "style": true,
+            "x?": true,
+            "rule::selector": "rect",
+            "rule::whitelist": true,
+        });
+    });
+
+    it("should succeed in whitelist-mode when all required and optional attributes match", function(){
+        return testSucceeds({
+            "width": true,
+            "height": true,
+            "style?": true,
+            "rule::selector": "rect",
+            "rule::whitelist": true,
+        });
+    });
+    
     it("should fail in whitelist-mode when not all attributes are allowed", function(){
         return testFails({
             "role": ["img", "progressbar"],
@@ -177,6 +199,16 @@ describe("Rule: attr", function(){
             "rule::whitelist": true,
         });
     });
+
+    it("should fail in whitelist-mode with an invalid value for an optional attribute", function(){
+        return testFails({
+            "role": ["img", "progressbar"],
+            "viewBox?": "0 0 25 25",
+            "rule::selector": "svg",
+            "rule::whitelist": true,
+        });
+    });
+    
     it("should succeed in whitelist-mode without attributes", function(){
         return testSucceeds({
             "rule::selector": "circle",
