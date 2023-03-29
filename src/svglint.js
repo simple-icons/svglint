@@ -100,7 +100,11 @@ async function normalizeConfig(config) {
         DEFAULT_CONFIG,
         config,
     );
-    defaulted.rules = Object.assign({}, DEFAULT_CONFIG.rules, config.rules);
+    var configrules = {}
+    if ((!config === null) && config.hasOwnProperty('rules')) {
+        configrules = config.rules
+    }
+    defaulted.rules = Object.assign({}, DEFAULT_CONFIG.rules, configrules);
     /** @type NormalizedConfig */
     const outp = {
         rules: await normalizeRules(defaulted.rules),
