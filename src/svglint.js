@@ -100,9 +100,9 @@ async function normalizeConfig(config) {
         DEFAULT_CONFIG,
         config,
     );
-    var configrules = {}
-    if ((!config === null) && config.hasOwnProperty('rules')) {
-        configrules = config.rules
+    var configrules = {};
+    if (!config === null) {
+        configrules = config.rules;
     }
     defaulted.rules = Object.assign({}, DEFAULT_CONFIG.rules, configrules);
     /** @type NormalizedConfig */
