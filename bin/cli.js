@@ -83,6 +83,8 @@ process.on("exit", () => {
             if (cli.flags.config) {
                 logger.error("Configuration file not found");
                 process.exit(EXIT_CODES.configuration);
+            } else {
+                configObj = {};
             }
         }
     } catch (e) {
