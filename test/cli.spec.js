@@ -47,7 +47,7 @@ describe("CLI", function(){
     });
 
     it("should fail with an invalid SVG", async function(){
-        const { failed, exitCode } = await execCliWith([INVALID_SVG]);
+        const { failed, exitCode } = await execCliWith([INVALID_SVG], "test/projects/with-config");
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(1);
     });
@@ -100,5 +100,10 @@ describe("Configuration files", function() {
     it("should succeed in a nested folder inside a project with a root config file", async function() {
         const { failed } = await execCliWith([VALID_SVG], "test/projects/cjs/bar/a/b/c");
         expect(failed).toBeFalsy();
+    });
+
+    it("should succeed in a project without a config file", async function () {
+        const { stdout } = await execCliWith([VALID_SVG], "test/projects/without-config");
+        expect(stdout).toNotMatch("Failed to lint");
     });
 });
