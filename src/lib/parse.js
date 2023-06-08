@@ -7,6 +7,7 @@
 import Parser from "htmlparser2";
 import fs from "fs";
 import path from "path";
+import process from "process";
 
 /**
  * Parses an SVG source into an AST

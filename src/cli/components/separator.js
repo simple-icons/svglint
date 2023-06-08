@@ -1,3 +1,4 @@
+import process from "process";
 import { chalk } from "../util.js";
 const columns = process.stdout.columns || 80;
 

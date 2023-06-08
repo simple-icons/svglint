@@ -1,4 +1,5 @@
 import path from "path";
+import process from "process";
 
 import { execa } from "execa";
 import expect from "expect";

@@ -1,3 +1,4 @@
+import process from "process";
 import util from "util";
 
 import SVGLint from "../src/svglint.js";

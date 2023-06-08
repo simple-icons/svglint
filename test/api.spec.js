@@ -1,5 +1,6 @@
 import expect from "expect";
 import * as path from "path";
+import process from "process";
 import * as url from "url";
 
 import SVGLint from "../src/svglint.js";

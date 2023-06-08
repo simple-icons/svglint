@@ -4,6 +4,7 @@
  * Acts as an interface to the JS API
  */
 import path from "path";
+import process from "process";
 import gui from "../src/cli/gui.js";
 import Logger from "../src/lib/logger.js";
 import SVGLint from "../src/svglint.js";
