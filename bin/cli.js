@@ -45,18 +45,21 @@ process.on("SIGINT", () => {
 const cli = meow(`
         ${chalk.yellow("Usage:")}
             ${chalk.bold("svglint")} [--config config.js] [--ci] [--debug] ${chalk.bold("file1.svg file2.svg")}
+            ${chalk.bold("svglint")} --stdin [--config config.js] [--ci] [--debug] < ${chalk.bold("file1.svg")}
 
         ${chalk.yellow("Options:")}
             ${chalk.bold("--help")}        Display this help text
             ${chalk.bold("--version")}     Show the current SVGLint version
             ${chalk.bold("--config, -c")}  Specify the config file. Defaults to '.svglintrc.js'
             ${chalk.bold("--debug,  -d")}  Show debug logs
-            ${chalk.bold("--ci, -C")}      Only output to stdout once, when linting is finished`, {
+            ${chalk.bold("--ci, -C")}      Only output to stdout once, when linting is finished
+            ${chalk.bold("--stdin")}       Read an SVG from stdin`, {
     importMeta: import.meta,
     flags: {
         config: { type: "string", alias: "c", },
         debug: { type: "boolean", alias: "d" },
-        ci: { type: "boolean", alias: "C" }
+        ci: { type: "boolean", alias: "C" },
+        stdin: { type: "boolean" }
     }
 });
 
@@ -70,10 +73,6 @@ process.on("exit", () => {
         Logger.setLevel(Logger.LEVELS.debug);
     }
     GUI.setCI(cli.flags.ci);
-    const files = cli.input
-        .map(v => glob.sync(v))
-        .reduce((a, v) => a.concat(v), [])
-        .map(v => path.resolve(process.cwd(), v));
 
     // load the config
     let configObj;
@@ -93,39 +92,78 @@ process.on("exit", () => {
         process.exit(EXIT_CODES.configuration);
     }
 
-    // lint all the files
-    // also keep track so we know when every linting has finished
-    let hasErrors = false;
-    let activeLintings = files.length;
-    const onLintingDone = () => {
-        --activeLintings;
-        logger.debug("Linting done,", activeLintings, "to go");
-        if (activeLintings <= 0) {
-            process.exit(
-                hasErrors ? EXIT_CODES.violations : EXIT_CODES.success
-            );
-        }
-    };
-    files.forEach(filePath => {
-        SVGLint.lintFile(filePath, configObj)
-            .then(linting => {
-                // handle case where linting failed (e.g. invalid file)
-                if (!linting) {
-                    onLintingDone();
-                    return;
-                }
+    if (cli.flags.stdin) {
+        // lint what's provided on stdin
+        const chunks = [];
 
-                // otherwise add it to GUI and wait for it to finish
-                GUI.addLinting(linting);
-                linting.on("done", () => {
-                    if (linting.state === linting.STATES.error) {
-                        hasErrors = true;
+        process.stdin.on("readable", () => {
+            let chunk;
+            while (null !== (chunk = process.stdin.read())) {
+                chunks.push(chunk);
+            }
+        });
+
+        process.stdin.on("end", () => {
+            SVGLint.lintSource(chunks.join(""), configObj)
+                .then(linting => {
+                    // handle case where linting failed (e.g. invalid file)
+                    if (!linting) {
+                        process.exit(EXIT_CODES.success);
                     }
-                    onLintingDone();
+
+                    // otherwise add it to GUI and wait for it to finish
+                    GUI.addLinting(linting);
+                    linting.on("done", () => {
+                        if (linting.state === linting.STATES.error) {
+                            process.exit(EXIT_CODES.violations);
+                        } else {
+                            process.exit(EXIT_CODES.success);
+                        }
+                    });
+                })
+                .catch(e => {
+                    logger.error("Failed to lint\n", e);
                 });
-            })
-            .catch(e => {
-                logger.error("Failed to lint file", filePath, "\n", e);
-            });
-    });
+        });
+    } else {
+        // lint all the CLI specified files
+        const files = cli.input
+            .map(v => glob.sync(v))
+            .reduce((a, v) => a.concat(v), [])
+            .map(v => path.resolve(process.cwd(), v));
+        // keep track so we know when every linting has finished
+        let hasErrors = false;
+        let activeLintings = files.length;
+        const onLintingDone = () => {
+            --activeLintings;
+            logger.debug("Linting done,", activeLintings, "to go");
+            if (activeLintings <= 0) {
+                process.exit(
+                    hasErrors ? EXIT_CODES.violations : EXIT_CODES.success
+                );
+            }
+        };
+        files.forEach(filePath => {
+            SVGLint.lintFile(filePath, configObj)
+                .then(linting => {
+                    // handle case where linting failed (e.g. invalid file)
+                    if (!linting) {
+                        onLintingDone();
+                        return;
+                    }
+
+                    // otherwise add it to GUI and wait for it to finish
+                    GUI.addLinting(linting);
+                    linting.on("done", () => {
+                        if (linting.state === linting.STATES.error) {
+                            hasErrors = true;
+                        }
+                        onLintingDone();
+                    });
+                })
+                .catch(e => {
+                    logger.error("Failed to lint file", filePath, "\n", e);
+                });
+        });
+    }
 })();
