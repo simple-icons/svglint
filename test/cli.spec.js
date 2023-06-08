@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 
 import { execa } from "execa";
@@ -16,12 +17,12 @@ const INVALID_SVG = path.resolve("./test/svgs/elm.test.svg");
  * @param {String} cwd The working directory
  * @returns {Promise<Object>} The CLI output
  */
-async function execCliWith(args, cwd=process.cwd()) {
+async function execCliWith(args, cwd=process.cwd(), input=null) {
     try {
         return await execa(
             path.resolve("./bin/cli.js"),
             args,
-            {cwd: path.resolve(cwd)},
+            {cwd: path.resolve(cwd), input},
         );
     } catch (error) {
         return error;
@@ -48,6 +49,17 @@ describe("CLI", function(){
 
     it("should fail with an invalid SVG", async function(){
         const { failed, exitCode } = await execCliWith([INVALID_SVG], "test/projects/with-config");
+        expect(failed).toBeTruthy();
+        expect(exitCode).toBe(1);
+    });
+
+    it("should succeed with a valid SVG on stdin", async function(){
+        const { failed } = await execCliWith(["--stdin"], process.cwd(), fs.readFileSync(VALID_SVG));
+        expect(failed).toBeFalsy();
+    });
+
+    it("should fail with an invalid SVG on stdin", async function(){
+        const { failed, exitCode } = await execCliWith(["--stdin"], "test/projects/with-config", fs.readFileSync(INVALID_SVG));
         expect(failed).toBeTruthy();
         expect(exitCode).toBe(1);
     });
