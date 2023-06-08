@@ -1,5 +1,5 @@
 import Logger from "../lib/logger.js";
-import xmlParser from "fast-xml-parser";
+import { XMLValidator } from "fast-xml-parser";
 const logger = Logger("rule:valid");
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
@@ -34,7 +34,7 @@ export default {
                 logger.debug("Encountered empty SVG. Considering valid");
                 return;
             }
-            const result = xmlParser.validate(ast.source);
+            const result = XMLValidator.validate(ast.source);
             if (result !== true) {
                 reporter.error(result.err.msg, null, ast);
             }
