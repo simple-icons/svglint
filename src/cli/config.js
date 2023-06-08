@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs";
+import process from "process";
 
 /**
  * Check if a file exists

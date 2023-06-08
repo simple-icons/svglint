@@ -1,6 +1,7 @@
 /**
  * @fileoverview Utilities for the CLI.
  */
+import process from "process";
 import { Chalk, supportsColor as chalkSupportsColor } from "chalk";
 import ansiRegex from "ansi-regex";
 
