@@ -19,6 +19,7 @@ $ svglint --help
 
   Usage:
       svglint [--config config.js] [--ci] [--debug] file1.svg file2.svg
+      svglint --stdin [--config config.js] [--ci] [--debug] < file1.svg
 
   Options:
       --help        Display this help text
@@ -26,6 +27,7 @@ $ svglint --help
       --config, -c  Specify the config file. Defaults to '.svglintrc.js'
       --debug,  -d  Show debug logs
       --ci, -C      Only output to stdout once, when linting is finished
+      --stdin       Read an SVG from stdin
 ```
 
 The tool can also be used through the JS API.
