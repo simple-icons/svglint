@@ -84,25 +84,29 @@ describe("Configuration files", function() {
     });
 
     it("should succeed passing an existent file path to --config", async function() {
-        const { failed } = await execCliWith(
-            [VALID_SVG, "--config", "test/projects/esm/foo/custom-svglint-config.js"]
+        const { failed, stdout } = await execCliWith(
+            [VALID_SVG, "--config", "test/projects/esm/foo/custom-svglint-config.js", "--debug"]
         );
         expect(failed).toBeFalsy();
+        expect(stdout.replaceAll( /\r?\n/g, "" )).toMatch( /Using configuration file: (.*?)test\/projects\/esm\/foo\/custom-svglint-config.js/ );
     });
 
     it("should succeed with an ESM .js config in a ESM project with type=module", async function() {
-        const { failed } = await execCliWith([VALID_SVG], "test/projects/esm/foo");
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], "test/projects/esm/foo");
         expect(failed).toBeFalsy();
+        expect(stdout.replaceAll( /\r?\n/g, "" )).toMatch( /Using configuration file: (.*?)test\/projects\/esm\/foo\/.svglintrc.js/ );
     });
 
     it("should succeed with an CJS .js config in a CJS project with type=commonjs", async function() {
-        const { failed } = await execCliWith([VALID_SVG], "test/projects/cjs/bar");
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], "test/projects/cjs/bar");
         expect(failed).toBeFalsy();
+        expect(stdout.replaceAll( /\r?\n/g, "" )).toMatch( /Using configuration file: (.*?)test\/projects\/cjs\/bar\/.svglintrc.js/ );
     });
 
     it("should succeed with a ESM .mjs config in a CJS project with type=commonjs", async function() {
-        const { failed } = await execCliWith([VALID_SVG], "test/projects/cjs/foo");
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], "test/projects/cjs/foo");
         expect(failed).toBeFalsy();
+        expect(stdout.replaceAll( /\r?\n/g, "" )).toMatch( /Using configuration file: (.*?)test\/projects\/cjs\/foo\/.svglintrc.mjs/ );
     });
 
     it("should succeed with a CJS .cjs config in a ESM project with type=module", async function() {
@@ -111,8 +115,9 @@ describe("Configuration files", function() {
     });
 
     it("should succeed in a nested folder inside a project with a root config file", async function() {
-        const { failed } = await execCliWith([VALID_SVG], "test/projects/cjs/bar/a/b/c");
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], "test/projects/cjs/bar/a/b/c");
         expect(failed).toBeFalsy();
+        expect(stdout.replaceAll( /\r?\n/g, "" )).toMatch( /Using configuration file: (.*?)test\/projects\/cjs\/bar\/.svglintrc.js/ );
     });
 
     it("should succeed in a project without a config file", async function () {

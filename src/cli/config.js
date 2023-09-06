@@ -101,18 +101,13 @@ async function getConfigurationFile(filename, folder) {
     // Look at parent directories or, finally, the user's home directory
     filepath = await getDefaultConfigurationFileTraversingParents(folder);
     if (!filepath) {
-		const homedir_file = path.join(os.homedir(), '.svglintrc.js');
-		if (await fileExists(homedir_file)) {
+        const homedir_file = path.join(os.homedir(), ".svglintrc.js");
+        if (await fileExists(homedir_file)) {
             filepath = homedir_file;
         }
     }
 
-    if (filepath) {
-        logger.debug("Using configuration file: " + filepath);
-        return filepath;
-    }
-
-    return false;
+    return filepath || false;
 }
 
 /**
@@ -122,6 +117,7 @@ async function getConfigurationFile(filename, folder) {
  */
 async function loadConfigurationFile(filename, folder=process.cwd()) {
     const filepath = await getConfigurationFile(filename, folder);
+    logger.debug("Using configuration file: " + filepath);
     if (filepath) {
         const module = await import(`file://${filepath}`);
         return module.default;
