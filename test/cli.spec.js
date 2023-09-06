@@ -110,8 +110,9 @@ describe("Configuration files", function() {
     });
 
     it("should succeed with a CJS .cjs config in a ESM project with type=module", async function() {
-        const { failed } = await execCliWith([VALID_SVG], "test/projects/esm/bar");
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], "test/projects/esm/bar");
         expect(failed).toBeFalsy();
+        expect(stdout.replaceAll( /\r?\n/g, "" )).toMatch( /Using configuration file: (.*?)test\/projects\/esm\/bar\/.svglintrc.cjs/ );
     });
 
     it("should succeed in a nested folder inside a project with a root config file", async function() {
