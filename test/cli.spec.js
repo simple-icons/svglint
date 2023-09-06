@@ -86,7 +86,7 @@ describe("Configuration files", function() {
 
     it("should succeed passing an existent file path to --config", async function() {
         project_path = "test/projects/esm/foo/";
-        filename = "custom-svglint-config.js"
+        filename = "custom-svglint-config.js";
         const { failed, stdout } = await execCliWith(
             [VALID_SVG, "--config", path.join( project_path, filename ), "--debug"]
         );
