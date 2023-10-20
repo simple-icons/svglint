@@ -48,7 +48,7 @@ linting.on("done", () => {
 ## Config
 
 In order to specify what should be linted SVGLint must be given a configuration object.
-If you are using the CLI, this configuration object is read from the file specified by `--config`. This defaults to `.svglintrc.js`, which will be searched for up through the directory tree - this is similar to tools such as ESLint.
+If you are using the CLI, this configuration object is read from the file specified by `--config`. This defaults to `.svglintrc.js`, which will be searched for up through the directory tree - this is similar to tools such as ESLint. If no configuration file is found searching up the directory tree, a configuration file located in the user's home directory is used (i.e. "$HOME/.svglintrc.js" on Unix-like systems).
 
 This configuration file should export a single object, of the format:
 

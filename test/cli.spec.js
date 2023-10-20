@@ -67,7 +67,7 @@ describe("CLI", function(){
 });
 
 describe("Configuration files", function() {
-    let config_file, filename, project_path;
+    let configFile, filename, projectPath;
     it("should fail with an non-existent configuration file", async function(){
         const { failed, exitCode } = await execCliWith(
             ["--config", "./this/file/does/not-exist.js"]
@@ -85,59 +85,59 @@ describe("Configuration files", function() {
     });
 
     it("should succeed passing an existent file path to --config", async function() {
-        project_path = "test/projects/esm/foo/";
+        projectPath = "test/projects/esm/foo/";
         filename = "custom-svglint-config.js";
         const { failed, stdout } = await execCliWith(
-            [VALID_SVG, "--config", path.join( project_path, filename ), "--debug"]
+            [VALID_SVG, "--config", path.join( projectPath, filename ), "--debug"]
         );
-        config_file = path.join( project_path, filename ).replace( /\\/g, "\\\\" );
+        configFile = path.join( projectPath, filename ).replace( /\\/g, "\\\\" );
         expect(failed).toBeFalsy();
-        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${config_file}`) );
+        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${configFile}`) );
     });
 
     it("should succeed with an ESM .js config in a ESM project with type=module", async function() {
-        project_path = "test/projects/esm/foo/";
+        projectPath = "test/projects/esm/foo/";
         filename = ".svglintrc.js";
-        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], project_path);
-        config_file = path.join( project_path, filename ).replace( /\\/g, "\\\\" );
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], projectPath);
+        configFile = path.join( projectPath, filename ).replace( /\\/g, "\\\\" );
         expect(failed).toBeFalsy();
-        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${config_file}`) );
+        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${configFile}`) );
     });
 
     it("should succeed with an CJS .js config in a CJS project with type=commonjs", async function() {
-        project_path = "test/projects/cjs/bar/";
+        projectPath = "test/projects/cjs/bar/";
         filename = ".svglintrc.js";
-        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], project_path);
-        config_file = path.join( project_path, filename ).replace( /\\/g, "\\\\" );
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], projectPath);
+        configFile = path.join( projectPath, filename ).replace( /\\/g, "\\\\" );
         expect(failed).toBeFalsy();
-        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${config_file}`) );
+        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${configFile}`) );
     });
 
     it("should succeed with a ESM .mjs config in a CJS project with type=commonjs", async function() {
-        project_path = "test/projects/cjs/foo/";
+        projectPath = "test/projects/cjs/foo/";
         filename = ".svglintrc.mjs";
-        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], project_path);
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], projectPath);
         expect(failed).toBeFalsy();
-        config_file = path.join( project_path, filename ).replace( /\\/g, "\\\\" );
-        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${config_file}`) );
+        configFile = path.join( projectPath, filename ).replace( /\\/g, "\\\\" );
+        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${configFile}`) );
     });
 
     it("should succeed with a CJS .cjs config in a ESM project with type=module", async function() {
-        project_path = "test/projects/esm/bar/";
+        projectPath = "test/projects/esm/bar/";
         filename = ".svglintrc.cjs";
-        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], project_path);
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], projectPath);
         expect(failed).toBeFalsy();
-        config_file = path.join( project_path, filename ).replace( /\\/g, "\\\\" );
-        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${config_file}`) );
+        configFile = path.join( projectPath, filename ).replace( /\\/g, "\\\\" );
+        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${configFile}`) );
     });
 
     it("should succeed in a nested folder inside a project with a root config file", async function() {
-        project_path = "test/projects/cjs/bar/";
+        projectPath = "test/projects/cjs/bar/";
         filename = ".svglintrc.js";
-        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], path.join(project_path, "a/b/c"));
+        const { failed, stdout } = await execCliWith([VALID_SVG, "--debug"], path.join(projectPath, "a/b/c"));
         expect(failed).toBeFalsy();
-        config_file = path.join( project_path, filename ).replace( /\\/g, "\\\\" );
-        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${config_file}`) );
+        configFile = path.join( projectPath, filename ).replace( /\\/g, "\\\\" );
+        expect(stdout.replace( /\r?\n/g, "" )).toMatch( new RegExp( `Using configuration file: (.*?)${configFile}`) );
     });
 
     it("should succeed in a project without a config file", async function () {

@@ -79,6 +79,17 @@ async function getDefaultConfigurationFileTraversingParents(folder) {
     }
 }
 
+async function getConfigurationInHomedir() {
+    let filepath;
+
+    const homedirFile = path.join(os.homedir(), ".svglintrc.js");
+    if (await fileExists(homedirFile)) {
+       filepath = homedirFile;
+    }
+
+   return filepath;
+ }
+
 /**
  * Get the configuration file to use
  * @param {String} filename The filename to look for
@@ -100,14 +111,11 @@ async function getConfigurationFile(filename, folder) {
 
     // Look at parent directories or, finally, the user's home directory
     filepath = await getDefaultConfigurationFileTraversingParents(folder);
-    if (!filepath) {
-        const homedir_file = path.join(os.homedir(), ".svglintrc.js");
-        if (await fileExists(homedir_file)) {
-            filepath = homedir_file;
-        }
+    if (filepath) {
+        return filepath;
     }
 
-    return filepath || false;
+    return await getConfigurationInHomedir();
 }
 
 /**
