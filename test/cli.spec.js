@@ -3,7 +3,7 @@ import path from "path";
 import process from "process";
 
 import { execa } from "execa";
-import expect from "expect";
+import { expect } from "expect";
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console
@@ -40,7 +40,7 @@ describe("CLI", function(){
     it("should succeed with --help", async function(){
         const { failed, stdout } = await execCliWith(["--help"]);
         expect(failed).toBeFalsy();
-        expect(stdout).toNotEqual("");
+        expect(stdout).not.toEqual("");
     });
 
     it("should succeed with a valid SVG", async function(){
@@ -117,6 +117,6 @@ describe("Configuration files", function() {
 
     it("should succeed in a project without a config file", async function () {
         const { stdout } = await execCliWith([VALID_SVG], "test/projects/without-config");
-        expect(stdout).toNotMatch("Failed to lint");
+        expect(stdout).not.toMatch("Failed to lint");
     });
 });
