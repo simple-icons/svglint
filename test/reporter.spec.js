@@ -1,4 +1,5 @@
 import { expect } from "expect";
+import { chalk } from "../src/cli/util.js";
 import SVGLint from "../src/svglint.js";
 
 async function lint(source, rules) {
@@ -35,13 +36,13 @@ describe("Reporter", function() {
             { elm: { "g > path": false } }
         );
         expect(results.elm.messages).toMatchObject([{
-            message: "Element disallowed\n  At node \u{1B}[1m<path>\u{1B}[22m (2:17)",
+            message: `Element disallowed\n  At node ${chalk.bold("<path>")} (2:17)`,
             reason: "Element disallowed at node <path>",
             type: "error",
             line: 2,
             column: 17
         }, {
-            message: "Element disallowed\n  At node \u{1B}[1m<path>\u{1B}[22m (3:17)",
+            message: `Element disallowed\n  At node ${chalk.bold("<path>")} (3:17)`,
             reason: "Element disallowed at node <path>",
             type: "error",
             line: 3,
