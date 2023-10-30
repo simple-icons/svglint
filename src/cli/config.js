@@ -84,11 +84,11 @@ async function getConfigurationInHomedir() {
 
     const homedirFile = path.join(os.homedir(), ".svglintrc.js");
     if (await fileExists(homedirFile)) {
-       filepath = homedirFile;
+        filepath = homedirFile;
     }
 
-   return filepath;
- }
+    return filepath;
+}
 
 /**
  * Get the configuration file to use
@@ -109,7 +109,6 @@ async function getConfigurationFile(filename, folder) {
         }
     }
 
-    // Look at parent directories or, finally, the user's home directory
     filepath = await getDefaultConfigurationFileTraversingParents(folder);
     if (filepath) {
         return filepath;
