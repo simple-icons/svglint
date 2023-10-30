@@ -3,7 +3,7 @@ import path from "path";
 import process from "process";
 
 import { execa } from "execa";
-import { expect } from "expect";
+import expect from "expect";
 
 process.on("unhandledRejection", error => {
     console.error(error); // eslint-disable-line no-console

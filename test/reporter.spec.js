@@ -1,4 +1,4 @@
-import { expect } from "expect";
+import expect from "expect";
 import { chalk } from "../src/cli/util.js";
 import SVGLint from "../src/svglint.js";
 
