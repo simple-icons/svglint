@@ -11,8 +11,11 @@ import Logger from "./logger.js";
 /**
  * @typedef {Object} Result
  * @property {String} message The message as a single string, suitable for human consumption
+ * @property {String} reason The message as a single string
  * @property {"error"|"warn"|"exception"} type The type of result
  * @property {String} [stacktrace] If Result is related to a node, a human-suitable string showing the related part of the file
+ * @property {number} [line] If Result is related to a node, the related line in the file
+ * @property {number} [column] If Result is related to a node, the related column in the file
  * @property {any[]} _message The original message, as given by the rule
  * @property {Node} [_node] If Result is related to a node, the related node
  * @property {AST} [_ast] If Result is related to a node, the related AST
@@ -31,6 +34,7 @@ function generateResult(message, type, node, ast) {
     const _message = message instanceof Array ? message : [message];
     const outp = {
         message: message,
+        reason: message,
         _message,
         _node: node,
         _ast: ast,
@@ -38,10 +42,14 @@ function generateResult(message, type, node, ast) {
     };
     if (message instanceof Error) {
         outp.message = message.stack || message.toString();
+        outp.reason = message.toString();
     }
     if (node) {
         // @ts-ignore
         outp.message += `\n  At node ${chalk.bold("<"+node.name+">")} (${node.lineNum}:${node.columnNum})`;
+        outp.reason += " at node <"+node.name+">";
+        outp.line = node.lineNum;
+        outp.column = node.columnNum;
     }
     // @ts-ignore
     return outp;
