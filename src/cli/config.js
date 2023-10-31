@@ -79,6 +79,10 @@ async function getDefaultConfigurationFileTraversingParents(folder) {
     }
 }
 
+/**
+ * Get the configuration file to use from the home directory.
+ * @returns {Promise<String,Boolean>} The path to the configuration file, or false
+ */
 async function getConfigurationInHomedir() {
     let filepath;
 
