@@ -1,6 +1,10 @@
 import path from "path";
 import fs from "fs";
+import os from "os";
 import process from "process";
+
+import Logger from "../lib/logger.js";
+const logger = Logger("");
 
 /**
  * Check if a file exists
@@ -76,6 +80,21 @@ async function getDefaultConfigurationFileTraversingParents(folder) {
 }
 
 /**
+ * Get the configuration file to use from the home directory.
+ * @returns {Promise<String,Boolean>} The path to the configuration file, or false
+ */
+async function getConfigurationInHomedir() {
+    let filepath;
+
+    const homedirFile = path.join(os.homedir(), ".svglintrc.js");
+    if (await fileExists(homedirFile)) {
+        filepath = homedirFile;
+    }
+
+    return filepath;
+}
+
+/**
  * Get the configuration file to use
  * @param {String} filename The filename to look for
  * @param {String} folder The folder to look in
@@ -94,7 +113,12 @@ async function getConfigurationFile(filename, folder) {
         }
     }
 
-    return await getDefaultConfigurationFileTraversingParents(folder);
+    filepath = await getDefaultConfigurationFileTraversingParents(folder);
+    if (filepath) {
+        return filepath;
+    }
+
+    return await getConfigurationInHomedir();
 }
 
 /**
@@ -104,6 +128,7 @@ async function getConfigurationFile(filename, folder) {
  */
 async function loadConfigurationFile(filename, folder=process.cwd()) {
     const filepath = await getConfigurationFile(filename, folder);
+    logger.debug("Using configuration file: " + filepath);
     if (filepath) {
         const module = await import(`file://${filepath}`);
         return module.default;
