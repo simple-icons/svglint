@@ -15,11 +15,14 @@ const logger = Logger("");
 /** @typedef {import("./lib/rule-loader.js").RuleModule} RuleModule */
 
 /**
- * @typedef {Object<string,any>} RulesConfig
+ * @typedef RulesConfig
  * An object with each key representing a rule name, and each value representing
  *   a rule config.
  * If the rule config is set to `false`, then the rule is disabled (useful for
  *   e.g. overwriting presets).
+ * @property {Object<string, number | boolean>} [elm={}]
+ * @property {Array<Object<string, string | boolean | RegExp>>} [attr=[]]
+ * @property {Array<Function>} [custom=[]]
  */
 /**
  * @typedef {Object<string,Function|Function[]>} NormalizedRules
