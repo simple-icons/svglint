@@ -13,13 +13,19 @@ const logger = Logger("");
 
 /** @typedef {import("./lib/parse.js").AST} AST */
 /** @typedef {import("./lib/rule-loader.js").RuleModule} RuleModule */
+/** @typedef {import("./rules/elm.js").ElmConfig} ElmConfig */
+/** @typedef {import("./rules/attr.js").AttrConfig} AttrConfig */
+/** @typedef {import("./rules/custom.js").CustomConfig} CustomConfig */
 
 /**
- * @typedef {Object<string,any>} RulesConfig
+ * @typedef RulesConfig
  * An object with each key representing a rule name, and each value representing
  *   a rule config.
  * If the rule config is set to `false`, then the rule is disabled (useful for
  *   e.g. overwriting presets).
+ * @property {ElmConfig} [elm={}]
+ * @property {Array<AttrConfig>} [attr=[]]
+ * @property {Array<CustomConfig>} [custom=[]]
  */
 /**
  * @typedef {Object<string,Function|Function[]>} NormalizedRules
