@@ -1,6 +1,7 @@
 import Logger from "../lib/logger.js";
 const logger = Logger("rule:custom");
 
+/** @typedef {import('cheerio').Cheerio<import('domhandler').Document>} Cheerio */
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
 /** @typedef {import("../lib/parse.js").Node} Node */
@@ -11,6 +12,7 @@ const logger = Logger("rule:custom");
  * @param {Reporter} reporter The reporter to report to
  * @param {Cheerio} $ A cheerio representation of the document
  * @param {AST} ast The AST of the document, which we should pass to reporter
+ * @param {Info} info Info related to the current file being linted
  */
 /**
  * @typedef {CustomRule} CustomConfig
