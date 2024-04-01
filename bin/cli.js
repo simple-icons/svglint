@@ -87,7 +87,7 @@ process.on("exit", () => {
                 configObj = {};
             }
         } else if (configObj === undefined) {
-            logger.error("Failed to get default export from configuration file");
+            logger.error("Default export missing from configuration file (use `export default {...}` or `module.exports = {...}`");
             process.exit(EXIT_CODES.configuration);
         }
     } catch (e) {
