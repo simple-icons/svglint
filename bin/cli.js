@@ -86,6 +86,9 @@ process.on("exit", () => {
             } else {
                 configObj = {};
             }
+        } else if (configObj === undefined) {
+            logger.error("Default export missing from configuration file (use `export default {...}` or `module.exports = {...}`");
+            process.exit(EXIT_CODES.configuration);
         }
     } catch (e) {
         logger.error(`Failed to parse config: ${e.stack}`);

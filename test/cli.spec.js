@@ -83,6 +83,14 @@ describe("Configuration files", function() {
         expect(exitCode).toBe(4);
     });
 
+    it("should fail with a configuration file without default export", async function(){
+        const { failed, exitCode } = await execCliWith(
+            ["--config", "./test/projects/with-config-no-default-export/.svglintrc.js"]
+        );
+        expect(failed).toBeTruthy();
+        expect(exitCode).toBe(4);
+    });
+
     it("should succeed passing an existent file path to --config", async function() {
         const { failed } = await execCliWith(
             [VALID_SVG, "--config", "test/projects/esm/foo/custom-svglint-config.js"]
