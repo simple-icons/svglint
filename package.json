@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-dynamic-import-vars": "^1.4.1",
-    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/git": "9.0.1",
     "commitizen": "^4.2.4",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.3.0",
