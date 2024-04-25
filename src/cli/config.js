@@ -1,10 +1,10 @@
-import path from "path";
-import fs from "fs";
-import os from "os";
-import process from "process";
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import process from 'node:process';
+import logging from '../lib/logger.js';
 
-import Logger from "../lib/logger.js";
-const logger = Logger("");
+const logger = logging('');
 
 /**
  * Check if a file exists
@@ -12,12 +12,14 @@ const logger = Logger("");
  * @returns {Promise<Boolean>} true if the file exists, false otherwise
  */
 function fileExists(filepath) {
-    return new Promise((res)=>{
-        fs.access(filepath, fs.constants.F_OK, err => {
-            if (!err) {
-                return res(true);
+    return new Promise((resolve) => {
+        // eslint-disable-next-line n/prefer-promises/fs
+        fs.access(filepath, fs.constants.F_OK, (error) => {
+            if (!error) {
+                return resolve(true);
             }
-            res(false);
+
+            resolve(false);
         });
     });
 }
@@ -29,9 +31,9 @@ function fileExists(filepath) {
  **/
 function isEsmPackageJson(filename) {
     try {
-        let pkg = JSON.parse(fs.readFileSync(filename, "utf8"));
-        return pkg.type && pkg.type === "module";
-    } catch (err) {
+        const package_ = JSON.parse(fs.readFileSync(filename, 'utf8'));
+        return package_.type && package_.type === 'module';
+    } catch {
         return false;
     }
 }
@@ -42,16 +44,18 @@ function isEsmPackageJson(filename) {
  * @returns {Promise<String,Boolean>} The path to the file if it exists, false otherwise
  */
 async function getDefaultConfigurationFile(folder) {
-    let filepath = path.resolve(folder, ".svglintrc.js");
+    let filepath = path.resolve(folder, '.svglintrc.js');
     if (await fileExists(filepath)) {
         return filepath;
     }
 
-    const packageJsonPath = path.resolve(folder, "package.json");
+    const packageJsonPath = path.resolve(folder, 'package.json');
     if (await fileExists(packageJsonPath)) {
         filepath = path.resolve(
             folder,
-            isEsmPackageJson(packageJsonPath) ? ".svglintrc.cjs" : ".svglintrc.mjs",
+            (await isEsmPackageJson(packageJsonPath))
+                ? '.svglintrc.cjs'
+                : '.svglintrc.mjs',
         );
         if (await fileExists(filepath)) {
             return filepath;
@@ -67,16 +71,17 @@ async function getDefaultConfigurationFile(folder) {
  * @returns {Promise<String,Boolean>} The path to the configuration file, or false
  */
 async function getDefaultConfigurationFileTraversingParents(folder) {
-    let filepath = await getDefaultConfigurationFile(folder);
+    const filepath = await getDefaultConfigurationFile(folder);
     if (filepath) {
         return filepath;
-    } else {
-        const parent = path.resolve(folder, "..");
-        if (parent === folder) {
-            return false;
-        }
-        return await getDefaultConfigurationFileTraversingParents(parent);
     }
+
+    const parent = path.resolve(folder, '..');
+    if (parent === folder) {
+        return false;
+    }
+
+    return getDefaultConfigurationFileTraversingParents(parent);
 }
 
 /**
@@ -86,7 +91,7 @@ async function getDefaultConfigurationFileTraversingParents(folder) {
 async function getConfigurationInHomedir() {
     let filepath;
 
-    const homedirFile = path.join(os.homedir(), ".svglintrc.js");
+    const homedirFile = path.join(os.homedir(), '.svglintrc.js');
     if (await fileExists(homedirFile)) {
         filepath = homedirFile;
     }
@@ -108,9 +113,9 @@ async function getConfigurationFile(filename, folder) {
             : path.resolve(folder, filename);
         if (await fileExists(filepath)) {
             return filepath;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     filepath = await getDefaultConfigurationFileTraversingParents(folder);
@@ -118,7 +123,7 @@ async function getConfigurationFile(filename, folder) {
         return filepath;
     }
 
-    return await getConfigurationInHomedir();
+    return getConfigurationInHomedir();
 }
 
 /**
@@ -126,17 +131,15 @@ async function getConfigurationFile(filename, folder) {
  * @param {String} folder The folder to start looking in
  * @returns {Promise<Object,null>} The configuration object, or null if no SVGLint configuration file is found
  */
-async function loadConfigurationFile(filename, folder=process.cwd()) {
+async function loadConfigurationFile(filename, folder = process.cwd()) {
     const filepath = await getConfigurationFile(filename, folder);
-    logger.debug("Using configuration file: " + filepath);
+    logger.debug('Using configuration file: ' + filepath);
     if (filepath) {
         const module = await import(`file://${filepath}`);
         return module.default;
-    } else {
-        return null;
     }
+
+    return null;
 }
 
-export {
-    loadConfigurationFile,
-};
+export {loadConfigurationFile};

@@ -4,10 +4,10 @@
  * It uses htmlparser2 to parse the source, which it gathers from either
  *   a string or a file.
  */
-import Parser from "htmlparser2";
-import fs from "fs";
-import path from "path";
-import process from "process";
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import Parser from 'htmlparser2';
 
 /**
  * Parses an SVG source into an AST
@@ -15,10 +15,7 @@ import process from "process";
  * @returns {AST} The parsed AST
  */
 export function parseSource(source) {
-    return normalizeAST(
-        sourceToAST(source),
-        source
-    );
+    return normalizeAST(sourceToAST(source), source);
 }
 
 /**
@@ -40,18 +37,19 @@ export function parseFile(file) {
     const filePath = path.isAbsolute(file)
         ? file
         : path.join(process.cwd(), file);
-    return new Promise((res, rej) => {
-        fs.readFile(
-            filePath,
-            "utf8",
-            (err, data) => {
-                if (err) {
-                    return rej(err);
-                }
-                try { return res(parseSource(data)); }
-                catch (e) { return rej(e); }
+    return new Promise((resolve, reject) => {
+        // eslint-disable-next-line n/prefer-promises/fs
+        fs.readFile(filePath, 'utf8', (error, data) => {
+            if (error) {
+                return reject(error);
             }
-        );
+
+            try {
+                return resolve(parseSource(data));
+            } catch (error_) {
+                return reject(error_);
+            }
+        });
     });
 }
 
@@ -68,7 +66,7 @@ export function parseFile(file) {
  * @property {Number} endIndex The string index at which the element ends
  * @property {Number} lineNum The line number at which the element starts
  * @property {Number} columnNum The index in the line at which the element starts
- * 
+ *
  * @property {Attributes} [attribs] An object of attributes on the Node
  * @property {AST} [children] The children of the Node
  * @property {String} [data] If type==="text", the content of the Node
@@ -77,14 +75,14 @@ export function parseFile(file) {
 /**
  * @typedef ASTShape
  * @property {String} source The source that generated the AST
- * 
+ *
  * @typedef {Node[] & ASTShape} AST
  * An AST representing an SVG document (or a list of children).
  */
 
 /**
  * Parses an SVG source code into an AST.
- * @param {String} source 
+ * @param {String} source
  * @returns {AST} The parsed AST
  */
 function sourceToAST(source) {
@@ -105,21 +103,27 @@ function sourceToAST(source) {
  * @param {String} source The string the AST was generated from
  */
 function normalizeNode(node, source) {
-    // calculate the distance from node start to line start
-    const lineStart = (
-        source.lastIndexOf("\n", node.startIndex + 
-            // make sure newline text nodes are set to start on the proper line
-            ((node.type === "text" && node.data.startsWith("\n")) ? -1 : 0))
-    ) + 1;
+    // Calculate the distance from node start to line start
+    const lineStart =
+        source.lastIndexOf(
+            '\n',
+            node.startIndex +
+                // Make sure newline text nodes are set to start on the proper line
+                (node.type === 'text' && node.data.startsWith('\n') ? -1 : 0),
+        ) + 1;
     node.columnNum = node.startIndex - lineStart;
 
-    // calculate the line number
-    let numLines = 0;
-    let columnNum = lineStart;
-    while ((columnNum = source.lastIndexOf("\n", columnNum - 1)) !== -1 && columnNum > 0) {
-        ++numLines;
+    // Calculate the line number
+    let numberLines = 0;
+    let columnNumber = lineStart;
+    while (
+        (columnNumber = source.lastIndexOf('\n', columnNumber - 1)) !== -1 &&
+        columnNumber > 0
+    ) {
+        ++numberLines;
     }
-    node.lineNum = numLines;
+
+    node.lineNum = numberLines;
     return node;
 }
 
@@ -132,13 +136,19 @@ function normalizeNode(node, source) {
  * @returns {AST} The normalized AST
  */
 function normalizeAST(ast, source) {
-    const handleNode = node => {
+    const handleNode = (node) => {
         normalizeNode(node, source);
         if (node.children) {
-            node.children.forEach(handleNode);
+            for (const child of node.children) {
+                handleNode(child);
+            }
         }
     };
-    ast.forEach(handleNode);
+
+    for (const child of ast) {
+        handleNode(child);
+    }
+
     // @ts-ignore
     ast.source = source;
     return ast;

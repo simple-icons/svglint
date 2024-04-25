@@ -1,5 +1,6 @@
-import Logger from "../../lib/logger.js";
-const logger = Logger("rule:async");
+import logging from '../../lib/logger.js';
+
+const logger = logging('rule:async');
 
 /**
  * @typedef AsyncConfig
@@ -8,16 +9,16 @@ const logger = Logger("rule:async");
  * @property {Number} wait The number of seconds to wait
  */
 
-export default {
+const asyncExample = {
     /**
      * Generates a linting function from a config
      * @param {AsyncConfig} config
      */
     generate(config) {
-        return function AsyncRule(reporter) {
-            logger.debug("Called", config);
-            let wait = config.wait;
-            return new Promise(res => {
+        return function (reporter) {
+            logger.debug('Called', config);
+            let {wait} = config;
+            return new Promise((resolve) => {
                 const intervalID = setInterval(() => {
                     if (--wait <= 0) {
                         clearInterval(intervalID);
@@ -25,12 +26,15 @@ export default {
                         if (config.method) {
                             reporter[config.method](config.message);
                         }
-                        res();
+
+                        resolve();
                     } else {
-                        logger.log(wait, "seconds to go");
+                        logger.log(wait, 'seconds to go');
                     }
                 }, 1000);
             });
         };
-    }
+    },
 };
+
+export default asyncExample;

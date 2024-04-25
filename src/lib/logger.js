@@ -3,9 +3,9 @@
  * If called using the JS API, this will be `console` with prefixes.
  * If called using the CLI, this will be our own custom logger.
  */
-import { inspect } from "util";
-import { EventEmitter } from "events";
-import { chalk, supportsColor } from "../cli/util.js";
+import {EventEmitter} from 'node:events';
+import {inspect} from 'node:util';
+import {chalk, supportsColor} from '../cli/util.js';
 
 const CONSOLE_COLORS = Object.freeze({
     debug: chalk.dim.gray,
@@ -19,66 +19,82 @@ const LEVELS = Object.freeze({
     warn: 2,
     error: 3,
 });
-const METHODS = ["debug", "log", "warn", "error"];
+const METHODS = ['debug', 'log', 'warn', 'error'];
 
 // Logger-global variables
 let isCLI = false;
 let level = LEVELS.log;
 
-// create a prefixing & colorizing wrapper around console for use in non-CLIs
+// Create a prefixing & colorizing wrapper around console for use in non-CLIs
 const wrappedConsole = Object.create(console);
-METHODS.forEach(method => {
-    const color = CONSOLE_COLORS[method]
-        ? CONSOLE_COLORS[method]
-        : v => v;
-    wrappedConsole[method] = (prefix, args) => {
-        // eslint-disable-next-line no-console
-        console[method].apply(console, [color("["+prefix+"]"), ...args]);
+for (const method of METHODS) {
+    // eslint-disable-next-line unicorn/prefer-logical-operator-over-ternary
+    const color = CONSOLE_COLORS[method] ? CONSOLE_COLORS[method] : (v) => v;
+    wrappedConsole[method] = (prefix, arguments_) => {
+        // eslint-disable-next-line no-useless-call, no-console
+        console[method].apply(console, [
+            color('[' + prefix + ']'),
+            ...arguments_,
+        ]);
     };
-});
+}
 
-// create a simple collector & emitter of messages for use in CLIs
+// Create a simple collector & emitter of messages for use in CLIs
 class CliConsole extends EventEmitter {
     constructor() {
         super();
         /** The messages that have been emitted so far.
          * @type {Array<{ prefix: String, args: Array, type: String }>} */
         this.messages = [];
-        METHODS.forEach(method => {
-            this[method] = (prefix, args) => {
-                const msg = {
-                    prefix: prefix.replace(/^SVGLint ?/, ""),
-                    args,
+        for (const method of METHODS) {
+            this[method] = (prefix, arguments_) => {
+                const message = {
+                    prefix: prefix.replace(/^SVGLint ?/, ''),
+                    args: arguments_,
                     type: method,
                 };
-                this.messages.push(msg);
-                this.emit("msg", msg);
+                this.messages.push(message);
+                this.emit('msg', message);
             };
-        });
+        }
     }
 }
 CliConsole.prototype.EVENTS = METHODS;
 const cliConsole = new CliConsole();
 
-const Logger = function(prefix) {
-    prefix = "SVGLint" + (prefix ? " " + prefix : "");
+const Logger = function (prefix) {
+    prefix = 'SVGLint' + (prefix ? ' ' + prefix : '');
     const logger = {};
-    METHODS.forEach(method => {
-        logger[method] = function(...args) {
-            if (level > LEVELS[method]) { return; }
+    for (const method of METHODS) {
+        logger[method] = function (...arguments_) {
+            if (level > LEVELS[method]) {
+                return;
+            }
+
             if (isCLI) {
-                cliConsole[method].call(cliConsole, prefix, args);
+                // eslint-disable-next-line no-useless-call
+                cliConsole[method].call(cliConsole, prefix, arguments_);
             } else {
-                wrappedConsole[method].call(wrappedConsole, prefix, args);
+                // eslint-disable-next-line no-useless-call
+                wrappedConsole[method].call(wrappedConsole, prefix, arguments_);
             }
         };
-    });
+    }
+
     return logger;
 };
+
 Logger.cliConsole = cliConsole;
-Logger.setCLI = value => { isCLI = value; };
-Logger.setLevel = value => { level = value; };
+Logger.setCLI = (value) => {
+    isCLI = value;
+};
+
+Logger.setLevel = (value) => {
+    level = value;
+};
+
 Logger.LEVELS = LEVELS;
-Logger.colorize = supportsColor ?
-    value => inspect(value, true, 2, true) : value => value;
+Logger.colorize = supportsColor
+    ? (value) => inspect(value, true, 2, true)
+    : (value) => value;
 export default Logger;

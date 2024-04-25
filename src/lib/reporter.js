@@ -1,9 +1,9 @@
 /**
  * @fileoverview The object that rules use to report errors, warnings and messages.
  */
-import { EventEmitter } from "events";
-import { chalk } from "../cli/util.js";
-import Logger from "./logger.js";
+import {EventEmitter} from 'node:events';
+import {chalk} from '../cli/util.js';
+import logging from './logger.js';
 
 /** @typedef {import("./parse.js").AST} AST */
 /** @typedef {import("./parse.js").Node} Node */
@@ -31,9 +31,9 @@ import Logger from "./logger.js";
  * @returns {Result}
  */
 function generateResult(message, type, node, ast) {
-    const _message = message instanceof Array ? message : [message];
+    const _message = Array.isArray(message) ? message : [message];
     const outp = {
-        message: message,
+        message,
         reason: message,
         _message,
         _node: node,
@@ -44,13 +44,15 @@ function generateResult(message, type, node, ast) {
         outp.message = message.stack || message.toString();
         outp.reason = message.toString();
     }
+
     if (node) {
         // @ts-ignore
-        outp.message += `\n  At node ${chalk.bold("<"+node.name+">")} (${node.lineNum}:${node.columnNum})`;
-        outp.reason += " at node <"+node.name+">";
+        outp.message += `\n  At node ${chalk.bold('<' + node.name + '>')} (${node.lineNum}:${node.columnNum})`;
+        outp.reason += ' at node <' + node.name + '>';
         outp.line = node.lineNum;
         outp.column = node.columnNum;
     }
+
     // @ts-ignore
     return outp;
 }
@@ -62,7 +64,7 @@ class Reporter extends EventEmitter {
     constructor(name) {
         super();
         this.name = name;
-        this.logger = Logger(`rprt:${this.name}`);
+        this.logger = logging(`rprt:${this.name}`);
         /** @type {Result[]} */
         this.messages = [];
 
@@ -77,11 +79,11 @@ class Reporter extends EventEmitter {
      *   to users as it indicates that the linting result cannot be trusted.
      * @param {Error} e The exception that occurred.
      */
-    exception(e) {
-        this.logger.debug("Exception reported:", e);
-        this.emit("exception", e);
+    exception(event) {
+        this.logger.debug('Exception reported:', event);
+        this.emit('exception', event);
         this.hasExceptions = true;
-        this.messages.push(generateResult(e, "exception"));
+        this.messages.push(generateResult(event, 'exception'));
     }
 
     /**
@@ -91,8 +93,12 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the error is related to a node, the AST of the file
      */
     error(message, node, ast) {
-        this.logger.debug("Error reported:", JSON.stringify(message), !!node);
-        const result = generateResult(message, "error", node, ast);
+        this.logger.debug(
+            'Error reported:',
+            JSON.stringify(message),
+            Boolean(node),
+        );
+        const result = generateResult(message, 'error', node, ast);
         this.hasErrors = true;
         this.messages.push(result);
     }
@@ -104,8 +110,12 @@ class Reporter extends EventEmitter {
      * @param {AST} [ast] If the warning is related to a node, the AST of the file
      */
     warn(message, node, ast) {
-        this.logger.debug("Warn reported:", JSON.stringify(message), !!node);
-        const result = generateResult(message, "warn", node, ast);
+        this.logger.debug(
+            'Warn reported:',
+            JSON.stringify(message),
+            Boolean(node),
+        );
+        const result = generateResult(message, 'warn', node, ast);
         this.hasWarns = true;
         this.messages.push(result);
     }

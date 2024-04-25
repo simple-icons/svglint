@@ -3,31 +3,31 @@
  * Handles formatting the state of a (multifile) linting in a human-friendly way.
  * Expects a terminal to be present as process.stdout.
  */
-import logUpdate from "log-update";
-import Logger from "../lib/logger.js";
-const logHistory = Logger.cliConsole;
+import logUpdate from 'log-update';
+import Logger from '../lib/logger.js';
+import LintingDisplay from './components/linting.js';
+import Log from './components/log.js';
+import Separator from './components/separator.js';
+import Summary from './components/summary.js';
 
-import Separator from "./components/separator.js";
-import Log from "./components/log.js";
-import LintingDisplay from "./components/linting.js";
-import Summary from "./components/summary.js";
+const logHistory = Logger.cliConsole;
 
 /** @typedef {import("../lib/linting.js")} Linting */
 
 export default class GUI {
     constructor() {
-        // subscribe to global logs
+        // Subscribe to global logs
         Logger.setCLI(true);
-        logHistory.on("msg", () => this.update());
+        logHistory.on('msg', () => this.update());
 
         /** If true, we should only write to stdout once */
         this.ci = false;
 
-        // generate one-shot components
+        // Generate one-shot components
         this.$titles = {
-            log: new Separator("Log"),
-            lints: new Separator("Files"),
-            summary: new Separator("Summary"),
+            log: new Separator('Log'),
+            lints: new Separator('Files'),
+            summary: new Separator('Summary'),
         };
         this.$log = new Log(logHistory);
         this.$summary = new Summary();
@@ -53,11 +53,15 @@ export default class GUI {
      * @param {Boolean} force If true, don't debounce
      */
     update(force = false) {
-        if (this.ci) { return; }
+        if (this.ci) {
+            return;
+        }
+
         clearTimeout(this._updateDebounce);
+        // eslint-disable-next-line logical-assignment-operators
         this._lastUpdate = this._lastUpdate || 0;
-        const cur = Date.now();
-        const exceededTimeout = (cur - this._lastUpdate) > 50;
+        const current = Date.now();
+        const exceededTimeout = current - this._lastUpdate > 50;
         if (exceededTimeout || force) {
             this._update();
         } else {
@@ -73,7 +77,7 @@ export default class GUI {
         this._lastUpdate = Date.now();
         logUpdate(this.render());
 
-        // animate if we should
+        // Animate if we should
         if (this.shouldAnimate()) {
             clearTimeout(this._animTimeout);
             this._animTimeout = setTimeout(() => this.update(), 100);
@@ -86,33 +90,26 @@ export default class GUI {
      */
     render() {
         const outp = [];
-        if (logHistory.messages.length) {
-            outp.push(
-                "",
-                this.$titles.log,
-                this.$log
-            );
+        if (logHistory.messages.length > 0) {
+            outp.push('', this.$titles.log, this.$log);
         }
-        if (this.$lintings.length) {
-            let $lintings = this.$lintings.filter(
-                $linting => $linting.linting.state !== $linting.linting.STATES.success
+
+        if (this.$lintings.length > 0) {
+            const $lintings = this.$lintings.filter(
+                ($linting) =>
+                    $linting.linting.state !== $linting.linting.STATES.success,
             );
-            if ($lintings.length) {
-                outp.push(
-                    "",
-                    this.$titles.lints,
-                    $lintings
-                        .join("\n")
-                );
+            if ($lintings.length > 0) {
+                outp.push('', this.$titles.lints, $lintings.join('\n'));
             }
         }
-        outp.push(
-            "",
-            this.$titles.summary,
-            this.$summary
-        );
-        if (outp[0] === "") { outp.shift(); }
-        return outp.join("\n");
+
+        outp.push('', this.$titles.summary, this.$summary);
+        if (outp[0] === '') {
+            outp.shift();
+        }
+
+        return outp.join('\n');
     }
 
     /**
@@ -120,7 +117,7 @@ export default class GUI {
      * @returns {Boolean}
      */
     shouldAnimate() {
-        return this.$lintings.some($linting => $linting.shouldAnimate());
+        return this.$lintings.some(($linting) => $linting.shouldAnimate());
     }
 
     /**
@@ -131,8 +128,8 @@ export default class GUI {
     addLinting(linting) {
         this.$lintings.push(new LintingDisplay(linting));
         this.$summary.addLinting(linting);
-        linting.on("rule", () => this.update());
-        linting.on("done", () => this.update());
+        linting.on('rule', () => this.update());
+        linting.on('done', () => this.update());
     }
 
     /**

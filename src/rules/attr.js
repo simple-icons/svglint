@@ -1,5 +1,6 @@
-import Logger from "../lib/logger.js";
-const logger = Logger("rule:attr");
+import logging from '../lib/logger.js';
+
+const logger = logging('rule:attr');
 
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
@@ -8,12 +9,12 @@ const logger = Logger("rule:attr");
 /**
  * @typedef {Object<string,string|string[]|boolean|RegExp>} AttrConfig
  *
- * The key represents the attribute name. The value has the following meanings:  
- * - `{Boolean}` If true, the attr must exist. If false, it must not exist.  
+ * The key represents the attribute name. The value has the following meanings:
+ * - `{Boolean}` If true, the attr must exist. If false, it must not exist.
  * - `{String}` The attr value must match this exactly. It must also exist.
  * - `{RegExp}` The attr value must match the regex.
  * - `{Array<String>}` The attr value must be one of these. It must also exist.
- * 
+ *
  * The following special configs are allowed:
  * - `{ "rule::selector": {String} }` Default "*". The matching elements must fulfill the other configs.
  * - `{ "rule::whitelist": {Boolean} }` Default `false`. If true, no other attributes can exist than those specified by the other configs.
@@ -34,11 +35,15 @@ const logger = Logger("rule:attr");
  *   - If whitelist is true, error if there are non-optional attributes left
  */
 
-const SPECIAL_ATTRIBS = ["rule::selector", "rule::whitelist", "rule::order"];
+const SPECIAL_ATTRIBS = new Set([
+    'rule::selector',
+    'rule::whitelist',
+    'rule::order',
+]);
 
-const OPTIONAL_SUFFIX = "?";
+const OPTIONAL_SUFFIX = '?';
 
-const isAttrOptional = (attr) => attr.endsWith(OPTIONAL_SUFFIX);
+const isAttributeOptional = (attribute) => attribute.endsWith(OPTIONAL_SUFFIX);
 
 /**
  * Executes on a single element.
@@ -47,147 +52,166 @@ const isAttrOptional = (attr) => attr.endsWith(OPTIONAL_SUFFIX);
  * @param {Reporter} reporter The rule reporter
  * @param {AST} ast The AST we are executing on
  */
+// eslint-disable-next-line complexity
 function executeOnElm($elm, config, reporter, ast) {
     // @ts-ignore
-    const attrs = Object.assign({}, $elm.attribs);
-    // check that all attributes that must exist do so
-    Object.keys(config).forEach(
-        attrib => {
-            // do nothing with special configs
-            if (SPECIAL_ATTRIBS.includes(attrib)) { return; }
-            // do nothing with optional attributes
-            if (isAttrOptional(attrib)) { return; }
-            // if defined and not false it must exist
-            if (config[attrib] && !(attrib in attrs)) {
-                reporter.error(
-                    `Expected attribute '${attrib}', didn't find it`,
-                    $elm,
-                    ast
-                );
-            }
+    const attributes_ = {...$elm.attribs};
+    // Check that all attributes that must exist do so
+    for (const attrib of Object.keys(config)) {
+        // Do nothing with special configs
+        if (SPECIAL_ATTRIBS.has(attrib)) {
+            continue;
         }
-    );
 
-    if (config["rule::order"]) {
-        const attributes = Object.keys(attrs);
+        // Do nothing with optional attributes
+        if (isAttributeOptional(attrib)) {
+            continue;
+        }
+
+        // If defined and not false it must exist
+        if (config[attrib] && !(attrib in attributes_)) {
+            reporter.error(
+                `Expected attribute '${attrib}', didn't find it`,
+                $elm,
+                ast,
+            );
+        }
+    }
+
+    if (config['rule::order']) {
+        const attributes = Object.keys(attributes_);
         if (attributes.length > 0) {
             let order;
-            if (config["rule::order"] === true) {
-                // alphabetical ordering
-                order = attributes.slice();
+            if (config['rule::order'] === true) {
+                // Alphabetical ordering
+                order = [...attributes];
                 order.sort();
             } else {
-                order = config["rule::order"];
+                order = config['rule::order'];
             }
 
-            let prevIndex = order.indexOf(attributes[0]);
+            let previousIndex = order.indexOf(attributes[0]);
             for (let i = 1; i < attributes.length; i++) {
                 const index = order.indexOf(attributes[i]);
                 if (index === -1) {
-                    // this attribute doesn't need ordering, ignore it
+                    // This attribute doesn't need ordering, ignore it
                     return;
                 }
 
-                if (prevIndex !== -1 && index < prevIndex) {
+                if (previousIndex !== -1 && index < previousIndex) {
                     reporter.error(
-                        `Wrong ordering of attributes, found "${
-                            attributes.join(", ")}", expected "${order.join(", ")}"`,
+                        `Wrong ordering of attributes, found "${attributes.join(
+                            ', ',
+                        )}", expected "${order.join(', ')}"`,
                         $elm,
-                        ast
+                        ast,
                     );
                     break;
                 }
-                prevIndex = index;
+
+                previousIndex = index;
             }
         }
     }
 
-    // check that all configs are met
-    Object.keys(attrs).forEach(
-        attrib => {
-            const value = attrs[attrib];
-            const expected = typeof config[attrib] !== "undefined" ? config[attrib] : config[`${attrib}${OPTIONAL_SUFFIX}`];
-            let handled = false;
-            // check each type
-            switch (typeof expected) {
-                case "boolean":
-                    handled = true;
-                    if (expected === false) {
-                        reporter.error(
-                            `Attribute '${attrib}' is disallowed`,
-                            $elm,
-                            ast
-                        );
-                    }
-                    break;
-                case "string":
-                    handled = true;
-                    if (value !== expected) {
-                        reporter.error(
-                            `Expected attribute '${attrib}' to be "${expected}", was "${value}"`,
-                            $elm,
-                            ast
-                        );
-                    }
-                    break;
-                case "object":
-                    if (expected instanceof Array) {
-                        handled = true;
-                        if (!expected.includes(value)) {
-                            reporter.error(
-                                `Expected attribute '${attrib}' to be one of ${
-                                    JSON.stringify(expected)
-                                }, was "${value}"`,
-                                $elm,
-                                ast
-                            );
-                        }
-                    } else if (expected instanceof RegExp) {
-                        handled = true;
-                        if (!expected.test(value)) {
-                            reporter.error(
-                                `Expected attribute '${attrib}' to match ${expected}, was "${value}"`,
-                                $elm,
-                                ast
-                            );
-                        }
-                    } else {
-                        reporter.warn(
-                            `Unknown config for attribute '${attrib}' (${
-                                JSON.stringify(expected)
-                            }), ignoring`,
-                            $elm,
-                            ast
-                        );
-                    }
-                    break;
+    // Check that all configs are met
+    for (const attrib of Object.keys(attributes_)) {
+        const value = attributes_[attrib];
+        const expected =
+            config[attrib] === undefined
+                ? config[`${attrib}${OPTIONAL_SUFFIX}`]
+                : config[attrib];
+        let handled = false;
+        // Check each type
+        // eslint-disable-next-line default-case
+        switch (typeof expected) {
+            case 'boolean': {
+                handled = true;
+                if (expected === false) {
+                    reporter.error(
+                        `Attribute '${attrib}' is disallowed`,
+                        $elm,
+                        ast,
+                    );
+                }
+
+                break;
             }
 
-            // if we handled the attribute (i.e. we had a config for it)
-            // then remove it from our attribute list
-            if (handled) {
-                delete attrs[attrib];
+            case 'string': {
+                handled = true;
+                if (value !== expected) {
+                    reporter.error(
+                        `Expected attribute '${attrib}' to be "${expected}", was "${value}"`,
+                        $elm,
+                        ast,
+                    );
+                }
+
+                break;
+            }
+
+            case 'object': {
+                if (Array.isArray(expected)) {
+                    handled = true;
+                    if (!expected.includes(value)) {
+                        reporter.error(
+                            `Expected attribute '${attrib}' to be one of ${JSON.stringify(
+                                expected,
+                            )}, was "${value}"`,
+                            $elm,
+                            ast,
+                        );
+                    }
+                } else if (expected instanceof RegExp) {
+                    handled = true;
+                    if (!expected.test(value)) {
+                        reporter.error(
+                            `Expected attribute '${attrib}' to match ${expected}, was "${value}"`,
+                            $elm,
+                            ast,
+                        );
+                    }
+                } else {
+                    reporter.warn(
+                        `Unknown config for attribute '${attrib}' (${JSON.stringify(
+                            expected,
+                        )}), ignoring`,
+                        $elm,
+                        ast,
+                    );
+                }
+
+                break;
             }
         }
-    );
 
-    if (config["rule::whitelist"]) {
-        const remaining = Object.keys(attrs).filter((attr) => !isAttrOptional(attr));
+        // If we handled the attribute (i.e. we had a config for it)
+        // then remove it from our attribute list
+        if (handled) {
+            delete attributes_[attrib];
+        }
+    }
 
-        if (remaining.length) {
+    if (config['rule::whitelist']) {
+        const remaining = Object.keys(attributes_).filter(
+            (attribute) => !isAttributeOptional(attribute),
+        );
+
+        if (remaining.length > 0) {
             reporter.error(
                 `Found extra attributes ${JSON.stringify(remaining)} with whitelisting enabled`,
                 $elm,
-                ast
+                ast,
             );
         }
     }
 }
 
-export default {
+const attribute = {
     /**
      * Generates a linting function from a config
-     * @param {AttrConfig} config 
+     * @param {AttrConfig} config
      */
     generate(config) {
         /**
@@ -197,14 +221,16 @@ export default {
          * @param {AST} ast The underlying AST representation of the document.
          *                  This should be given to Reporter when warning/erroring with a node.
          */
-        return function AttrRule(reporter, $, ast) {
-            logger.debug("Called", config);
+        return function (reporter, $, ast) {
+            logger.debug('Called', config);
 
-            // find all elements that match the selector and execute on them
-            const selector = config["rule::selector"] || "*";
+            // Find all elements that match the selector and execute on them
+            const selector = config['rule::selector'] || '*';
             const $elms = $.find(selector).toArray();
-            logger.debug("Found elms for selector", selector, $elms.length);
-            $elms.forEach($elm => executeOnElm($elm, config, reporter, ast));
+            logger.debug('Found elms for selector', selector, $elms.length);
+            for (const $elm of $elms) executeOnElm($elm, config, reporter, ast);
         };
-    }
+    },
 };
+
+export default attribute;

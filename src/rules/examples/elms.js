@@ -1,5 +1,6 @@
-import Logger from "../../lib/logger.js";
-const logger = Logger("rule:elms");
+import logging from '../../lib/logger.js';
+
+const logger = logging('rule:elms');
 
 /**
  * @typedef ElmsConfig
@@ -9,7 +10,7 @@ const logger = Logger("rule:elms");
  *                             The first of all matching elements will be used.
  */
 
-export default {
+const elmsExample = {
     /**
      * Generates a linting function from a config
      * @param {ElmsConfig} config
@@ -22,10 +23,12 @@ export default {
          * @param {AST} ast The underlying AST representation of the document.
          *                  This should be given to Reporter when warning/erroring with a node.
          */
-        return function ElmsRule(reporter, $, ast) {
-            logger.debug("Called", config);
+        return function (reporter, $, ast) {
+            logger.debug('Called', config);
             const elm = $(config.selector)[0];
             reporter[config.method](config.message, elm, ast);
         };
-    }
+    },
 };
+
+export default elmsExample;
