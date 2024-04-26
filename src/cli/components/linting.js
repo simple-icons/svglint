@@ -1,7 +1,6 @@
-import { chalk, chunkString, MSG_META, COLUMNS } from "../util.js";
-import stripAnsi from "strip-ansi";
-
-import Spinner from "./spinner.js";
+import stripAnsi from 'strip-ansi';
+import {COLUMNS, MSG_META, chalk, chunkString} from '../util.js';
+import Spinner from './spinner.js';
 
 /** @typedef {import("../../lib/reporter.js")} Reporter */
 /** @typedef {import("../../lib/linting.js")} Linting */
@@ -13,15 +12,12 @@ import Spinner from "./spinner.js";
  */
 function flattenReporters(results) {
     const outp = [];
-    Object.keys(results).sort().forEach(
-        reporterName => {
-            const reporter = results[reporterName];
-            const reporters = (reporter instanceof Array)
-                ? reporter
-                : [reporter];
-            outp.push(...reporters);
-        }
-    );
+    for (const reporterName of Object.keys(results).sort()) {
+        const reporter = results[reporterName];
+        const reporters = Array.isArray(reporter) ? reporter : [reporter];
+        outp.push(...reporters);
+    }
+
     return outp;
 }
 
@@ -48,17 +44,18 @@ export default class LintingDisplay {
      * @returns {String}
      */
     renderHeader() {
-        const linting = this.linting;
+        const {linting} = this;
         let symbol;
-        for (let state of Object.keys(MSG_META)) {
+        for (const state of Object.keys(MSG_META)) {
             if (linting.state === linting.STATES[state]) {
                 const meta = MSG_META[state];
-                symbol = meta.color(state === "linting"
-                    ? this.$spinner
-                    : meta.symbol);
+                symbol = meta.color(
+                    state === 'linting' ? this.$spinner : meta.symbol,
+                );
             }
         }
-        return symbol + " " + chalk.bold.underline(linting.name);
+
+        return symbol + ' ' + chalk.bold.underline(linting.name);
     }
 
     /**
@@ -67,18 +64,18 @@ export default class LintingDisplay {
      */
     renderReporters() {
         const outp = flattenReporters(this.linting.results)
-            .map(reporter => new ReporterDisplay(reporter))
-            .filter(display => display.shouldDisplay())
-            .join("\n");
-        if (outp.length) {
-            return "\n" + outp;
+            .map((reporter) => new ReporterDisplay(reporter))
+            .filter((display) => display.shouldDisplay())
+            .join('\n');
+        if (outp.length > 0) {
+            return '\n' + outp;
         }
-        return "";
+
+        return '';
     }
 
     toString() {
-        return this.renderHeader()
-            + this.renderReporters();
+        return this.renderHeader() + this.renderReporters();
     }
 }
 
@@ -88,26 +85,32 @@ class ReporterDisplay {
     }
 
     shouldDisplay() {
-        return !!this.reporter.messages.length;
+        return this.reporter.messages.length > 0;
     }
 
-    formatMsg(msg) {
-        const type = msg.type;
-        const meta = MSG_META[type];
-        const prefix = `  ${meta.color(meta.symbol + " " + this.reporter.name)}${msg._node
-            ? chalk.gray.dim(` ${msg._node.lineNum}:${msg._node.columnNum}`)
-            : ""
+    formatMsg(message) {
+        const meta = MSG_META[message.type];
+        const prefix = `  ${meta.color(meta.symbol + ' ' + this.reporter.name)}${
+            message._node
+                ? chalk.gray.dim(
+                      ` ${message._node.lineNum}:${message._node.columnNum}`,
+                  )
+                : ''
         } `;
         const prefixLength = stripAnsi(prefix).length;
-        return prefix
-            + chunkString((msg.message||"").toString() || "", COLUMNS - prefixLength - 1)
-                .join("\n"+" ".repeat(prefixLength));
+        return (
+            prefix +
+            chunkString(
+                (message.message || '').toString() || '',
+                COLUMNS - prefixLength - 1,
+            ).join('\n' + ' '.repeat(prefixLength))
+        );
     }
 
     toString() {
-        const msgs = this.reporter.messages.map(
-            msg => this.formatMsg(msg)
+        const msgs = this.reporter.messages.map((message) =>
+            this.formatMsg(message),
         );
-        return msgs.join("\n");
+        return msgs.join('\n');
     }
 }

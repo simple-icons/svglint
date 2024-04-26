@@ -1,5 +1,6 @@
-import Logger from "../../lib/logger.js";
-const logger = Logger("rule:identity");
+import logging from '../../lib/logger.js';
+
+const logger = logging('rule:identity');
 
 /**
  * @typedef IdentityConfig
@@ -7,18 +8,20 @@ const logger = Logger("rule:identity");
  * @property {String} message The message to warn/error with
  */
 
-export default {
+const identityExample = {
     /**
      * Generates a linting function from a config
      * @param {IdentityConfig} config
      */
     generate(config) {
-        return function IdentityRule(reporter) {
-            logger.debug("Called", config);
+        return function (reporter) {
+            logger.debug('Called', config);
             // Report the message if type !== succeed
             if (config.method) {
                 reporter[config.method](config.message);
             }
         };
-    }
+    },
 };
+
+export default identityExample;

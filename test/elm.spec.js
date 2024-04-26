@@ -1,11 +1,10 @@
-import process from "process";
-import util from "util";
+import process from 'node:process';
+import util from 'node:util';
+import {chalk} from '../src/cli/util.js';
+import SVGLint from '../src/svglint.js';
 
-import SVGLint from "../src/svglint.js";
-import { chalk } from "../src/cli/util.js";
-
-process.on("unhandledRejection", error => {
-    console.error(error); // eslint-disable-line no-console
+process.on('unhandledRejection', (error) => {
+    console.error(error);
 });
 
 /**
@@ -40,8 +39,8 @@ const testSVG = `<svg>
     <g></g>
 </svg>`;
 
-function inspect(obj) {
-    return chalk.reset(util.inspect(obj, false, 3, true));
+function inspect(object) {
+    return chalk.reset(util.inspect(object, false, 3, true));
 }
 
 /**
@@ -50,109 +49,117 @@ function inspect(obj) {
  * @param {String} [svg=testSVG] The SVG to lint
  * @returns {Promise<void>} Throws if linting fails
  */
-async function testSucceeds(config, svg=testSVG) {
+async function testSucceeds(config, svg = testSVG) {
     const linting = await SVGLint.lintSource(svg, config);
-    linting.on("done", () => {
+    linting.on('done', () => {
         if (linting.state !== linting.STATES.success) {
-            throw new Error(`Linting failed (${linting.state}): ${inspect(config)}`);
+            throw new Error(
+                `Linting failed (${linting.state}): ${inspect(config)}`,
+            );
         }
     });
 }
+
 /**
  * Tests that a config fails when ran
  * @param {Config} config The config to test
  * @param {String} svg The SVG to lint
  * @returns {Promise<void>} Throws if the linting doesn't fail
  */
-async function testFails(config, svg=testSVG) {
+async function testFails(config, svg = testSVG) {
     const _config = {
-        rules: { elm: config },
+        rules: {elm: config},
     };
     const linting = await SVGLint.lintSource(svg, _config);
-    linting.on("done", () => {
+    linting.on('done', () => {
         if (linting.state !== linting.STATES.error) {
-            throw new Error(`Linting did not fail (${linting.state}): ${inspect(_config)}`);
+            throw new Error(
+                `Linting did not fail (${linting.state}): ${inspect(_config)}`,
+            );
         }
     });
 }
 
-describe("Rule: elm", function(){
-    it("should succeed without config", function(){
+describe('Rule: elm', function () {
+    it('should succeed without config', function () {
         return testSucceeds({});
     });
 
-    it("should succeed with a required element", function(){
+    it('should succeed with a required element', function () {
         return testSucceeds({
-            "svg > title": true,
+            'svg > title': true,
         });
     });
-    it("should fail without a required element", function(){
+    it('should fail without a required element', function () {
         return testFails({
-            "svg > foobar": true,
+            'svg > foobar': true,
         });
     });
 
-    it("should succeed without a disallowed element", function(){
+    it('should succeed without a disallowed element', function () {
         return testSucceeds({
-            "g > foobar": false,
+            'g > foobar': false,
         });
     });
-    it("should fail with a disallowed element", function(){
+    it('should fail with a disallowed element', function () {
         return testFails({
-            "g > path": false
+            'g > path': false,
         });
     });
 
-    it("should succeed with a found number of elements", function(){
+    it('should succeed with a found number of elements', function () {
         return testSucceeds({
-            "g": 2,
+            g: 2,
         });
     });
-    it("should fail with an exceeded number of elements", function(){
+    it('should fail with an exceeded number of elements', function () {
         return testFails({
-            "g": 1,
+            g: 1,
         });
     });
-    it("should fail with a too low number of elements", function(){
+    it('should fail with a too low number of elements', function () {
         return testFails({
-            "g": 3,
+            g: 3,
         });
     });
 
-    it("should succeed with a found range of elements", function() {
+    it('should succeed with a found range of elements', function () {
         return Promise.all([
             testSucceeds({
-                "g > path": [1,2],
+                'g > path': [1, 2],
             }),
-            testSucceeds({
-                "g > path": [1,2],
-            }, "<svg><g><path></path></g></svg>"),
+            testSucceeds(
+                {
+                    'g > path': [1, 2],
+                },
+                '<svg><g><path></path></g></svg>',
+            ),
         ]);
     });
-    it("should fail with an exceeded range of elements", function() {
+    it('should fail with an exceeded range of elements', function () {
         return testFails({
-            "g > path": [0,1],
+            'g > path': [0, 1],
         });
     });
-    it("should fail with a too low range of elements", function(){
+    it('should fail with a too low range of elements', function () {
         return testFails({
-            "g > path": [3,5],
+            'g > path': [3, 5],
         });
     });
 
-    it("should succeed when a disallowed element is allowed by another rule", function(){
+    it('should succeed when a disallowed element is allowed by another rule', function () {
         return Promise.all([
             testSucceeds({
-                "path": false,
-                "g > path": true,
+                path: false,
+                'g > path': true,
             }),
             testSucceeds({
-                "path": false,
-                "g > path": 2,
+                path: false,
+                'g > path': 2,
             }),
             testSucceeds({
-                "path": false,
-                "g > path": [1,2],
+                path: false,
+                'g > path': [1, 2],
             }),
         ]);
     });

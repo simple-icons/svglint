@@ -1,5 +1,6 @@
-import Logger from "../lib/logger.js";
-const logger = Logger("rule:custom");
+import logging from '../lib/logger.js';
+
+const logger = logging('rule:custom');
 
 /** @typedef {import('cheerio').Cheerio<import('domhandler').Document>} Cheerio */
 /** @typedef {import("../lib/reporter.js")} Reporter */
@@ -19,7 +20,7 @@ const logger = Logger("rule:custom");
  * The function will be executed as if though it was a rule.
  */
 
-export default {
+const custom = {
     /**
      * Generates a linting function from a config
      * @param {CustomConfig} config
@@ -33,9 +34,11 @@ export default {
          *                  This should be given to Reporter when warning/erroring with a node.
          * @param {Info} info Info related to the current file being linted.
          */
-        return function CustomRule(reporter, $, ast, info) {
-            logger.debug("Called", config);
+        return function (reporter, $, ast, info) {
+            logger.debug('Called', config);
             return config(reporter, $, ast, info);
         };
-    }
+    },
 };
+
+export default custom;

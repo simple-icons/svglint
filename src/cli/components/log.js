@@ -1,5 +1,5 @@
-import nodeUtil from "util";
-import { MSG_META, supportsColor } from "../util.js";
+import nodeUtil from 'node:util';
+import {MSG_META, supportsColor} from '../util.js';
 
 /** @typedef {import("../../lib/logger.js").CliConsole} CliHistory */
 
@@ -7,14 +7,15 @@ import { MSG_META, supportsColor } from "../util.js";
  * Stringifies a list of data into a colorized single line
  * @param {Array} args The data to stringify
  */
-function stringifyArgs(args=[]) {
-    return args.map(
-        v => (
-            typeof v === "string"
+function stringifyArguments(arguments_ = []) {
+    return arguments_
+        .map((v) =>
+            (typeof v === 'string'
                 ? v
-                : nodeUtil.inspect(v, { colors: supportsColor, depth: 3 })
-        ).replace(/^Error: /, "")
-    ).join(" ");
+                : nodeUtil.inspect(v, {colors: supportsColor, depth: 3})
+            ).replace(/^Error: /, ''),
+        )
+        .join(' ');
 }
 
 /**
@@ -22,16 +23,24 @@ function stringifyArgs(args=[]) {
  */
 export default class Log {
     /** @param {CliHistory} logHistory */
-    constructor(logHistory) { this.logs = logHistory; }
+    constructor(logHistory) {
+        this.logs = logHistory;
+    }
+
     toString() {
-        return this.logs.messages.map(msg => {
-            const meta = MSG_META[msg.type];
-            const prefix = msg.prefix
-                ? `[${meta.symbol}|${msg.prefix}]`
-                : `(${meta.symbol})`;
-            const message = stringifyArgs(msg.args);
-            return (supportsColor ? meta.color(prefix) : prefix) + " "
-                + message;
-        }).join("\n");
+        return this.logs.messages
+            .map((message_) => {
+                const meta = MSG_META[message_.type];
+                const prefix = message_.prefix
+                    ? `[${meta.symbol}|${message_.prefix}]`
+                    : `(${meta.symbol})`;
+                const message = stringifyArguments(message_.args);
+                return (
+                    (supportsColor ? meta.color(prefix) : prefix) +
+                    ' ' +
+                    message
+                );
+            })
+            .join('\n');
     }
 }

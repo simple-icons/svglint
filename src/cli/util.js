@@ -1,58 +1,54 @@
 /**
  * @fileoverview Utilities for the CLI.
  */
-import process from "process";
-import { Chalk, supportsColor as chalkSupportsColor } from "chalk";
-import ansiRegex from "ansi-regex";
+import process from 'node:process';
+import ansiRegex from 'ansi-regex';
+// eslint-disable-next-line unicorn/import-style
+import {Chalk, supportsColor as chalkSupportsColor} from 'chalk';
 
-const supportsColor = chalkSupportsColor &&
-    !("NO_COLOR" in process.env) &&
-    !("SVGLINT_NO_COLOR" in process.env);
+const supportsColor =
+    chalkSupportsColor &&
+    !('NO_COLOR' in process.env) &&
+    !('SVGLINT_NO_COLOR' in process.env);
 
-let chalk = supportsColor ? new Chalk() : new Chalk({level: 0});
+const chalk = supportsColor ? new Chalk() : new Chalk({level: 0});
 
 const COLUMNS = process.stdout.columns || 80;
 const MSG_META = Object.freeze({
-    // logs
-    "debug": Object.freeze({
-        symbol: "d",
+    // Logs
+    debug: Object.freeze({
+        symbol: 'd',
         color: chalk.gray.dim.bold,
     }),
-    "log": Object.freeze({
-        symbol: "i",
+    log: Object.freeze({
+        symbol: 'i',
         color: chalk.blue.bold,
     }),
 
-    // lintings
-    "linting": Object.freeze({
+    // Lintings
+    linting: Object.freeze({
         symbol: null,
         color: chalk.gray.dim,
     }),
-    "success": Object.freeze({
-        symbol: "✓",
+    success: Object.freeze({
+        symbol: '✓',
         color: chalk.green.bold,
     }),
-    "warn": Object.freeze({
-        symbol: "!",
+    warn: Object.freeze({
+        symbol: '!',
         color: chalk.yellow.bold,
     }),
-    "error": Object.freeze({
-        symbol: "x",
+    error: Object.freeze({
+        symbol: 'x',
         color: chalk.red.bold,
     }),
-    "exception": Object.freeze({
-        symbol: "!!!",
+    exception: Object.freeze({
+        symbol: '!!!',
         color: chalk.bgRed.bold,
     }),
 });
 
-export {
-    chalk,
-    chunkString,
-    supportsColor,
-    MSG_META,
-    COLUMNS,
-};
+export {chalk, chunkString, supportsColor, MSG_META, COLUMNS};
 
 /**
  * Splits a string into N sized chunks.
@@ -62,36 +58,51 @@ export {
  * @param {Number} N    The length to chunk into
  * @returns {Array<String>}
  */
-function chunkString(str, N) {
+function chunkString(string_, N) {
     const outp = [];
-    const blacklist = [ansiRegex()];
-    let tmp = ""; let tmpLen = 0;
-    for (let i = 0, l = str.length; i < l; ++i) {
-        if (str[i] === "\n"        // split at newlines
-            || tmpLen === N) { // and at length
-            outp.push(tmp);
-            tmp = "";
-            tmpLen = 0;
+    const exclude = [ansiRegex()];
+    let temporary = '';
+    let temporaryLength = 0;
+    for (let i = 0, l = string_.length; i < l; ++i) {
+        if (
+            string_[i] === '\n' || // Split at newlines
+            temporaryLength === N
+        ) {
+            // And at length
+            outp.push(temporary);
+            temporary = '';
+            temporaryLength = 0;
         }
-        if (str[i] === "\n") { // don't add newlines to our outp str
+
+        if (string_[i] === '\n') {
+            // Don't add newlines to our outp str
             continue;
         }
-        let blacklisted = false;
-        for (let regex of blacklist) { // skip blacklist matches
-            const tester = new RegExp("^"+regex.source);
-            const match = tester.exec(str.slice(i));
+
+        let excluded = false;
+        for (const regex of exclude) {
+            // Skip excluded matches
+            const tester = new RegExp('^' + regex.source);
+            const match = tester.exec(string_.slice(i));
             if (match) {
                 i += match[0].length - 1;
-                tmp += match[0];
-                blacklisted = true;
+                temporary += match[0];
+                excluded = true;
                 break;
             }
         }
-        if (blacklisted) { continue; }
 
-        tmp += str[i];
-        ++tmpLen;
+        if (excluded) {
+            continue;
+        }
+
+        temporary += string_[i];
+        ++temporaryLength;
     }
-    if (tmp) { outp.push(tmp); }
+
+    if (temporary) {
+        outp.push(temporary);
+    }
+
     return outp;
 }

@@ -1,11 +1,13 @@
-export default {
+const config = {
     rules: {
         attr: {
-            "rule::selector": "path",
-            "d": true,
+            'rule::selector': 'path',
+            d: true,
         },
         elm: {
-            "g": true,
-        }
-    }
+            g: true,
+        },
+    },
 };
+
+export default config;

@@ -28,16 +28,10 @@ jobs:
         os:
           - ubuntu-latest
         node-version:
-          - 12.22.0
-          - 14.17.0
-          - 16.0.0
-          - 18.0.0
-          - 20.0.0
           - 12
           - 14
           - 16
           - 18
-          - 19
           - 20
         include:
           - os: macos-latest
@@ -52,9 +46,11 @@ jobs:
         with:
           cache: npm
           node-version: ${{ matrix.node-version }}
-      - name: Install compatible npm version
-        run: npm install --global npm@8.1.2
+      - name: Use specific version of npm for Node.js 12 & 14
+        if: matrix.node-version < 16
+        run: npm install -g npm@8
       - name: Install dependencies
-        run: npm ci
+        # Use `--engine-strict=false` to ignore engine errors from XO dependencies
+        run: npm ci --engine-strict=false
       - name: Test
         run: npm test

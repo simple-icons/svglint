@@ -6,24 +6,24 @@
  * It receives the parsed AST and rules from ../svglint.js, and then runs each
  *   rule and gathers the results.
  */
-import { EventEmitter } from "events";
-import path from "path";
-import process from "process";
-import * as cheerio from "cheerio";
-import * as parse from "./parse.js";
-import Reporter from "./reporter.js";
-import Logger from "./logger.js";
+import {EventEmitter} from 'node:events';
+import path from 'node:path';
+import process from 'node:process';
+import cheerio from 'cheerio';
+import logging from './logger.js';
+import * as parse from './parse.js';
+import Reporter from './reporter.js';
 
 /** @typedef {import("./parse.js").AST} AST */
 /** @typedef {import("./parse.js").Node} Node */
 /** @typedef {import("../svglint.js").NormalizedRules} NormalizedRules */
 
 const STATES = Object.freeze({
-    "ignored": "ignored",
-    "linting": "linting",
-    "success": "success",
-    "warn":    "warn",
-    "error":   "error",
+    ignored: 'ignored',
+    linting: 'linting',
+    success: 'success',
+    warn: 'warn',
+    error: 'error',
 });
 
 /**
@@ -52,14 +52,12 @@ class Linting extends EventEmitter {
         /** If false, the linting has at least one rule that threw when executing */
         this.valid = true;
         /** The name used for logging/human consumption */
-        this.name = file
-            ? path.relative(process.cwd(), file)
-            : "API";
+        this.name = file ? path.relative(process.cwd(), file) : 'API';
         /** The Reporters for each rule we've linted
          * @type Object<string,Reporter|Reporter[]> */
         this.results = {};
         /** The logger used to show debugs */
-        this.logger = Logger(`lint:${this.name}`);
+        this.logger = logging(`lint:${this.name}`);
 
         this.lint();
     }
@@ -71,27 +69,25 @@ class Linting extends EventEmitter {
     lint() {
         this.state = STATES.linting;
 
-        // keep track of when every rule has finished
+        // Keep track of when every rule has finished
         const ruleNames = Object.keys(this.rules);
         if (ruleNames.length === 0) {
-            this.logger.debug("No rules to lint, finishing");
+            this.logger.debug('No rules to lint, finishing');
             this.state = STATES.success;
-            Promise.resolve()
-                .then(() => this.emit("done"));
+            Promise.resolve().then(() => this.emit('done'));
             return;
         }
+
         this.activeRules = ruleNames.length;
 
-        this.logger.debug("Started linting");
-        this.logger.debug("  Rules:", ruleNames);
+        this.logger.debug('Started linting');
+        this.logger.debug('  Rules:', ruleNames);
 
-        // start every rule
-        ruleNames.forEach(ruleName => {
+        // Start every rule
+        for (const ruleName of ruleNames) {
             const ast = parse.clone(this.ast);
-            const cheerioParsed = cheerio.load(
-                "<root></root>",
-                { xmlMode: true }
-            )("root")
+            const cheerioParsed = cheerio
+                .load('<root></root>', {xmlMode: true})('root')
                 // @ts-ignore
                 .append(ast);
             /**
@@ -101,43 +97,53 @@ class Linting extends EventEmitter {
              * @param {Function} onDone Function to call once the rule is done
              */
             const execute = (rule, reporterName, onDone) => {
-                // gather results from the rule through a reporter
+                // Gather results from the rule through a reporter
                 const reporter = this._generateReporter(reporterName);
-                // execute the rule, potentially waiting for async rules
+                // Execute the rule, potentially waiting for async rules
                 // also handles catching errors from the rule
                 Promise.resolve()
-                    .then(() => rule(reporter, cheerioParsed, ast, { filepath: this.path }))
-                    .catch(e => reporter.exception(e))
+                    .then(() =>
+                        rule(reporter, cheerioParsed, ast, {
+                            filepath: this.path,
+                        }),
+                    )
+                    .catch((error) => reporter.exception(error))
                     .then(() => onDone(reporter));
             };
 
             /** @type {Function|Function[]} */
             const rule = this.rules[ruleName];
-            if (rule instanceof Array) {
+            if (Array.isArray(rule)) {
                 /** @type {Reporter[]} */
                 const results = [];
                 let activeRules = rule.length;
-                rule.forEach((r, i) => {
-                    execute(r, `${ruleName}-${i+1}`, result => {
+                for (const [i, r] of rule.entries()) {
+                    execute(r, `${ruleName}-${i + 1}`, (result) => {
                         results[i] = result;
                         if (--activeRules <= 0) {
                             this._onRuleFinish(ruleName, results);
                         }
                     });
-                });
+                }
+
                 if (rule.length === 0) {
-                    Promise.resolve()
-                        .then(() => {
-                            this._onRuleFinish(ruleName, this._generateReporter(ruleName));
-                        });
-                    this.logger.debug("Rule had no configs", Logger.colorize(ruleName));
+                    Promise.resolve().then(() => {
+                        this._onRuleFinish(
+                            ruleName,
+                            this._generateReporter(ruleName),
+                        );
+                    });
+                    this.logger.debug(
+                        'Rule had no configs',
+                        logging.colorize(ruleName),
+                    );
                 }
             } else {
-                execute(rule, ruleName, result => {
+                execute(rule, ruleName, (result) => {
                     this._onRuleFinish(ruleName, result);
                 });
             }
-        });
+        }
     }
 
     /**
@@ -148,8 +154,8 @@ class Linting extends EventEmitter {
      * @private
      */
     _onRuleFinish(ruleName, reporter) {
-        this.logger.debug("Rule finished", Logger.colorize(ruleName));
-        this.emit("rule", {
+        this.logger.debug('Rule finished', logging.colorize(ruleName));
+        this.emit('rule', {
             name: ruleName,
             result: reporter,
         });
@@ -158,8 +164,11 @@ class Linting extends EventEmitter {
         --this.activeRules;
         if (this.activeRules === 0) {
             this.state = this._calculateState();
-            this.logger.debug("Linting finished with status", Logger.colorize(this.state));
-            this.emit("done");
+            this.logger.debug(
+                'Linting finished with status',
+                logging.colorize(this.state),
+            );
+            this.emit('done');
         }
     }
 
@@ -169,24 +178,30 @@ class Linting extends EventEmitter {
      */
     _calculateState() {
         let state = STATES.success;
-        for (let k in this.results) {
+        // eslint-disable-next-line guard-for-in
+        for (const k in this.results) {
             const result = this.results[k];
-            if (result instanceof Array) {
-                if (result.some(res => res.hasErrors || res.hasExceptions)) {
+            if (Array.isArray(result)) {
+                if (
+                    result.some((item) => item.hasErrors || item.hasExceptions)
+                ) {
                     return STATES.error;
                 }
-                if (result.some(res => res.hasWarns)) {
+
+                if (result.some((item) => item.hasWarns)) {
                     state = STATES.warn;
                 }
             } else {
                 if (result.hasErrors || result.hasExceptions) {
                     return STATES.error;
                 }
+
                 if (result.hasWarns) {
                     state = STATES.warn;
                 }
             }
         }
+
         return state;
     }
 
@@ -199,12 +214,14 @@ class Linting extends EventEmitter {
      */
     _generateReporter(ruleName) {
         const reporter = new Reporter(ruleName);
-        reporter.once("exception", () => {
+        reporter.once('exception', () => {
             this.valid = false;
         });
         return reporter;
     }
 }
+
+// eslint-disable-next-line no-multi-assign
 Linting.STATES = Linting.prototype.STATES = STATES;
 
 export default Linting;
