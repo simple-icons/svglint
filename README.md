@@ -207,9 +207,9 @@ export default {
     rules: {
         custom: [
             (reporter, $, ast, { filename }) => {
+                // Don't allow explicit '</path>' closing tag
                 reporter.name = 'no-self-closing-path';
 
-                // Don't allow explicit '</path>' closing tag
                 if (!ast.source.includes('</path>')) {
                     return;
                 }
@@ -235,5 +235,18 @@ import("package-of-the-rule/rule-name.js");
 ```
 
 So you need to export the rule function from the file `rule-name.js` in the package `package-of-the-rule` as default to expose it.
+
+##### Example
+
+```javascript
+export default {
+    rules: {
+        'package-of-the-rule/rule-name': {
+            // config for the rule `rule-name` of the external
+            // hypotetical npm package `package-of-the-rule`
+        }
+    }
+}
+```
 
 [selecting-elements-cheerio]: https://cheerio.js.org/docs/basics/selecting
