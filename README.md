@@ -84,10 +84,14 @@ export default {
             (reporter, $, ast) => {
                 // config for a custom rule named `my-first-rule`
                 reporter.name = 'my-first-rule';
+
+                // ... additional code for the rule
             },
             (reporter, $, ast) => {
                 // config for a custom rule named `my-second-rule`
                 reporter.name = 'my-second-rule';
+
+                // ... additional code for the rule
             }
         ],
 
