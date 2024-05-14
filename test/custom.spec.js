@@ -49,13 +49,13 @@ describe('Rule: custom', function () {
 
     it('should provide file information', function () {
         return testSucceeds([
-            (_reporter, _$, _ast, info) => {
+            (reporter, _$, _ast, info) => {
                 if (!info) {
-                    throw new Error('no info provided');
+                    reporter.error('no info provided');
                 }
 
                 if (!Object.hasOwn(info, 'filepath')) {
-                    throw new Error('no filepath provided on info');
+                    reporter.error('no filepath provided on info');
                 }
             },
         ]);
