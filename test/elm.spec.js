@@ -1,11 +1,4 @@
-import process from 'node:process';
-import util from 'node:util';
-import {chalk} from '../src/cli/util.js';
-import SVGLint from '../src/svglint.js';
-
-process.on('unhandledRejection', (error) => {
-    console.error(error);
-});
+import {testFailsFactory, testSucceedsFactory} from './helpers.js';
 
 /**
  * ### `elm`
@@ -39,46 +32,8 @@ const testSVG = `<svg>
     <g></g>
 </svg>`;
 
-function inspect(object) {
-    return chalk.reset(util.inspect(object, false, 3, true));
-}
-
-/**
- * Tests that a config succeeds when ran
- * @param {Config} config The config to test
- * @param {String} [svg=testSVG] The SVG to lint
- * @returns {Promise<void>} Throws if linting fails
- */
-async function testSucceeds(config, svg = testSVG) {
-    const linting = await SVGLint.lintSource(svg, config);
-    linting.on('done', () => {
-        if (linting.state !== linting.STATES.success) {
-            throw new Error(
-                `Linting failed (${linting.state}): ${inspect(config)}`,
-            );
-        }
-    });
-}
-
-/**
- * Tests that a config fails when ran
- * @param {Config} config The config to test
- * @param {String} svg The SVG to lint
- * @returns {Promise<void>} Throws if the linting doesn't fail
- */
-async function testFails(config, svg = testSVG) {
-    const _config = {
-        rules: {elm: config},
-    };
-    const linting = await SVGLint.lintSource(svg, _config);
-    linting.on('done', () => {
-        if (linting.state !== linting.STATES.error) {
-            throw new Error(
-                `Linting did not fail (${linting.state}): ${inspect(_config)}`,
-            );
-        }
-    });
-}
+const testFails = testFailsFactory(testSVG, 'elm');
+const testSucceeds = testSucceedsFactory(testSVG, 'elm');
 
 describe('Rule: elm', function () {
     it('should succeed without config', function () {

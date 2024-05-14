@@ -6,6 +6,6 @@ module.exports = {
         },
         elm: {
             "g": true,
-        }
+        },
     }
 };

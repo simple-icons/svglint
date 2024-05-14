@@ -1,15 +1,10 @@
 import path from 'node:path';
-import process from 'node:process';
 import url from 'node:url';
 import expect from 'expect';
 import SVGLint from '../src/svglint.js';
 
 const currentFilePath = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(currentFilePath);
-
-process.on('unhandledRejection', (error) => {
-    console.error(error);
-});
 
 const svg = '<svg></svg>';
 
