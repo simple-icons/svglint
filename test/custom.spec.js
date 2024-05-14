@@ -54,7 +54,8 @@ describe('Rule: custom', function () {
                     reporter.error('no info provided');
                 }
 
-                if (!Object.hasOwn(info, 'filepath')) {
+                // eslint-disable-next-line prefer-object-has-own
+                if (!Object.prototype.hasOwnProperty.call(info, 'filepath')) {
                     reporter.error('no filepath provided on info');
                 }
             },
