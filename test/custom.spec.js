@@ -54,6 +54,7 @@ describe('Rule: custom', function () {
                     reporter.error('no info provided');
                 }
 
+                // NOTE: Object.hasOwn is not available at Node.js v12 nor v14
                 // eslint-disable-next-line prefer-object-has-own
                 if (!Object.prototype.hasOwnProperty.call(info, 'filepath')) {
                     reporter.error('no filepath provided on info');
