@@ -189,7 +189,7 @@ export default {
 
 The `valid` rule specifies if the SVG is valid or not. It should be a boolean to enable or disable the rule.
 
-#### Custom rules
+#### Custom rules (`custom`)
 
 Custom rules can be specified by an array of functions. Each function should have the signature `(reporter, $, ast, { filename }) => void`, where:
 
