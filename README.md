@@ -142,7 +142,7 @@ export default {
 
 Rules at `attr` specify the attributes that are allowed on elements. It should be an object or an array of objects where the keys must be either:
 
-- `"rule::selector"`: The value must be the CSS selector of the element to which the rule applies. See [_Selecting elements_ on cheerio's documentation][selecting-elements-cheerio].
+- `"rule::selector"`: The value must be the CSS selector of the element to which the rule applies. See [*Selecting elements* on cheerio's documentation][selecting-elements-cheerio].
 - `"rule::whitelist"`: If enabled, extra attributes beyond of the ones defined in additional keys are not allowed on the element. The value must be a boolean.
 - `"rule::order"`: The value must be either:
   - `true`: the attributes must be defined in alphabetical order.
