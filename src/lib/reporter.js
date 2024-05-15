@@ -5,6 +5,7 @@ import {EventEmitter} from 'node:events';
 import {chalk} from '../cli/util.js';
 import logging from './logger.js';
 
+/** @typedef {import('cheerio').Cheerio<import('domhandler').Document>} Cheerio */
 /** @typedef {import("./parse.js").AST} AST */
 /** @typedef {import("./parse.js").Node} Node */
 
