@@ -85,12 +85,14 @@ export default {
                 // config for a custom rule named `my-first-rule`
                 reporter.name = 'my-first-rule';
 
+                reporter.error('An error message');
                 // ... additional code for the rule
             },
             (reporter, $, ast) => {
                 // config for a custom rule named `my-second-rule`
                 reporter.name = 'my-second-rule';
 
+                reporter.warn('A warning message');
                 // ... additional code for the rule
             }
         ],
