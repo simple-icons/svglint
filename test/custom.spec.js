@@ -1,35 +1,8 @@
-import {testFailsFactory, testSucceedsFactory} from './helpers.js';
-
 /**
- * ### `custom`
-
-Specifies a custom rule.
-Used as a quick-and-dirty way of adding rules when you don't want to write an
-entire NPM package.
-
-```javascript
-[function(reporter, $, ast) {
-    reporter.error(
-        "This will fail at <svg>",
-        $.find("svg")[0],
-        ast
-    );
-}, function(reporter, $, ast) {
-    reporter.warn(
-        "This will warn at <svg>",
-        $.find("svg")[0],
-        ast
-    );
-}, function(reporter, $, ast) {
-    // this will succeed
-}, function(reporter, $, ast) {
-    // this does async work, then succeeds
-    return new Promise(res => {
-        setTimeout(() => res(), 1000);
-    });
-}]
-```
+ * @fileoverview Tests for the `custom` rules.
  */
+
+import {testFailsFactory, testSucceedsFactory} from './helpers.js';
 
 const testSVG = `<svg role="img" viewBox="0 0 24 24">
     <g id="foo">

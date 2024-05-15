@@ -85,12 +85,14 @@ export default {
                 // config for a custom rule named `my-first-rule`
                 reporter.name = 'my-first-rule';
 
+                reporter.error('An error message');
                 // ... additional code for the rule
             },
             (reporter, $, ast) => {
                 // config for a custom rule named `my-second-rule`
                 reporter.name = 'my-second-rule';
 
+                reporter.warn('A warning message');
                 // ... additional code for the rule
             }
         ],
@@ -114,7 +116,7 @@ All rules are optional.
 
 Rules at `elm` specify what elements are allowed in the SVG. It should be an object or an array of objects where:
 
-- The keys are the element CSS selectors. See [_Selecting elements_ on cheerio's documentation][selecting-elements-cheerio].
+- The keys are the element CSS selectors. See [*Selecting elements* on cheerio's documentation][selecting-elements-cheerio].
 - The values are either:
   - `true` if at least one of the element is present.
   - `false` if the element must not be present.

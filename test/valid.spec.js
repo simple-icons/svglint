@@ -1,13 +1,11 @@
+/**
+ * @fileoverview Tests for the `valid` rule.
+ */
+
 import {testFailsFactory, testSucceedsFactory} from './helpers.js';
 
 const testFails = async (svg, config) => testFailsFactory(svg, config)();
 const testSucceeds = async (svg, config) => testSucceedsFactory(svg, config)();
-
-/**
- * ### `valid`
-
-Requires that the SVG is valid XML.
- */
 
 describe('Rule: valid', function () {
     it('should succeed by default for a valid SVG', function () {

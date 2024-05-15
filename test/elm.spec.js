@@ -1,27 +1,8 @@
-import {testFailsFactory, testSucceedsFactory} from './helpers.js';
-
 /**
- * ### `elm`
-
-Specifies the elements that must/must not exist.  
-Specified as a map with keys mapping to a value. Supported value types are `Array<Number>|Number|Boolean`.
-The key is used as a selector.  
-If the value is a boolean, it indicates whether the selector must be matched (`true`) or must not be matched (`false`).  
-If the value is a number, it indicates that exactly that number of matches must be found.  
-If the number is an array, it must have a length of 2, and indicates the range between which the number of matches must be.
-
-If an element is permitted by one rule and rejected by another, it is overall permitted.
-
-```javascript
-{
-    "svg": true,         // the root svg element must exist
-    "svg > title": true, // the title element must exist inside the root element
-    "g": 2,              // exactly 2 groups must exist
-    "g > path": [0,2],   // up to two paths can exist
-    "*": false,          // nothing else can exist
-}
-```
+ * @fileoverview Tests for the `elm` rules.
  */
+
+import {testFailsFactory, testSucceedsFactory} from './helpers.js';
 
 const testSVG = `<svg>
     <title></title>

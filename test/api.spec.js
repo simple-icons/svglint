@@ -1,9 +1,9 @@
 import path from 'node:path';
-import url from 'node:url';
+import {fileURLToPath} from 'node:url';
 import expect from 'expect';
 import SVGLint from '../src/svglint.js';
 
-const currentFilePath = url.fileURLToPath(import.meta.url);
+const currentFilePath = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(currentFilePath);
 
 const svg = '<svg></svg>';
