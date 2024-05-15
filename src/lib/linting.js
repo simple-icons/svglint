@@ -9,7 +9,7 @@
 import {EventEmitter} from 'node:events';
 import path from 'node:path';
 import process from 'node:process';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import logging from './logger.js';
 import * as parse from './parse.js';
 import Reporter from './reporter.js';
@@ -86,7 +86,7 @@ class Linting extends EventEmitter {
         // Start every rule
         for (const ruleName of ruleNames) {
             const ast = parse.clone(this.ast);
-            const cheerioParsed = cheerio
+            const $ = cheerio
                 .load('<root></root>', {xmlMode: true})('root')
                 // @ts-ignore
                 .append(ast);
@@ -103,7 +103,7 @@ class Linting extends EventEmitter {
                 // also handles catching errors from the rule
                 Promise.resolve()
                     .then(() =>
-                        rule(reporter, cheerioParsed, ast, {
+                        rule(reporter, $, ast, {
                             filepath: this.path,
                         }),
                     )
