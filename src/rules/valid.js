@@ -3,6 +3,7 @@ import logging from '../lib/logger.js';
 
 const logger = logging('rule:valid');
 
+/** @typedef {import('cheerio').Cheerio<import('domhandler').Document>} Cheerio */
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
 /** @typedef {import("../lib/parse.js").Node} Node */
