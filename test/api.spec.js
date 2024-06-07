@@ -49,12 +49,13 @@ describe('.lintSource()', function () {
         });
     });
 
-    /*
-    TODO:
     it('should throw with malformed SVG', function (done) {
-        SVGLint.lintSource('<svg<path', {}).catch(() => done());
+        SVGLint.lintSource('<svg<path', {})
+            .then((linting) => {
+                linting.lint();
+            })
+            .catch(() => done());
     });
-    */
 });
 
 describe('.lintFile()', function () {
