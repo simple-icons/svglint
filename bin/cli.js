@@ -130,6 +130,7 @@ process.on('exit', () => {
                             process.exit(EXIT_CODES.success);
                         }
                     });
+                    linting.lint();
                 })
                 .catch((error) => {
                     logger.error('Failed to lint\n', error);
@@ -171,6 +172,7 @@ process.on('exit', () => {
 
                         onLintingDone();
                     });
+                    linting.lint();
                 })
                 .catch((error) => {
                     logger.error('Failed to lint file', filePath, '\n', error);

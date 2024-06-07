@@ -8,6 +8,7 @@ async function lint(source, rules) {
         linting.on('done', () => {
             resolve(linting.results);
         });
+        linting.lint();
     });
 }
 

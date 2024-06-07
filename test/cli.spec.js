@@ -42,7 +42,7 @@ describe('CLI', function () {
         expect(failed).toBeFalsy();
     });
 
-    it('should fail with an invalid SVG', async function () {
+    it('should fail with a SVG that does not matches config', async function () {
         const {failed, exitCode} = await execCli(
             [INVALID_SVG],
             'test/projects/with-config',
@@ -60,7 +60,7 @@ describe('CLI', function () {
         expect(failed).toBeFalsy();
     });
 
-    it('should fail with an invalid SVG on stdin', async function () {
+    it('should fail with a SVG that does not matches config on stdin', async function () {
         const {failed, exitCode} = await execCli(
             ['--stdin'],
             'test/projects/with-config',

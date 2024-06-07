@@ -30,22 +30,6 @@ export function testSucceedsFactory(svg, ruleNameOrConfig) {
                     : ruleNameOrConfig;
             const linting = await SVGLint.lintSource(svg, config);
 
-            // TODO: there is a race condition here. The this.lint() method
-            // of the Linting class is called in the constructor, so it's possible
-            // that the linting is already done before we call the on('done')
-            // event listener. Removing the next condition will make some `valid`
-            // rules tests fail.
-            if (linting.state === linting.STATES.success) {
-                resolve();
-            } else if (linting.state !== linting.STATES.linting) {
-                reject(
-                    new Error(
-                        `Linting failed (${linting.state}):` +
-                            ` ${inspect(config)}`,
-                    ),
-                );
-            }
-
             linting.on('done', () => {
                 if (linting.state === linting.STATES.success) {
                     resolve();
@@ -58,6 +42,8 @@ export function testSucceedsFactory(svg, ruleNameOrConfig) {
                     );
                 }
             });
+
+            linting.lint();
         });
     };
 }
@@ -84,18 +70,6 @@ export function testFailsFactory(svg, ruleNameOrConfig) {
                     : ruleNameOrConfig;
             const linting = await SVGLint.lintSource(svg, config);
 
-            // TODO: Same that the TODO explained at testSucceedsFactory
-            if (linting.state === linting.STATES.error) {
-                resolve();
-            } else if (linting.state !== linting.STATES.linting) {
-                reject(
-                    new Error(
-                        `Linting did not fail (${linting.state}):` +
-                            ` ${inspect(config)}`,
-                    ),
-                );
-            }
-
             linting.on('done', () => {
                 if (linting.state === linting.STATES.error) {
                     resolve();
@@ -108,6 +82,8 @@ export function testFailsFactory(svg, ruleNameOrConfig) {
                     );
                 }
             });
+
+            linting.lint();
         });
     };
 }

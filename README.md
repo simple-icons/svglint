@@ -48,6 +48,8 @@ linting.on("done", () => {
         console.log("You've been a naughty boy!");
     }
 });
+
+linting.lint();
 ```
 
 ## Config
