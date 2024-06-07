@@ -25,10 +25,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/birjj/svglint"
+    "url": "https://github.com/simple-icons/svglint"
   },
   "bugs": {
-    "url": "https://github.com/birjj/svglint/issues"
+    "url": "https://github.com/simple-icons/svglint/issues"
   },
   "scripts": {
     "lint": "xo",
