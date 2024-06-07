@@ -1,6 +1,6 @@
 - id: svglint
   name: svglint
-  entry: svglint -C  # The `-C` flag is used due to https://github.com/birjj/svglint/issues/56
+  entry: svglint -C  # The `-C` flag is used due to https://github.com/simple-icons/svglint/issues/56
   description: Linter for SVGs
   language: node
   types:
