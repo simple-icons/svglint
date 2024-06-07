@@ -58,8 +58,6 @@ class Linting extends EventEmitter {
         this.results = {};
         /** The logger used to show debugs */
         this.logger = logging(`lint:${this.name}`);
-
-        this.lint();
     }
 
     /**
