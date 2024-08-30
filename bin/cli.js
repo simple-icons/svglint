@@ -14,8 +14,6 @@ import logging from '../src/lib/logger.js';
 import SVGLint from '../src/svglint.js';
 // @ts-ignore
 
-const gui = new GUI();
-
 const logger = logging('');
 
 const EXIT_CODES = Object.freeze({
@@ -46,7 +44,7 @@ const cli = meow(
     `
         ${chalk.yellow('Usage:')}
             ${chalk.bold('svglint')} [--config config.js] [--ci] [--debug] ${chalk.bold('file1.svg file2.svg')}
-            ${chalk.bold('svglint')} --stdin [--config config.js] [--ci] [--debug] < ${chalk.bold('file1.svg')}
+            ${chalk.bold('svglint')} --stdin [--config config.js] [--summary] [--ci] [--debug] < ${chalk.bold('file1.svg')}
 
         ${chalk.yellow('Options:')}
             ${chalk.bold('--help')}        Display this help text
@@ -54,7 +52,8 @@ const cli = meow(
             ${chalk.bold('--config, -c')}  Specify the config file. Defaults to '.svglintrc.js'
             ${chalk.bold('--debug,  -d')}  Show debug logs
             ${chalk.bold('--ci, -C')}      Only output to stdout once, when linting is finished
-            ${chalk.bold('--stdin')}       Read an SVG from stdin`,
+            ${chalk.bold('--stdin')}       Read an SVG from stdin
+            ${chalk.bold('--summary')}     Print the summary at the end`,
     {
         importMeta: import.meta,
         flags: {
@@ -62,9 +61,12 @@ const cli = meow(
             debug: {type: 'boolean', alias: 'd'},
             ci: {type: 'boolean', alias: 'C'},
             stdin: {type: 'boolean'},
+            summary: {type: 'boolean', default: true},
         },
     },
 );
+
+const gui = new GUI({ printSummary: cli.flags.summary });
 
 process.on('exit', () => {
     gui.finish();
