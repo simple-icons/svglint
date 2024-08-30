@@ -104,7 +104,10 @@ export default {
             // config for the rule `icon-precision` of the external
             // hypotetical npm package `simple-icons-svglint-rules`
         }
-    }
+    },
+    ignore: [
+        'glob/to/files/to/ignores/**',
+    ]
 }
 ```
 
@@ -252,5 +255,9 @@ export default {
     }
 }
 ```
+
+### `ignore`
+
+It's an optional array of strings containing glob for files to ignore.
 
 [selecting-elements-cheerio]: https://cheerio.js.org/docs/basics/selecting
