@@ -66,7 +66,7 @@ const cli = meow(
     },
 );
 
-const gui = new GUI({ printSummary: cli.flags.summary });
+const gui = new GUI({printSummary: cli.flags.summary});
 
 process.on('exit', () => {
     gui.finish();
