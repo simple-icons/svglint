@@ -15,7 +15,7 @@ const logHistory = Logger.cliConsole;
 /** @typedef {import("../lib/linting.js")} Linting */
 
 export default class GUI {
-    constructor() {
+    constructor({printSummary = true} = {}) {
         // Subscribe to global logs
         Logger.setCLI(true);
         logHistory.on('msg', () => this.update());
@@ -30,7 +30,7 @@ export default class GUI {
             summary: new Separator('Summary'),
         };
         this.$log = new Log(logHistory);
-        this.$summary = new Summary();
+        this.$summary = printSummary ? new Summary() : null;
         /** @type {LintingDisplay[]} */
         this.$lintings = [];
     }
@@ -40,8 +40,11 @@ export default class GUI {
      */
     finish() {
         if (this.ci) {
-            // eslint-disable-next-line no-console
-            console.log(this.render());
+            const output = this.render();
+            if (output) {
+                // eslint-disable-next-line no-console
+                console.log(output);
+            }
         } else {
             this.update(true);
         }
@@ -104,7 +107,10 @@ export default class GUI {
             }
         }
 
-        outp.push('', this.$titles.summary, this.$summary);
+        if (this.$summary) {
+            outp.push('', this.$titles.summary, this.$summary);
+        }
+
         if (outp[0] === '') {
             outp.shift();
         }
@@ -127,7 +133,10 @@ export default class GUI {
      */
     addLinting(linting) {
         this.$lintings.push(new LintingDisplay(linting));
-        this.$summary.addLinting(linting);
+        if (this.$summary) {
+            this.$summary.addLinting(linting);
+        }
+
         linting.on('rule', () => this.update());
         linting.on('done', () => this.update());
     }

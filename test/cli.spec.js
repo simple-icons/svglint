@@ -144,3 +144,21 @@ describe('Configuration files', function () {
         expect(stdout).not.toMatch('Failed to lint');
     });
 });
+
+describe('--no-summary', function () {
+    it('should not print summary with valid SVG', async function () {
+        const {stdout} = await execCli([VALID_SVG, '--no-summary']);
+        expect(stdout).not.toMatch('Summary');
+    });
+
+    it('should print the summary not passing --no-summary', async function () {
+        const {stdout} = await execCli([VALID_SVG]);
+        expect(stdout).toMatch('Summary');
+    });
+
+    it('should print errors with invalid SVG', async function () {
+        const {stdout} = await execCli([INVALID_SVG, '--no-summary']);
+        expect(stdout).toMatch('Files');
+        expect(stdout).not.toMatch('Summary');
+    });
+});
