@@ -139,9 +139,11 @@ process.on('exit', () => {
     } else {
         // Lint all the CLI specified files
         const files = cli.input
-            .flatMap((v) => glob.sync(v, {
-                ignore: configObject.ignore || [],
-            }))
+            .flatMap((v) =>
+                glob.sync(v, {
+                    ignore: configObject.ignore || [],
+                }),
+            )
             .map((v) => path.resolve(process.cwd(), v));
         // Keep track so we know when every linting has finished
         let hasErrors = false;
