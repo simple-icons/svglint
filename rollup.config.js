@@ -1,6 +1,7 @@
+import fs from 'node:fs';
 import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
-// eslint-disable-next-line unicorn/prefer-module
-const packageJson = require('./package.json');
+
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 const config = {
     input: './src/svglint.js',
