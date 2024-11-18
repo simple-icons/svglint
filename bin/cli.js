@@ -44,7 +44,7 @@ const cli = meow(
     `
         ${chalk.yellow('Usage:')}
             ${chalk.bold('svglint')} [--config config.js] [--ci] [--debug] ${chalk.bold('file1.svg file2.svg')}
-            ${chalk.bold('svglint')} --stdin [--config config.js] [--summary] [--ci] [--debug] < ${chalk.bold('file1.svg')}
+            ${chalk.bold('svglint')} --stdin [--config config.js] [--no-summary] [--ci] [--debug] < ${chalk.bold('file1.svg')}
 
         ${chalk.yellow('Options:')}
             ${chalk.bold('--help')}        Display this help text
@@ -53,7 +53,7 @@ const cli = meow(
             ${chalk.bold('--debug,  -d')}  Show debug logs
             ${chalk.bold('--ci, -C')}      Only output to stdout once, when linting is finished
             ${chalk.bold('--stdin')}       Read an SVG from stdin
-            ${chalk.bold('--summary')}     Print the summary at the end`,
+            ${chalk.bold('--summary')}     Print the summary at the end (default)`,
     {
         importMeta: import.meta,
         flags: {
