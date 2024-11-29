@@ -1,4 +1,4 @@
-import nodeUtil from 'node:util';
+import {inspect} from 'node:util';
 import {MSG_META, supportsColor} from '../util.js';
 
 /** @typedef {import("../../lib/logger.js").CliConsole} CliHistory */
@@ -12,7 +12,7 @@ function stringifyArguments(arguments_ = []) {
         .map((v) =>
             (typeof v === 'string'
                 ? v
-                : nodeUtil.inspect(v, {colors: supportsColor, depth: 3})
+                : inspect(v, {colors: supportsColor, depth: 3})
             ).replace(/^Error: /, ''),
         )
         .join(' ');

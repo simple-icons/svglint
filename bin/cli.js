@@ -5,7 +5,7 @@
  */
 import path from 'node:path';
 import process from 'node:process';
-import glob from 'glob';
+import {glob} from 'glob';
 import meow from 'meow';
 import {loadConfigurationFile} from '../src/cli/config.js';
 import GUI from '../src/cli/gui.js';
@@ -57,9 +57,9 @@ const cli = meow(
     {
         importMeta: import.meta,
         flags: {
-            config: {type: 'string', alias: 'c'},
-            debug: {type: 'boolean', alias: 'd'},
-            ci: {type: 'boolean', alias: 'C'},
+            config: {type: 'string', shortFlag: 'c'},
+            debug: {type: 'boolean', shortFlag: 'd'},
+            ci: {type: 'boolean', shortFlag: 'C'},
             stdin: {type: 'boolean'},
             summary: {type: 'boolean', default: true},
         },
