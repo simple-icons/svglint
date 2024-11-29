@@ -1,0 +1,19 @@
+name: CodeQL Analysis
+
+on:
+  push:
+    branches:
+      - master
+      - v*
+  pull_request:
+
+jobs:
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          config-file: ./.github/codeql-config.yml
