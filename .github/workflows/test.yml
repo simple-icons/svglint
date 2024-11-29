@@ -1,5 +1,10 @@
 name: Test
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+      - v*
+  pull_request:
 
 permissions: read-all
 
