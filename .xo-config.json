@@ -6,7 +6,7 @@
     "test/projects/broken/broken-svglint-config.js"
   ],
   "rules": {    
-    "unicorn/prefer-event-target": "warn",
+    "unicorn/prefer-event-target": "off",
     "n/file-extension-in-import": "off",
     "sort-imports": [
       "error",
@@ -32,6 +32,7 @@
         "newlines-between": "never"
       }
     ],
+    "promise/prefer-await-to-then": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }]
   },
   "overrides": [

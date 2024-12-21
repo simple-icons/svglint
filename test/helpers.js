@@ -1,11 +1,11 @@
-import util from 'node:util';
+import {inspect as nodeInspect} from 'node:util';
 import {chalk} from '../src/cli/util.js';
 import SVGLint from '../src/svglint.js';
 
 /** @typedef {import('../src/svglint.js').Config} Config */
 
 function inspect(object) {
-    return chalk.reset(util.inspect(object, false, 3, true));
+    return chalk.reset(nodeInspect(object, false, 3, true));
 }
 
 /**
