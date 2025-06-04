@@ -32,6 +32,7 @@
   },
   "scripts": {
     "lint": "xo",
+    "format": "xo --fix",
     "prepublishOnly": "rollup -c",
     "test": "mocha --timeout 10000"
   },
@@ -42,24 +43,24 @@
     "ansi-regex": "^6.1.0",
     "chalk": "^5.3.0",
     "cheerio": "^1.0.0",
-    "fast-xml-parser": "^4.5.0",
-    "glob": "^11.0.0",
+    "fast-xml-parser": "^5.2.3",
+    "glob": "^11.0.2",
     "htmlparser2": "^3.9.1",
     "log-update": "^6.1.0",
     "meow": "^13.2.0",
     "strip-ansi": "^7.1.0"
   },
   "devDependencies": {
-    "@rollup/plugin-dynamic-import-vars": "^2.1.5",
+    "@rollup/plugin-dynamic-import-vars": "2.1.5",
     "@semantic-release/git": "10.0.1",
-    "commitizen": "^4.3.1",
-    "cz-conventional-changelog": "^3.3.0",
-    "execa": "^8.0.1",
-    "expect": "^27.5.1",
-    "mocha": "^10.8.2",
-    "rollup": "^4.27.4",
-    "semantic-release": "^24.2.0",
-    "xo": "^0.59.3"
+    "commitizen": "4.3.1",
+    "cz-conventional-changelog": "3.3.0",
+    "execa": "9.6.0",
+    "expect": "27.5.1",
+    "mocha": "11.5.0",
+    "rollup": "4.27.4",
+    "semantic-release": "24.2.5",
+    "xo": "1.0.5"
   },
   "engines": {
     "node": ">=20.0.0"

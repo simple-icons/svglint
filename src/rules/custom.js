@@ -21,24 +21,24 @@ const logger = logging('rule:custom');
  */
 
 const custom = {
-    /**
-     * Generates a linting function from a config
-     * @param {CustomConfig} config
-     */
-    generate(config) {
-        /**
-         * Performs the linting according to the previously passed config.
-         * @param {Reporter} reporter The reporter to report warnings/errors to
-         * @param {Cheerio} $ A cheerio representation of the document
-         * @param {AST} ast The underlying AST representation of the document.
-         *                  This should be given to Reporter when warning/erroring with a node.
-         * @param {Info} info Info related to the current file being linted.
-         */
-        return function (reporter, $, ast, info) {
-            logger.debug('Called', config);
-            return config(reporter, $, ast, info);
-        };
-    },
+	/**
+	 * Generates a linting function from a config
+	 * @param {CustomConfig} config
+	 */
+	generate(config) {
+		/**
+		 * Performs the linting according to the previously passed config.
+		 * @param {Reporter} reporter The reporter to report warnings/errors to
+		 * @param {Cheerio} $ A cheerio representation of the document
+		 * @param {AST} ast The underlying AST representation of the document.
+		 *                  This should be given to Reporter when warning/erroring with a node.
+		 * @param {Info} info Info related to the current file being linted.
+		 */
+		return function (reporter, $, ast, info) {
+			logger.debug('Called', config);
+			return config(reporter, $, ast, info);
+		};
+	},
 };
 
 export default custom;
