@@ -27,12 +27,12 @@ jobs:
         run: npm run lint
 
   lychee:
-    name: Check links with Lychee
+    name: Lychee
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run Lychee
+      - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
           fail: ${{ github.ref != 'refs/heads/master' }}

@@ -32,7 +32,7 @@ So, the release processs is really simple.
 
 Remember:
 
-- Prefix commit messages with `fix:`, `feat:`, `chore:`, `BREAKING CHANGE:` etc.
+- Prefix commit messages with `fix:`, `feat:`, `chore:`, `breaking:` etc.
 - Don't manually commit version bumps.
 - Dispatch manually the [Release workflow] when a new release is ready.
 
