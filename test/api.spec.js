@@ -3,13 +3,9 @@
  */
 
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
 import expect from 'expect';
 import {describe, it} from 'mocha';
 import SVGLint from '../src/svglint.js';
-
-const currentFilePath = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(currentFilePath);
 
 const svg = '<svg></svg>';
 
@@ -65,14 +61,15 @@ describe('.lintSource()', () => {
 
 describe('.lintFile()', () => {
 	it('should resolve with empty SVG', () =>
-		SVGLint.lintFile(path.join(__dirname, './svgs/empty.svg'), {}).then(
-			(linting) => {
-				linting.on('done', () => {
-					expect(linting.state).toBe(linting.STATES.success);
-				});
-				linting.lint();
-			},
-		));
+		SVGLint.lintFile(
+			path.join(import.meta.dirname, './svgs/empty.svg'),
+			{},
+		).then((linting) => {
+			linting.on('done', () => {
+				expect(linting.state).toBe(linting.STATES.success);
+			});
+			linting.lint();
+		}));
 
 	it('should resolve with relative path', () => {
 		SVGLint.lintFile('./test/svgs/empty.svg', {}).then((linting) => {
@@ -84,17 +81,18 @@ describe('.lintFile()', () => {
 	});
 
 	it('should resolve with absolute path', () =>
-		SVGLint.lintFile(path.join(__dirname, './svgs/empty.svg'), {}).then(
-			(linting) => {
-				linting.on('done', () => {
-					expect(linting.state).toBe(linting.STATES.success);
-				});
-				linting.lint();
-			},
-		));
+		SVGLint.lintFile(
+			path.join(import.meta.dirname, './svgs/empty.svg'),
+			{},
+		).then((linting) => {
+			linting.on('done', () => {
+				expect(linting.state).toBe(linting.STATES.success);
+			});
+			linting.lint();
+		}));
 
 	it('should succeed without config', () =>
-		SVGLint.lintFile(path.join(__dirname, './svgs/empty.svg')).then(
+		SVGLint.lintFile(path.join(import.meta.dirname, './svgs/empty.svg')).then(
 			(linting) => {
 				linting.on('done', () => {
 					expect(linting.state).toBe(linting.STATES.success);
