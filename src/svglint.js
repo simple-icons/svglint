@@ -171,7 +171,7 @@ const svglint = {
 
 	// API used only by the CLI to avoid recreating config objects
 
-	async lintFileWithNormalizedConfig(file, config = {}) {
+	async lintFileWithNormalizedConfig(file, config) {
 		const ast = await parse.parseFile(file);
 		if (ast.length === 0 && ast.source.trim() !== '') {
 			throw new Error(`Unable to parse SVG from ${file}: ${ast.source}`);
@@ -180,7 +180,7 @@ const svglint = {
 		return new Linting(file, ast, config.rules, config.fixtures);
 	},
 
-	async lintSourceWithNormalizedConfig(source, config = {}) {
+	async lintSourceWithNormalizedConfig(source, config) {
 		const ast = await parse.parseSource(source);
 		if (ast.length === 0 && ast.source.trim() !== '') {
 			throw new Error(`Unable to parse SVG from API: ${ast.source}`);
