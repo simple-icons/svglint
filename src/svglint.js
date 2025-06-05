@@ -38,6 +38,14 @@ const logger = logging('');
  * If any blob matches a file, the file is not linted.
  */
 /**
+ * @typedef {() => Fixtures} FixturesConfig
+ * A function that resolves to an object of fixtures.
+ */
+/**
+ * @typedef {Object<string,any>} Fixtures
+ * Resolved fixtures for a file to lint.
+ */
+/**
  * @typedef Config
  * @property {RulesConfig} [rules={}] The rules to lint by
  * @property {IgnoreList} [ignore=[]] The blobs representing which files to ignore
@@ -105,6 +113,7 @@ async function normalizeConfig(config) {
 	const outp = {
 		rules: await normalizeRules(defaulted.rules),
 		ignore: defaulted.ignore,
+		fixtures: defaulted.fixtures,
 	};
 	return outp;
 }
@@ -123,7 +132,7 @@ ${ast.source}`);
 	}
 
 	const config_ = await normalizeConfig(config);
-	return new Linting(file, ast, config_.rules);
+	return new Linting(file, ast, config_.rules, config_.fixtures);
 }
 
 const svglint = {

@@ -17,6 +17,8 @@ import Reporter from './reporter.js';
 /** @typedef {import("./parse.js").AST} AST */
 /** @typedef {import("./parse.js").Node} Node */
 /** @typedef {import("../svglint.js").NormalizedRules} NormalizedRules */
+/** @typedef {import("../svglint.js").Fixtures} Fixtures */
+/** @typedef {import("../svglint.js").FixturesConfig} FixturesConfig */
 
 const STATES = Object.freeze({
 	ignored: 'ignored',
@@ -38,13 +40,16 @@ class Linting extends EventEmitter {
 	 * @param {String} file The file to lint
 	 * @param {AST} ast The AST of the file
 	 * @param {NormalizedRules} rules The rules to lint by
+	 * @param {FixturesConfig|undefined} fixturesLoader The fixtures loader
 	 */
-	constructor(file, ast, rules) {
+	constructor(file, ast, rules, fixturesLoader) {
 		super();
 		/** The AST of the file */
 		this.ast = ast;
 		/** The rules we use for linting */
 		this.rules = rules;
+		/** Fixtures for the linting */
+		this.fixturesLoader = fixturesLoader;
 		/** The path to the file */
 		this.path = file;
 		/** The current state of the linting */
@@ -76,66 +81,58 @@ class Linting extends EventEmitter {
 			return;
 		}
 
-		this.activeRules = ruleNames.length;
+		this._maybeLoadFixtures((fixtures) => {
+			this.logger.debug('Started linting');
+			this.logger.debug('  Rules:', ruleNames);
 
-		this.logger.debug('Started linting');
-		this.logger.debug('  Rules:', ruleNames);
+			this.activeRules = ruleNames.length;
 
-		// Start every rule
-		for (const ruleName of ruleNames) {
-			const ast = parse.clone(this.ast);
-			const $ = cheerio
-				.load('<root></root>', {xmlMode: true})('root')
-				// @ts-ignore
-				.append(ast);
-			/**
-			 * Executes a rule function.
-			 * @param {Function} rule The loaded rule
-			 * @param {String} reporterName The name to give the reporter
-			 * @param {Function} onDone Function to call once the rule is done
-			 */
-			const execute = (rule, reporterName, onDone) => {
-				// Gather results from the rule through a reporter
-				const reporter = this._generateReporter(reporterName);
-				// Execute the rule, potentially waiting for async rules
-				// also handles catching errors from the rule
-				Promise.resolve()
-					.then(() =>
-						rule(reporter, $, ast, {
-							filepath: this.path,
-						}),
-					)
-					.catch((error) => reporter.exception(error))
-					.then(() => onDone(reporter));
-			};
+			// Start every rule
+			for (const ruleName of ruleNames) {
+				const ast = parse.clone(this.ast);
+				const $ = cheerio
+					.load('<root></root>', {xmlMode: true})('root')
+					// @ts-ignore
+					.append(ast);
 
-			/** @type {Function|Function[]} */
-			const rule = this.rules[ruleName];
-			if (Array.isArray(rule)) {
-				/** @type {Reporter[]} */
-				const results = [];
-				let activeRules = rule.length;
-				for (const [i, r] of rule.entries()) {
-					execute(r, `${ruleName}-${i + 1}`, (result) => {
-						results[i] = result;
-						if (--activeRules <= 0) {
-							this._onRuleFinish(ruleName, results);
-						}
+				/** @type {Function|Function[]} */
+				const rule = this.rules[ruleName];
+				if (Array.isArray(rule)) {
+					/** @type {Reporter[]} */
+					const results = [];
+					let activeRules = rule.length;
+					for (const [i, r] of rule.entries()) {
+						this._executeRule(
+							r,
+							`${ruleName}-${i + 1}`,
+							$,
+							ast,
+							fixtures,
+							(result) => {
+								results[i] = result;
+								if (--activeRules <= 0) {
+									this._onRuleFinish(ruleName, results);
+								}
+							},
+						);
+					}
+
+					if (rule.length === 0) {
+						Promise.resolve().then(() => {
+							this._onRuleFinish(ruleName, this._generateReporter(ruleName));
+						});
+						this.logger.debug(
+							'Rule had no configs',
+							logging.colorize(ruleName),
+						);
+					}
+				} else {
+					this._executeRule(rule, ruleName, $, ast, fixtures, (result) => {
+						this._onRuleFinish(ruleName, result);
 					});
 				}
-
-				if (rule.length === 0) {
-					Promise.resolve().then(() => {
-						this._onRuleFinish(ruleName, this._generateReporter(ruleName));
-					});
-					this.logger.debug('Rule had no configs', logging.colorize(ruleName));
-				}
-			} else {
-				execute(rule, ruleName, (result) => {
-					this._onRuleFinish(ruleName, result);
-				});
 			}
-		}
+		});
 	}
 
 	/**
@@ -208,6 +205,69 @@ class Linting extends EventEmitter {
 			this.valid = false;
 		});
 		return reporter;
+	}
+
+	/**
+	 * Executes a rule function.
+	 * @param {Function} rule The loaded rule
+	 * @param {String} reporterName The name to give the reporter
+	 * @param {$} $ The cheerio instance to use for the rule
+	 * @param {AST} ast The AST to use for the rule
+	 * @param {Fixtures|undefined} fixtures The fixtures to use for the rule
+	 * @param {() => Reporter} onDone Function to call once the rule is done
+	 */
+	// eslint-disable-next-line max-params
+	_executeRule(rule, reporterName, $, ast, fixtures, onDone) {
+		// Gather results from the rule through a reporter
+		const reporter = this._generateReporter(reporterName);
+		// Execute the rule, potentially waiting for async rules
+		// also handles catching errors from the rule
+		const injected = {filepath: this.path};
+		if (fixtures !== undefined) {
+			injected.fixtures = globalThis.structuredClone(fixtures);
+		}
+
+		Promise.resolve()
+			.then(() => rule(reporter, $, ast, injected))
+			.catch((error) => reporter.exception(error))
+			.then(() => onDone(reporter));
+	}
+
+	/**
+	 * Maybe loads fixtures for the linting.
+	 * @param {() => Fixtures|undefined} onDone
+	 */
+	_maybeLoadFixtures(onDone) {
+		if (this.fixturesLoader) {
+			this.logger.debug('Resolving fixtures for linting');
+			const ast = parse.clone(this.ast);
+			const $ = cheerio
+				.load('<root></root>', {xmlMode: true})('root')
+				// @ts-ignore
+				.append(ast);
+			// Resolve fixtures
+			const reporter = this._generateReporter('fixtures-loader');
+			Promise.resolve()
+				.then(() =>
+					this.fixturesLoader(reporter, $, ast, {filepath: this.path}),
+				)
+				.catch((error) => reporter.exception(error))
+				.then((fixtures) => {
+					if (
+						reporter.hasErrors ||
+						reporter.hasExceptions ||
+						reporter.hasWarns
+					) {
+						this.state = reporter.hasWarns ? STATES.warn : STATES.error;
+						this.emit('done');
+					} else {
+						onDone(fixtures);
+					}
+				});
+		} else {
+			this.logger.debug('No fixtures loader, skipping');
+			onDone(undefined);
+		}
 	}
 }
 
