@@ -31,8 +31,12 @@
     "url": "https://github.com/simple-icons/svglint/issues"
   },
   "scripts": {
-    "lint": "xo",
-    "format": "xo --fix",
+    "lint": "npm run lint:xo && npm run lint:markdown",
+    "lint:xo": "xo",
+    "lint:markdown": "markdownlint-cli2 .",
+    "format": "npm run format:xo && npm run format:markdown",
+    "format:xo": "xo --fix",
+    "format:markdown": "markdownlint-cli2 --fix .",
     "prepublishOnly": "rollup -c",
     "test": "mocha --timeout 10000"
   },
@@ -57,6 +61,7 @@
     "cz-conventional-changelog": "3.3.0",
     "execa": "9.6.0",
     "expect": "27.5.1",
+    "markdownlint-cli2": "0.18.1",
     "mocha": "11.5.0",
     "rollup": "4.27.4",
     "semantic-release": "24.2.5",
