@@ -55,14 +55,14 @@ const logger = logging('');
  * @typedef NormalizedConfig
  * @property {NormalizedRules} rules The rules to lint by
  * @property {IgnoreList} ignore The blobs representing which files to ignore
- * @property {FixturesConfig|undefined} fixtures The fixtures function to inject data
+ * @property {FixturesConfig} fixtures The fixtures function to inject data
  */
 
 /** @type Config */
 const DEFAULT_CONFIG = Object.freeze({
-	useSvglintRc: true,
 	rules: {valid: true},
 	ignore: [],
+	fixtures: undefined,
 });
 
 /**
@@ -110,7 +110,10 @@ async function normalizeConfig(config) {
 		...DEFAULT_CONFIG,
 		...config,
 	};
-	defaulted.rules = {...DEFAULT_CONFIG.rules, ...config.rules};
+	defaulted.rules = {
+		...DEFAULT_CONFIG.rules,
+		...defaulted.rules,
+	};
 	/** @type NormalizedConfig */
 	const outp = {
 		rules: await normalizeRules(defaulted.rules),
@@ -163,6 +166,27 @@ const svglint = {
 		const ast = await parse.parseFile(file);
 		return lint(file, ast, config);
 	},
+
+	// API used only by the CLI to avoid recreating config objects
+
+	async lintFileWithNormalizedConfig(file, config = {}) {
+		const ast = await parse.parseFile(file);
+		if (ast.length === 0 && ast.source.trim() !== '') {
+			throw new Error(`Unable to parse SVG from ${file}: ${ast.source}`);
+		}
+
+		return new Linting(file, ast, config.rules, config.fixtures);
+	},
+
+	async lintSourceWithNormalizedConfig(source, config = {}) {
+		const ast = await parse.parseSource(source);
+		if (ast.length === 0 && ast.source.trim() !== '') {
+			throw new Error(`Unable to parse SVG from API: ${ast.source}`);
+		}
+
+		return new Linting(null, ast, config.rules, config.fixtures);
+	},
 };
 
 export default svglint;
+export {normalizeConfig};

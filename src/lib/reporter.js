@@ -58,6 +58,13 @@ function generateResult(message, type, node, ast) {
 	return outp;
 }
 
+/**
+ * The Reporter class is used by rules to report errors, warnings and exceptions.
+ * It collects the messages and provides a way to access them.
+ * @extends EventEmitter
+ * @interface Reporter
+ * @property {String} name The name of this reporter
+ */
 class Reporter extends EventEmitter {
 	/**
 	 * @param {String} name The name of this reporter

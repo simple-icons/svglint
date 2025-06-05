@@ -11,7 +11,8 @@ import {loadConfigurationFile} from '../src/cli/config.js';
 import GUI from '../src/cli/gui.js';
 import {chalk} from '../src/cli/util.js';
 import logging from '../src/lib/logger.js';
-import SVGLint from '../src/svglint.js';
+import SVGLint, {normalizeConfig} from '../src/svglint.js';
+
 // @ts-ignore
 
 const logger = logging('');
@@ -115,8 +116,10 @@ process.on('exit', () => {
 			}
 		});
 
-		process.stdin.on('end', () => {
-			SVGLint.lintSource(chunks.join(''), configObject)
+		process.stdin.on('end', async () => {
+			const source = chunks.join('');
+			const normalizedConfig = await normalizeConfig(configObject);
+			SVGLint.lintSourceWithNormalizedConfig(source, normalizedConfig)
 				.then((linting) => {
 					// Handle case where linting failed (e.g. invalid file)
 					if (!linting) {
@@ -140,13 +143,12 @@ process.on('exit', () => {
 		});
 	} else {
 		// Lint all the CLI specified files
+		const ignore = configObject.ignore || [];
+		delete configObject.ignore; // Remove ignore from config to avoid passing it to SVGLint
 		const files = cli.input
-			.flatMap((v) =>
-				glob.sync(v, {
-					ignore: configObject.ignore || [],
-				}),
-			)
+			.flatMap((v) => glob.sync(v, {ignore}))
 			.map((v) => path.resolve(process.cwd(), v));
+
 		// Keep track so we know when every linting has finished
 		let hasErrors = false;
 		let activeLintings = files.length;
@@ -158,8 +160,9 @@ process.on('exit', () => {
 			}
 		};
 
+		const normalizedConfig = await normalizeConfig(configObject);
 		for (const filePath of files) {
-			SVGLint.lintFile(filePath, configObject)
+			SVGLint.lintFileWithNormalizedConfig(filePath, normalizedConfig)
 				.then((linting) => {
 					// Handle case where linting failed (e.g. invalid file)
 					if (!linting) {
