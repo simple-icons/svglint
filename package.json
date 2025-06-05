@@ -92,8 +92,19 @@
             {
               "type": "chore",
               "release": "patch"
+            },
+            {
+              "type": "breaking",
+              "release": "major"
+            },
+            {
+              "type": "BREAKING CHANGE",
+              "release": "major"
             }
-          ]
+          ],
+          "parserOpts": {
+            "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+          }
         }
       ],
       "@semantic-release/release-notes-generator",
