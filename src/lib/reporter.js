@@ -32,93 +32,89 @@ import logging from './logger.js';
  * @returns {Result}
  */
 function generateResult(message, type, node, ast) {
-    const _message = Array.isArray(message) ? message : [message];
-    const outp = {
-        message,
-        reason: message,
-        _message,
-        _node: node,
-        _ast: ast,
-        type,
-    };
-    if (message instanceof Error) {
-        outp.message = message.stack || message.toString();
-        outp.reason = message.toString();
-    }
+	const _message = Array.isArray(message) ? message : [message];
+	const outp = {
+		message,
+		reason: message,
+		_message,
+		_node: node,
+		_ast: ast,
+		type,
+	};
+	if (message instanceof Error) {
+		outp.message = message.stack || message.toString();
+		outp.reason = message.toString();
+	}
 
-    if (node) {
-        // @ts-ignore
-        outp.message += `\n  At node ${chalk.bold('<' + node.name + '>')} (${node.lineNum}:${node.columnNum})`;
-        outp.reason += ' at node <' + node.name + '>';
-        outp.line = node.lineNum;
-        outp.column = node.columnNum;
-    }
+	if (node) {
+		// @ts-ignore
+		outp.message += `\n  At node ${chalk.bold('<' + node.name + '>')} (${node.lineNum}:${node.columnNum})`;
+		outp.reason += ' at node <' + node.name + '>';
+		outp.line = node.lineNum;
+		outp.column = node.columnNum;
+	}
 
-    // @ts-ignore
-    return outp;
+	// @ts-ignore
+	return outp;
 }
 
 class Reporter extends EventEmitter {
-    /**
-     * @param {String} name The name of this reporter
-     */
-    constructor(name) {
-        super();
-        this.name = name;
-        this.logger = logging(`rprt:${this.name}`);
-        /** @type {Result[]} */
-        this.messages = [];
+	/**
+	 * @param {String} name The name of this reporter
+	 */
+	constructor(name) {
+		super();
+		this.name = name;
+		this.logger = logging(`rprt:${this.name}`);
+		/** @type {Result[]} */
+		this.messages = [];
 
-        this.hasExceptions = false;
-        this.hasWarns = false;
-        this.hasErrors = false;
-    }
+		this.hasExceptions = false;
+		this.hasWarns = false;
+		this.hasErrors = false;
+	}
 
-    /**
-     * Reports that an exception occurred during rule processing.
-     * This doesn't change the current linting result, but is important to show
-     *   to users as it indicates that the linting result cannot be trusted.
-     * @param {Error} e The exception that occurred.
-     */
-    exception(event) {
-        this.logger.debug('Exception reported:', event);
-        this.emit('exception', event);
-        this.hasExceptions = true;
-        this.messages.push(generateResult(event, 'exception'));
-    }
+	/**
+	 * Reports that an exception occurred during rule processing.
+	 * This doesn't change the current linting result, but is important to show
+	 *   to users as it indicates that the linting result cannot be trusted.
+	 * @param {Error} e The exception that occurred.
+	 */
+	exception(event) {
+		this.logger.debug('Exception reported:', event);
+		this.emit('exception', event);
+		this.hasExceptions = true;
+		this.messages.push(generateResult(event, 'exception'));
+	}
 
-    /**
-     * Reports that an error was found during linting.
-     * @param {any[]|any} message The message of the result, in console.log format
-     * @param {Node|Cheerio} [node] If the error is related to a node, the related node
-     * @param {AST} [ast] If the error is related to a node, the AST of the file
-     */
-    error(message, node, ast) {
-        this.logger.debug(
-            'Error reported:',
-            JSON.stringify(message),
-            Boolean(node),
-        );
-        const result = generateResult(message, 'error', node, ast);
-        this.hasErrors = true;
-        this.messages.push(result);
-    }
+	/**
+	 * Reports that an error was found during linting.
+	 * @param {any[]|any} message The message of the result, in console.log format
+	 * @param {Node|Cheerio} [node] If the error is related to a node, the related node
+	 * @param {AST} [ast] If the error is related to a node, the AST of the file
+	 */
+	error(message, node, ast) {
+		this.logger.debug(
+			'Error reported:',
+			JSON.stringify(message),
+			Boolean(node),
+		);
+		const result = generateResult(message, 'error', node, ast);
+		this.hasErrors = true;
+		this.messages.push(result);
+	}
 
-    /**
-     * Reports that a warning was found during linting.
-     * @param {any[]|any} message The message of the result, in console.log format
-     * @param {Node|Cheerio} [node] If the warning is related to a node, the related node
-     * @param {AST} [ast] If the warning is related to a node, the AST of the file
-     */
-    warn(message, node, ast) {
-        this.logger.debug(
-            'Warn reported:',
-            JSON.stringify(message),
-            Boolean(node),
-        );
-        const result = generateResult(message, 'warn', node, ast);
-        this.hasWarns = true;
-        this.messages.push(result);
-    }
+	/**
+	 * Reports that a warning was found during linting.
+	 * @param {any[]|any} message The message of the result, in console.log format
+	 * @param {Node|Cheerio} [node] If the warning is related to a node, the related node
+	 * @param {AST} [ast] If the warning is related to a node, the AST of the file
+	 */
+	warn(message, node, ast) {
+		this.logger.debug('Warn reported:', JSON.stringify(message), Boolean(node));
+		const result = generateResult(message, 'warn', node, ast);
+		this.hasWarns = true;
+		this.messages.push(result);
+	}
 }
 export default Reporter;

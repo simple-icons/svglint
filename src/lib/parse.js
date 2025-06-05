@@ -15,7 +15,7 @@ import Parser from 'htmlparser2';
  * @returns {AST} The parsed AST
  */
 export function parseSource(source) {
-    return normalizeAST(sourceToAST(source), source);
+	return normalizeAST(sourceToAST(source), source);
 }
 
 /**
@@ -24,8 +24,8 @@ export function parseSource(source) {
  * @returns {AST} The cloned AST
  */
 export function clone(ast) {
-    // @ts-ignore
-    return parseSource(ast.source);
+	// @ts-ignore
+	return parseSource(ast.source);
 }
 
 /**
@@ -34,23 +34,23 @@ export function clone(ast) {
  * @returns {Promise<AST>} The parsed AST
  */
 export function parseFile(file) {
-    const filePath = path.isAbsolute(file)
-        ? file
-        : path.join(process.cwd(), file);
-    return new Promise((resolve, reject) => {
-        // eslint-disable-next-line n/prefer-promises/fs
-        fs.readFile(filePath, 'utf8', (error, data) => {
-            if (error) {
-                return reject(error);
-            }
+	const filePath = path.isAbsolute(file)
+		? file
+		: path.join(process.cwd(), file);
+	return new Promise((resolve, reject) => {
+		// eslint-disable-next-line n/prefer-promises/fs
+		fs.readFile(filePath, 'utf8', (error, data) => {
+			if (error) {
+				return reject(error);
+			}
 
-            try {
-                return resolve(parseSource(data));
-            } catch (error_) {
-                return reject(error_);
-            }
-        });
-    });
+			try {
+				return resolve(parseSource(data));
+			} catch (error_) {
+				return reject(error_);
+			}
+		});
+	});
 }
 
 /**
@@ -86,13 +86,13 @@ export function parseFile(file) {
  * @returns {AST} The parsed AST
  */
 function sourceToAST(source) {
-    // @ts-ignore
-    const outp = Parser.parseDOM(source, {
-        withStartIndices: true,
-        withEndIndices: true,
-        xmlMode: true,
-    });
-    return outp;
+	// @ts-ignore
+	const outp = Parser.parseDOM(source, {
+		withStartIndices: true,
+		withEndIndices: true,
+		xmlMode: true,
+	});
+	return outp;
 }
 
 /**
@@ -103,28 +103,28 @@ function sourceToAST(source) {
  * @param {String} source The string the AST was generated from
  */
 function normalizeNode(node, source) {
-    // Calculate the distance from node start to line start
-    const lineStart =
-        source.lastIndexOf(
-            '\n',
-            node.startIndex +
-                // Make sure newline text nodes are set to start on the proper line
-                (node.type === 'text' && node.data.startsWith('\n') ? -1 : 0),
-        ) + 1;
-    node.columnNum = node.startIndex - lineStart;
+	// Calculate the distance from node start to line start
+	const lineStart =
+		source.lastIndexOf(
+			'\n',
+			node.startIndex +
+				// Make sure newline text nodes are set to start on the proper line
+				(node.type === 'text' && node.data.startsWith('\n') ? -1 : 0),
+		) + 1;
+	node.columnNum = node.startIndex - lineStart;
 
-    // Calculate the line number
-    let numberLines = 0;
-    let columnNumber = lineStart;
-    while (
-        (columnNumber = source.lastIndexOf('\n', columnNumber - 1)) !== -1 &&
-        columnNumber > 0
-    ) {
-        ++numberLines;
-    }
+	// Calculate the line number
+	let numberLines = 0;
+	let columnNumber = lineStart;
+	while (
+		(columnNumber = source.lastIndexOf('\n', columnNumber - 1)) !== -1 &&
+		columnNumber > 0
+	) {
+		++numberLines;
+	}
 
-    node.lineNum = numberLines;
-    return node;
+	node.lineNum = numberLines;
+	return node;
 }
 
 /**
@@ -136,20 +136,20 @@ function normalizeNode(node, source) {
  * @returns {AST} The normalized AST
  */
 function normalizeAST(ast, source) {
-    const handleNode = (node) => {
-        normalizeNode(node, source);
-        if (node.children) {
-            for (const child of node.children) {
-                handleNode(child);
-            }
-        }
-    };
+	const handleNode = (node) => {
+		normalizeNode(node, source);
+		if (node.children) {
+			for (const child of node.children) {
+				handleNode(child);
+			}
+		}
+	};
 
-    for (const child of ast) {
-        handleNode(child);
-    }
+	for (const child of ast) {
+		handleNode(child);
+	}
 
-    // @ts-ignore
-    ast.source = source;
-    return ast;
+	// @ts-ignore
+	ast.source = source;
+	return ast;
 }

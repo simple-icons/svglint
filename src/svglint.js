@@ -50,9 +50,9 @@ const logger = logging('');
 
 /** @type Config */
 const DEFAULT_CONFIG = Object.freeze({
-    useSvglintRc: true,
-    rules: {valid: true},
-    ignore: [],
+	useSvglintRc: true,
+	rules: {valid: true},
+	ignore: [],
 });
 
 /**
@@ -63,35 +63,30 @@ const DEFAULT_CONFIG = Object.freeze({
  * @returns {Promise<NormalizedRules>} Resolves to the normalized rules
  */
 async function normalizeRules(rulesConfig) {
-    /** @type {NormalizedRules} */
-    const outp = {};
-    const promises = Object.keys(rulesConfig)
-        // Make sure no disabled rules are allowed in
-        .filter((k) => rulesConfig[k] !== false)
-        // Then convert each rule config into a rule func
-        .map(async (ruleName) => {
-            /** @type {RuleModule} */
-            let loadedRule;
-            try {
-                loadedRule = await loadRule(ruleName);
-            } catch {
-                logger.warn(`Unknown rule "${ruleName}".`);
-                return;
-            }
+	/** @type {NormalizedRules} */
+	const outp = {};
+	const promises = Object.keys(rulesConfig)
+		// Make sure no disabled rules are allowed in
+		.filter((k) => rulesConfig[k] !== false)
+		// Then convert each rule config into a rule func
+		.map(async (ruleName) => {
+			/** @type {RuleModule} */
+			let loadedRule;
+			try {
+				loadedRule = await loadRule(ruleName);
+			} catch {
+				logger.warn(`Unknown rule "${ruleName}".`);
+				return;
+			}
 
-            // Handle the case where there are multiple configs for a single rule
-            const config = rulesConfig[ruleName];
-            if (Array.isArray(config)) {
-                /** @type {Array} */
-                outp[ruleName] = config.map((config) =>
-                    loadedRule.generate(config),
-                );
-            } else {
-                outp[ruleName] = loadedRule.generate(config);
-            }
-        });
-    await Promise.all(promises);
-    return outp;
+			// Handle the case where there are multiple configs for a single rule
+			const config = rulesConfig[ruleName];
+			outp[ruleName] = Array.isArray(config)
+				? config.map((config) => loadedRule.generate(config))
+				: loadedRule.generate(config);
+		});
+	await Promise.all(promises);
+	return outp;
 }
 
 /**
@@ -101,17 +96,17 @@ async function normalizeRules(rulesConfig) {
  * @returns {Promise<NormalizedConfig>} Resolves to the normalized config
  */
 async function normalizeConfig(config) {
-    const defaulted = {
-        ...DEFAULT_CONFIG,
-        ...config,
-    };
-    defaulted.rules = {...DEFAULT_CONFIG.rules, ...config.rules};
-    /** @type NormalizedConfig */
-    const outp = {
-        rules: await normalizeRules(defaulted.rules),
-        ignore: defaulted.ignore,
-    };
-    return outp;
+	const defaulted = {
+		...DEFAULT_CONFIG,
+		...config,
+	};
+	defaulted.rules = {...DEFAULT_CONFIG.rules, ...config.rules};
+	/** @type NormalizedConfig */
+	const outp = {
+		rules: await normalizeRules(defaulted.rules),
+		ignore: defaulted.ignore,
+	};
+	return outp;
 }
 
 /**
@@ -122,41 +117,41 @@ async function normalizeConfig(config) {
  * @returns {Promise<Linting>} Resolves to the linting that represents the result
  */
 async function lint(file, ast, config) {
-    if (ast.length === 0 && ast.source.trim() !== '') {
-        throw new Error(`Unable to parse SVG from ${file || 'API'}:
+	if (ast.length === 0 && ast.source.trim() !== '') {
+		throw new Error(`Unable to parse SVG from ${file || 'API'}:
 ${ast.source}`);
-    }
+	}
 
-    const config_ = await normalizeConfig(config);
-    return new Linting(file, ast, config_.rules);
+	const config_ = await normalizeConfig(config);
+	return new Linting(file, ast, config_.rules);
 }
 
 const svglint = {
-    /**
-     * Lints a single SVG string.
-     * The function returns before the Linting is finished.
-     * You should listen to Linting.on("done") to wait for the result.
-     * @param {String} source The SVG to lint
-     * @param {Config} [config={}] The config to lint by
-     * @return {Promise<Linting>} Resolves to the Linting that represents the result
-     */
-    async lintSource(source, config = {}) {
-        const ast = parse.parseSource(source);
-        return lint(null, ast, config);
-    },
+	/**
+	 * Lints a single SVG string.
+	 * The function returns before the Linting is finished.
+	 * You should listen to Linting.on("done") to wait for the result.
+	 * @param {String} source The SVG to lint
+	 * @param {Config} [config={}] The config to lint by
+	 * @return {Promise<Linting>} Resolves to the Linting that represents the result
+	 */
+	async lintSource(source, config = {}) {
+		const ast = parse.parseSource(source);
+		return lint(null, ast, config);
+	},
 
-    /**
-     * Lints a single file.
-     * The returned Promise resolves before the Linting is finished.
-     * You should listen to Linting.on("done") to wait for the result.
-     * @param {String} file The file path to lint
-     * @param {Config} [config={}] The config to lint by
-     * @returns {Promise<Linting>} Resolves to the Linting that represents the result
-     */
-    async lintFile(file, config = {}) {
-        const ast = await parse.parseFile(file);
-        return lint(file, ast, config);
-    },
+	/**
+	 * Lints a single file.
+	 * The returned Promise resolves before the Linting is finished.
+	 * You should listen to Linting.on("done") to wait for the result.
+	 * @param {String} file The file path to lint
+	 * @param {Config} [config={}] The config to lint by
+	 * @returns {Promise<Linting>} Resolves to the Linting that represents the result
+	 */
+	async lintFile(file, config = {}) {
+		const ast = await parse.parseFile(file);
+		return lint(file, ast, config);
+	},
 };
 
 export default svglint;

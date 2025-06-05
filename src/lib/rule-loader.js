@@ -20,13 +20,13 @@
  * @returns {Promise<RuleModule>} Resolves to the function exported by the rule if found.
  */
 async function ruleLoader(ruleName) {
-    const fileName = ruleName.endsWith('.js') ? ruleName : ruleName + '.js';
-    const isExternal = ruleName.includes('/');
-    const module = await (isExternal
-        ? import(`svglint-plugin-${ruleName}`)
-        : import(`../rules/${fileName.slice(0, -3)}.js`));
+	const fileName = ruleName.endsWith('.js') ? ruleName : ruleName + '.js';
+	const isExternal = ruleName.includes('/');
+	const module = await (isExternal
+		? import(`svglint-plugin-${ruleName}`)
+		: import(`../rules/${fileName.slice(0, -3)}.js`));
 
-    return module.default;
+	return module.default;
 }
 
 export default ruleLoader;
