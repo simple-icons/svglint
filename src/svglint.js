@@ -17,6 +17,7 @@ const logger = logging('');
 /** @typedef {import("./rules/elm.js").ElmConfig} ElmConfig */
 /** @typedef {import("./rules/attr.js").AttrConfig} AttrConfig */
 /** @typedef {import("./rules/custom.js").CustomConfig} CustomConfig */
+/** @typedef {import("./rules/custom.js").Info} Info */
 
 /**
  * @typedef RulesConfig
@@ -37,10 +38,15 @@ const logger = logging('');
  * An array of strings, each of which is a blob that represents files to ignore.
  * If any blob matches a file, the file is not linted.
  */
+
 /**
- * @typedef {(() => Fixtures)|undefined} FixturesConfig
- * A function that resolves to an object of fixtures.
+ * @callback FixturesConfig
+ * @param {Reporter} reporter The reporter to report to
+ * @param {Cheerio} $ A cheerio representation of the document
+ * @param {AST} ast The AST of the document, which we should pass to reporter
+ * @param {{filepath: string}} info Info related to the current file being linted
  */
+
 /**
  * @typedef {Object<string,any>} Fixtures
  * Resolved fixtures for a file to lint.

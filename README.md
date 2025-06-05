@@ -324,14 +324,27 @@ not create unnecessary copies of the data, so rules should not mutate them.
 #### Example
 
 ```javascript
+/**
+ * @typedef {{fixtures: {
+ *     iconPath: string,
+ *     segments: import('svg-path-segments').Segment,
+ *     bbox: import('svg-path-bbox').BBox
+ * }}} Info
+ */
+
 /** @type {import('svglint').Config} */
 const config = {
     rules: {
         custom: [
-            (reporter, $, ast, { fixtures }) => {
+            (
+                reporter,
+                $,
+                ast,
+                /** @type {Info} */ {fixtures: {iconPath, segments, bbox}},
+            ) => {
                 reporter.name = 'my-custom-rule';
 
-                reporter.warn(`Expensive computation: ${fixtures.myFixture}`);
+                reporter.warn(`Segments: ${segments}`);
 
                 // WARNING: don't do this
                 // fixtures.myFixture = 'new value';
@@ -343,11 +356,12 @@ const config = {
         ]
     },
 
-    fixtures: (reporter, $, ast) => {
-        return {
-            myFixture: expensiveComputation($, ast, reporter.filepath),
-        };
-    }
+    fixtures(_reporter, $, _ast, { filepath: _ }) {
+        const iconPath = $.find('path').attr('d');
+        const segments = parsePath(iconPath);
+        const bbox = svgPathBbox(iconPath);
+        return {iconPath, segments, bbox};
+    },
 };
 
 export default config;

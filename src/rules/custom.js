@@ -6,7 +6,7 @@ const logger = logging('rule:custom');
 /** @typedef {import("../lib/reporter.js")} Reporter */
 /** @typedef {import("../lib/parse.js").AST} AST */
 /** @typedef {import("../lib/parse.js").Node} Node */
-/** @typedef {{ filepath: string }} Info */
+/** @typedef {{ filepath: string, fixtures: any }} Info */
 
 /**
  * @callback CustomRule
