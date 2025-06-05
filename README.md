@@ -318,6 +318,9 @@ Fixtures are used to inject data for each linted file. It should be a function
 that takes the same parameters as a custom rule, but it returns an object with
 the data to inject. The data can be accessed in the custom rules.
 
+Fixture values are mutable as the fixtures object is passed as reference to
+not create unnecessary copies of the data, so rules should not mutate them.
+
 #### Example
 
 ```javascript
@@ -329,7 +332,13 @@ const config = {
                 reporter.name = 'my-custom-rule';
 
                 reporter.warn(`Expensive computation: ${fixtures.myFixture}`);
-                // ... additional code for the rule
+
+                // WARNING: don't do this
+                // fixtures.myFixture = 'new value';
+                //
+                // Instead, create a deep clone
+                // const myFixture = globalThis.structuredClone(fixtures.myFixture);
+                // myFixture.newProperty = 'new value';
             }
         ]
     },

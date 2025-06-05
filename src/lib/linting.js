@@ -40,7 +40,7 @@ class Linting extends EventEmitter {
 	 * @param {String} file The file to lint
 	 * @param {AST} ast The AST of the file
 	 * @param {NormalizedRules} rules The rules to lint by
-	 * @param {FixturesConfig|undefined} fixturesLoader The fixtures loader
+	 * @param {FixturesConfig} fixturesLoader The fixtures loader
 	 */
 	constructor(file, ast, rules, fixturesLoader) {
 		super();
@@ -224,7 +224,9 @@ class Linting extends EventEmitter {
 		// also handles catching errors from the rule
 		const injected = {filepath: this.path};
 		if (fixtures !== undefined) {
-			injected.fixtures = globalThis.structuredClone(fixtures);
+			// If fixtures are provided, inject them into the rule.
+			// Note that fixtures are mutable. Rules should not mutate them.
+			injected.fixtures = fixtures;
 		}
 
 		Promise.resolve()
@@ -245,27 +247,32 @@ class Linting extends EventEmitter {
 				.load('<root></root>', {xmlMode: true})('root')
 				// @ts-ignore
 				.append(ast);
+
 			// Resolve fixtures
-			const reporter = this._generateReporter('fixtures-loader');
+			const reporter = this._generateReporter('fixtures');
 			Promise.resolve()
 				.then(() =>
 					this.fixturesLoader(reporter, $, ast, {filepath: this.path}),
 				)
 				.catch((error) => reporter.exception(error))
 				.then((fixtures) => {
-					if (
-						reporter.hasErrors ||
-						reporter.hasExceptions ||
-						reporter.hasWarns
-					) {
-						this.state = reporter.hasWarns ? STATES.warn : STATES.error;
+					if (reporter.hasErrors || reporter.hasExceptions) {
+						this.state = STATES.error;
+						this.logger.debug(
+							'Fixtures rule aborted execution with status',
+							logging.colorize(this.state),
+						);
 						this.emit('done');
 					} else {
+						if (reporter.hasWarns) {
+							this.state = STATES.warn;
+						}
+
 						onDone(fixtures);
 					}
 				});
 		} else {
-			this.logger.debug('No fixtures loader, skipping');
+			this.logger.debug('No fixtures loader detected');
 			onDone(undefined);
 		}
 	}

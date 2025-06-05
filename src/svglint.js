@@ -38,7 +38,7 @@ const logger = logging('');
  * If any blob matches a file, the file is not linted.
  */
 /**
- * @typedef {() => Fixtures} FixturesConfig
+ * @typedef {(() => Fixtures)|undefined} FixturesConfig
  * A function that resolves to an object of fixtures.
  */
 /**
@@ -49,11 +49,13 @@ const logger = logging('');
  * @typedef Config
  * @property {RulesConfig} [rules={}] The rules to lint by
  * @property {IgnoreList} [ignore=[]] The blobs representing which files to ignore
+ * @property {FixturesConfig} [fixtures] The fixtures function to inject data
  */
 /**
  * @typedef NormalizedConfig
  * @property {NormalizedRules} rules The rules to lint by
  * @property {IgnoreList} ignore The blobs representing which files to ignore
+ * @property {FixturesConfig|undefined} fixtures The fixtures function to inject data
  */
 
 /** @type Config */
