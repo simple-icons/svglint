@@ -1,6 +1,6 @@
 {
   "name": "svglint",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Linter for SVGs",
   "type": "module",
   "exports": {
@@ -99,7 +99,10 @@
             }
           ],
           "parserOpts": {
-            "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+            "noteKeywords": [
+              "BREAKING CHANGE",
+              "BREAKING CHANGES"
+            ]
           }
         }
       ],
