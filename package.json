@@ -96,10 +96,6 @@
             {
               "type": "breaking",
               "release": "major"
-            },
-            {
-              "type": "BREAKING CHANGE",
-              "release": "major"
             }
           ],
           "parserOpts": {

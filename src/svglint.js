@@ -17,6 +17,7 @@ const logger = logging('');
 /** @typedef {import("./rules/elm.js").ElmConfig} ElmConfig */
 /** @typedef {import("./rules/attr.js").AttrConfig} AttrConfig */
 /** @typedef {import("./rules/custom.js").CustomConfig} CustomConfig */
+/** @typedef {import("./rules/custom.js").Info} Info */
 
 /**
  * @typedef RulesConfig
@@ -37,22 +38,33 @@ const logger = logging('');
  * An array of strings, each of which is a blob that represents files to ignore.
  * If any blob matches a file, the file is not linted.
  */
+
+/**
+ * @callback FixturesConfig
+ * @param {Reporter} reporter The reporter to report to
+ * @param {Cheerio} $ A cheerio representation of the document
+ * @param {AST} ast The AST of the document, which we should pass to reporter
+ * @param {{filepath: string}} info Info related to the current file being linted
+ */
+
 /**
  * @typedef Config
  * @property {RulesConfig} [rules={}] The rules to lint by
  * @property {IgnoreList} [ignore=[]] The blobs representing which files to ignore
+ * @property {FixturesConfig} [fixtures] The fixtures function to inject data
  */
 /**
  * @typedef NormalizedConfig
  * @property {NormalizedRules} rules The rules to lint by
  * @property {IgnoreList} ignore The blobs representing which files to ignore
+ * @property {FixturesConfig} fixtures The fixtures function to inject data
  */
 
 /** @type Config */
 const DEFAULT_CONFIG = Object.freeze({
-	useSvglintRc: true,
 	rules: {valid: true},
 	ignore: [],
+	fixtures: undefined,
 });
 
 /**
@@ -100,11 +112,15 @@ async function normalizeConfig(config) {
 		...DEFAULT_CONFIG,
 		...config,
 	};
-	defaulted.rules = {...DEFAULT_CONFIG.rules, ...config.rules};
+	defaulted.rules = {
+		...DEFAULT_CONFIG.rules,
+		...defaulted.rules,
+	};
 	/** @type NormalizedConfig */
 	const outp = {
 		rules: await normalizeRules(defaulted.rules),
 		ignore: defaulted.ignore,
+		fixtures: defaulted.fixtures,
 	};
 	return outp;
 }
@@ -123,7 +139,7 @@ ${ast.source}`);
 	}
 
 	const config_ = await normalizeConfig(config);
-	return new Linting(file, ast, config_.rules);
+	return new Linting(file, ast, config_.rules, config_.fixtures);
 }
 
 const svglint = {
@@ -152,6 +168,27 @@ const svglint = {
 		const ast = await parse.parseFile(file);
 		return lint(file, ast, config);
 	},
+
+	// API used only by the CLI to avoid recreating config objects
+
+	async lintFileWithNormalizedConfig(file, config) {
+		const ast = await parse.parseFile(file);
+		if (ast.length === 0 && ast.source.trim() !== '') {
+			throw new Error(`Unable to parse SVG from ${file}: ${ast.source}`);
+		}
+
+		return new Linting(file, ast, config.rules, config.fixtures);
+	},
+
+	async lintSourceWithNormalizedConfig(source, config) {
+		const ast = await parse.parseSource(source);
+		if (ast.length === 0 && ast.source.trim() !== '') {
+			throw new Error(`Unable to parse SVG from API: ${ast.source}`);
+		}
+
+		return new Linting(null, ast, config.rules, config.fixtures);
+	},
 };
 
 export default svglint;
+export {normalizeConfig};
