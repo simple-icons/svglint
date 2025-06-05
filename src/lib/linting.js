@@ -213,7 +213,7 @@ class Linting extends EventEmitter {
 	 * @param {String} reporterName The name to give the reporter
 	 * @param {$} $ The cheerio instance to use for the rule
 	 * @param {AST} ast The AST to use for the rule
-	 * @param {Fixtures|undefined} fixtures The fixtures to use for the rule
+	 * @param {any} fixtures The fixtures to use for the rule
 	 * @param {() => Reporter} onDone Function to call once the rule is done
 	 */
 	// eslint-disable-next-line max-params

@@ -48,10 +48,6 @@ const logger = logging('');
  */
 
 /**
- * @typedef {Object<string,any>} Fixtures
- * Resolved fixtures for a file to lint.
- */
-/**
  * @typedef Config
  * @property {RulesConfig} [rules={}] The rules to lint by
  * @property {IgnoreList} [ignore=[]] The blobs representing which files to ignore
