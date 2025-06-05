@@ -1,8 +1,9 @@
-name: Test
+name: Verify
 on:
   push:
     branches:
       - master
+    tags:
       - v*
   pull_request:
 
@@ -24,6 +25,22 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+
+  lychee:
+    name: Check links with Lychee
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: ${{ github.ref != 'refs/heads/master' }}
+          failIfEmpty: false
+          jobSummary: true
+          format: markdown
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   test:
     name: Run tests
     runs-on: ${{ matrix.os }}
@@ -46,11 +63,7 @@ jobs:
         with:
           cache: npm
           node-version: ${{ matrix.node-version }}
-      - name: Use specific version of npm for Node.js 12 & 14
-        if: matrix.node-version < 16
-        run: npm install -g npm@8
       - name: Install dependencies
-        # Use `--engine-strict=false` to ignore engine errors from XO dependencies
-        run: npm ci --engine-strict=false
+        run: npm ci
       - name: Test
         run: npm test
