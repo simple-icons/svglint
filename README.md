@@ -116,7 +116,7 @@ const config = {
     ignore: [
         'glob/to/files/to/ignores/**',
     ]
-}
+};
 
 export default config;
 ```
@@ -148,7 +148,8 @@ Only one `<svg>` element with one `<title>` element and one `<path>` element
 inside.
 
 ```javascript
-export default {
+/** @type {import('svglint').Config} */
+const config = {
     rules: {
         elm: {
             'svg': 1,
@@ -157,7 +158,9 @@ export default {
             '*': false
         }
     }
-}
+};
+
+export default config;
 ```
 
 #### `attr`
@@ -185,7 +188,8 @@ be an object or an array of objects where the keys must be either:
 ##### Example
 
 ```javascript
-export default {
+/** @type {import('svglint').Config} */
+const config = {
     rules: {
         attr: [
             {
@@ -211,7 +215,9 @@ export default {
             },
         ],
     }
-}
+};
+
+export default config;
 ```
 
 #### `valid`
@@ -237,7 +243,8 @@ report an error.
 ##### Example
 
 ```javascript
-export default {
+/** @type {import('svglint').Config} */
+const config = {
     rules: {
         custom: [
             (reporter, $, ast, { filename }) => {
@@ -257,7 +264,9 @@ export default {
             },
         ]
     }
-}
+};
+
+export default config;
 ```
 
 #### External rules
@@ -276,19 +285,22 @@ The rule function must be exported from the file `rule-name.js` in the package
 ##### Example
 
 ```javascript
-export default {
+/** @type {import('svglint').Config} */
+const config = {
     rules: {
         'package-of-the-rule/rule-name': {
             // config for the rule `rule-name` of the external
             // hypotetical npm package `package-of-the-rule`
         }
     }
-}
+};
+
+export default config;
 ```
 
 ### `ignore`
 
-It's an optional array of strings containing glob for files to ignore.
+It's an optional array of strings containing globs for files to ignore.
 
 [*Selecting elements* on cheerio's documentation]: https://cheerio.js.org/docs/basics/selecting
 [`XMLValidator` of fast-xml-parser]: https://github.com/NaturalIntelligence/fast-xml-parser/blob/HEAD/docs/v4/4.XMLValidator.md
