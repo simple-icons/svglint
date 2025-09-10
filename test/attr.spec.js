@@ -174,4 +174,15 @@ describe('Rule: attr', () => {
 			'rule::whitelist': true,
 			'rule::order': true,
 		}));
+	it.only('should fail customizing ordering with whitelist', () =>
+		testFailsFactory(
+			testSVG.replace('viewBox="0 0 24 24"', 'viewBox="0 0 24 24" foo="bar"'),
+			'attr',
+		)({
+			role: true,
+			viewBox: true,
+			'rule::selector': 'svg',
+			'rule::whitelist': true,
+			'rule::order': ['role', 'viewBox'],
+		}));
 });
