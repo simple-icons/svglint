@@ -42,4 +42,5 @@ Remember:
 [`@semantic-release/release-notes-generator`]: https://github.com/semantic-release/release-notes-generator
 [`@semantic-release/npm`]: https://github.com/semantic-release/npm
 [`@semantic-release/github`]: https://github.com/semantic-release/github
+[`@semantic-release/git`]: https://github.com/semantic-release/git
 [Release workflow]: https://github.com/simple-icons/svglint/actions/workflows/release.yml
