@@ -12,7 +12,7 @@ jobs:
       contents: write # to create a GitHub Release
       issues: write # to comment on issues included in a release
       pull-requests: write # to comment on Pull Requests included in a release
-      id-token: write # to generate npm provenance statements
+      id-token: write # to generate npm provenance statements and allow OIDC auth
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,5 +28,4 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
