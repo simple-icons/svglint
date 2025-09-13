@@ -40,9 +40,6 @@
     "prepublishOnly": "rollup -c",
     "test": "mocha --timeout 10000"
   },
-  "publishConfig": {
-    "provenance": true
-  },
   "dependencies": {
     "ansi-regex": "^6.1.0",
     "chalk": "^5.3.0",
