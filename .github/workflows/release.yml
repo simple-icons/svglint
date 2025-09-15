@@ -15,14 +15,14 @@ jobs:
       id-token: write # to generate npm provenance statements and allow OIDC auth
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Node.js setup
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           cache: npm
-          node-version: 20
+          node-version: 24
       - name: Install dependencies
         run: npm ci
       - name: Release
