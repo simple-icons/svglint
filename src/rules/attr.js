@@ -96,7 +96,7 @@ function executeOnElm($elm, config, reporter, ast) {
 				const index = order.indexOf(attributes[i]);
 				if (index === -1) {
 					// This attribute doesn't need ordering, ignore it
-					break;
+					continue;
 				}
 
 				if (previousIndex !== -1 && index < previousIndex) {
