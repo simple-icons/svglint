@@ -183,7 +183,10 @@ describe('Rule: attr', () => {
 		}));
 	it('should pass in whitelist-mode customizing ordering', () =>
 		testSucceedsFactory(
-			testSVG.replace('viewBox="0 0 24 24"', 'foo="bar" bar="baz" viewBox="0 0 24 24" '),
+			testSVG.replace(
+				'viewBox="0 0 24 24"',
+				'foo="bar" bar="baz" viewBox="0 0 24 24" ',
+			),
 			'attr',
 		)({
 			role: true,
@@ -196,7 +199,10 @@ describe('Rule: attr', () => {
 		}));
 	it('should fail in no whitelist-mode customizing ordering', () =>
 		testFailsFactory(
-			testSVG.replace('viewBox="0 0 24 24"', 'foo="bar" bar="baz" viewBox="0 0 24 24" '),
+			testSVG.replace(
+				'viewBox="0 0 24 24"',
+				'foo="bar" bar="baz" viewBox="0 0 24 24" ',
+			),
 			'attr',
 		)({
 			role: true,
