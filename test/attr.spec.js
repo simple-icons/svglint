@@ -146,17 +146,17 @@ describe('Rule: attr', () => {
 			'rule::selector': 'rect',
 			'rule::order': ['width', 'style', 'height'],
 		}));
-	it('should succeed enforcing ordering of first attributes', () =>
+	it('should succeed enforcing ordering of first attributes without whitelist', () =>
 		testSucceeds({
 			'rule::selector': 'rect',
 			'rule::order': ['height', 'width'],
 		}));
-	it('should succeed enforcing soft ordering of some attributes', () =>
+	it('should succeed enforcing ordering of some attributes without whitelist', () =>
 		testSucceeds({
 			'rule::selector': 'rect',
 			'rule::order': ['height', 'style'],
 		}));
-	it('should succeed enforcing alphabetical ordering with true', () =>
+	it('should succeed enforcing alphabetical ordering', () =>
 		testSucceeds({
 			'rule::selector': 'svg',
 			'rule::order': true,
@@ -166,23 +166,50 @@ describe('Rule: attr', () => {
 			'rule::selector': 'rect',
 			'rule::order': true,
 		}));
-	it('should succeed enforcing hard ordering with whitelist', () =>
-		testSucceeds({
-			role: true,
-			viewBox: true,
-			'rule::selector': 'svg',
-			'rule::whitelist': true,
-			'rule::order': true,
-		}));
-	it('should fail customizing ordering with whitelist', () =>
+	// Keep in mind that custom ordering of attributes is not related with whitelist mode.
+	// Whitelist mode only affects to additional attributes being present or not.
+	// The next tests are only integration tests for both features working together.
+	it('should fail in whitelist-mode customizing ordering', () =>
 		testFailsFactory(
-			testSVG.replace('viewBox="0 0 24 24"', 'viewBox="0 0 24 24" foo="bar"'),
+			testSVG.replace('viewBox="0 0 24 24"', 'foo="bar" viewBox="0 0 24 24"'),
 			'attr',
 		)({
 			role: true,
 			viewBox: true,
+			foo: 'bar',
 			'rule::selector': 'svg',
 			'rule::whitelist': true,
-			'rule::order': ['role', 'viewBox'],
+			'rule::order': ['viewBox', 'role'],
+		}));
+	it('should pass in whitelist-mode customizing ordering', () =>
+		testSucceedsFactory(
+			testSVG.replace(
+				'viewBox="0 0 24 24"',
+				'foo="bar" bar="baz" viewBox="0 0 24 24" ',
+			),
+			'attr',
+		)({
+			role: true,
+			viewBox: true,
+			foo: true,
+			bar: true,
+			'rule::selector': 'svg',
+			'rule::whitelist': true,
+			'rule::order': ['role', 'foo', 'bar', 'viewBox'],
+		}));
+	it('should fail in no whitelist-mode customizing ordering', () =>
+		testFailsFactory(
+			testSVG.replace(
+				'viewBox="0 0 24 24"',
+				'foo="bar" bar="baz" viewBox="0 0 24 24" ',
+			),
+			'attr',
+		)({
+			role: true,
+			viewBox: true,
+			foo: true,
+			bar: true,
+			'rule::selector': 'svg',
+			'rule::order': ['role', 'viewBox', 'bar'],
 		}));
 });
