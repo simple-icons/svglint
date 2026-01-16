@@ -5,6 +5,7 @@
  */
 import path from 'node:path';
 import process from 'node:process';
+import {exec} from 'node:child_process';
 import {glob} from 'glob';
 import meow from 'meow';
 import {loadConfigurationFile} from '../src/cli/config.js';
@@ -54,7 +55,8 @@ const cli = meow(
             ${chalk.bold('--debug,  -d')}  Show debug logs
             ${chalk.bold('--ci, -C')}      Only output to stdout once, when linting is finished
             ${chalk.bold('--stdin')}       Read an SVG from stdin
-            ${chalk.bold('--summary')}     Print the summary at the end (default)`,
+            ${chalk.bold('--summary')}     Print the summary at the end (default)
+            ${chalk.bold('--git-changed')} Only lint files that have changed according to git`,
 	{
 		importMeta: import.meta,
 		flags: {
@@ -71,6 +73,28 @@ const gui = new GUI({printSummary: cli.flags.summary});
 
 process.on('exit', () => {
 	gui.finish();
+});
+
+/**
+ * Load files based on input and/or git changed files
+ * @param {string} input CLI input files
+ * @param {boolean} gitChanged Whether to load changed files from git
+ * @returns {Promise<string[]>} A promise that resolves to an array of file paths
+ */
+const loadInputFiles = (input, gitChanged) => new Promise((resolve, reject) => {
+	const files = input ?? [];
+	if (gitChanged) {
+		exec("git diff --cached --name-only --diff-filter=ACM '**/*.svg' | xargs", (error, stdout) => {
+			if (error) {
+				reject(error);
+				return;
+			}
+			const allFiles = files.concat(stdout.split('\n').filter(Boolean));
+			resolve(allFiles);
+		});
+	} else {
+		resolve(files);
+	}
 });
 
 /** CLI main function */
@@ -145,7 +169,7 @@ process.on('exit', () => {
 		// Lint all the CLI specified files
 		const ignore = configObject.ignore || [];
 		delete configObject.ignore; // Remove ignore from config to avoid passing it to SVGLint
-		const files = cli.input
+		const files = (await loadInputFiles(cli.input, cli.flags.gitChanged))
 			.flatMap((v) => glob.sync(v, {ignore}))
 			.map((v) => path.resolve(process.cwd(), v));
 
