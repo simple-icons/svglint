@@ -86,7 +86,7 @@ const loadInputFiles = (input, gitChanged) =>
 		const files = input ?? [];
 		if (gitChanged) {
 			exec(
-				"git diff --cached --name-only --diff-filter=ACM '**/*.svg' | xargs",
+				"git diff --cached --name-only --diff-filter=ACM '**/*.svg'",
 				(error, stdout) => {
 					if (error) {
 						reject(error);
