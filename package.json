@@ -61,7 +61,7 @@
     "markdownlint-cli2": "0.18.1",
     "mocha": "11.5.0",
     "rollup": "4.27.4",
-    "semantic-release": "24.2.5",
+    "semantic-release": "25.0.2",
     "xo": "1.0.5"
   },
   "engines": {
