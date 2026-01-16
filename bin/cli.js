@@ -3,9 +3,9 @@
  * @fileoverview The CLI that is executed from a terminal.
  * Acts as an interface to the JS API
  */
+import {exec} from 'node:child_process';
 import path from 'node:path';
 import process from 'node:process';
-import {exec} from 'node:child_process';
 import {glob} from 'glob';
 import meow from 'meow';
 import {loadConfigurationFile} from '../src/cli/config.js';
@@ -81,21 +81,26 @@ process.on('exit', () => {
  * @param {boolean} gitChanged Whether to load changed files from git
  * @returns {Promise<string[]>} A promise that resolves to an array of file paths
  */
-const loadInputFiles = (input, gitChanged) => new Promise((resolve, reject) => {
-	const files = input ?? [];
-	if (gitChanged) {
-		exec("git diff --cached --name-only --diff-filter=ACM '**/*.svg' | xargs", (error, stdout) => {
-			if (error) {
-				reject(error);
-				return;
-			}
-			const allFiles = files.concat(stdout.split('\n').filter(Boolean));
-			resolve(allFiles);
-		});
-	} else {
-		resolve(files);
-	}
-});
+const loadInputFiles = (input, gitChanged) =>
+	new Promise((resolve, reject) => {
+		const files = input ?? [];
+		if (gitChanged) {
+			exec(
+				"git diff --cached --name-only --diff-filter=ACM '**/*.svg' | xargs",
+				(error, stdout) => {
+					if (error) {
+						reject(error);
+						return;
+					}
+
+					const allFiles = [...files, ...stdout.split('\n').filter(Boolean)];
+					resolve(allFiles);
+				},
+			);
+		} else {
+			resolve(files);
+		}
+	});
 
 /** CLI main function */
 // eslint-disable-next-line unicorn/prefer-top-level-await
@@ -169,7 +174,8 @@ const loadInputFiles = (input, gitChanged) => new Promise((resolve, reject) => {
 		// Lint all the CLI specified files
 		const ignore = configObject.ignore || [];
 		delete configObject.ignore; // Remove ignore from config to avoid passing it to SVGLint
-		const files = (await loadInputFiles(cli.input, cli.flags.gitChanged))
+		const inputFiles = await loadInputFiles(cli.input, cli.flags.gitChanged);
+		const files = inputFiles
 			.flatMap((v) => glob.sync(v, {ignore}))
 			.map((v) => path.resolve(process.cwd(), v));
 
