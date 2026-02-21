@@ -134,7 +134,7 @@ describe('Fixtures', () => {
 			rules: {
 				custom: [
 					(_reporter, _$, _ast, {fixtures}) => {
-						fixtures.foo = 'baz'; // Should throw TypeError
+						fixtures.foo = 'baz'; // TypeError
 					},
 				],
 			},
@@ -147,7 +147,7 @@ describe('Fixtures', () => {
 			rules: {
 				custom: [
 					(_reporter, _$, _ast, {fixtures}) => {
-						fixtures.nested.value = 2; // Should throw
+						fixtures.nested.value = 2; // TypeError
 					},
 				],
 			},
@@ -158,7 +158,7 @@ describe('Fixtures', () => {
 			rules: {
 				custom: [
 					(_reporter, _$, _ast, {fixtures}) => {
-						fixtures.newProp = 123; // Should throw
+						fixtures.newProp = 123; // TypeError
 					},
 				],
 			},
