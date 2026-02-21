@@ -128,4 +128,39 @@ describe('Fixtures', () => {
 				throw new Error('Im a fixture throwing an error without a rule');
 			},
 		}));
+	it('should throw when mutating fixtures', () =>
+		testFails({
+			fixtures: () => ({foo: 'bar'}),
+			rules: {
+				custom: [
+					(_reporter, _$, _ast, {fixtures}) => {
+						fixtures.foo = 'baz'; // Should throw TypeError
+					},
+				],
+			},
+		}));
+	it('should throw when mutating nested fixture properties', () =>
+		testFails({
+			fixtures: () => ({
+				nested: {value: 1},
+			}),
+			rules: {
+				custom: [
+					(_reporter, _$, _ast, {fixtures}) => {
+						fixtures.nested.value = 2; // Should throw
+					},
+				],
+			},
+		}));
+	it('should throw when adding new fixture properties', () =>
+		testFails({
+			fixtures: () => ({foo: 'bar'}),
+			rules: {
+				custom: [
+					(_reporter, _$, _ast, {fixtures}) => {
+						fixtures.newProp = 123; // Should throw
+					},
+				],
+			},
+		}));
 });
