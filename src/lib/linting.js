@@ -29,6 +29,23 @@ const STATES = Object.freeze({
 });
 
 /**
+ * Freezes an object and all of its nested properties. Used in fixtures to prevent mutation.
+ * @param {object} obj The object to deep freeze.
+ * @returns The frozen object.
+ */
+function deepFreeze(object) {
+	if (!object || typeof object !== 'object' || Object.isFrozen(object)) {
+		return object;
+	}
+
+	for (const key of Reflect.ownKeys(object)) {
+		deepFreeze(object[key]);
+	}
+
+	return Object.freeze(object);
+}
+
+/**
  * Represents a single file that is being linted.
  * Contains the status and potential result of the linting.
  * @event rule Emitted when a rule is finished
@@ -256,6 +273,7 @@ class Linting extends EventEmitter {
 				)
 				.catch((error) => reporter.exception(error))
 				.then((fixtures) => {
+					fixtures &&= deepFreeze(fixtures);
 					if (reporter.hasErrors || reporter.hasExceptions) {
 						this.state = STATES.error;
 						this.logger.debug(
