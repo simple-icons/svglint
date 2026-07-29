@@ -142,7 +142,7 @@ ${ast.source}`);
 	return new Linting(file, ast, config_.rules, config_.fixtures);
 }
 
-const svglint = {
+const SVGLint = {
 	/**
 	 * Lints a single SVG string.
 	 * The function returns before the Linting is finished.
@@ -190,5 +190,5 @@ const svglint = {
 	},
 };
 
-export default svglint;
+export default SVGLint;
 export {normalizeConfig};
