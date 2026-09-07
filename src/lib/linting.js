@@ -275,6 +275,8 @@ class Linting extends EventEmitter {
 				.then((fixtures) => {
 					fixtures &&= deepFreeze(fixtures);
 					if (reporter.hasErrors || reporter.hasExceptions) {
+						this.emit('rule', {name: 'fixtures', result: reporter});
+						this.results.fixtures = reporter;
 						this.state = STATES.error;
 						this.logger.debug(
 							'Fixtures rule aborted execution with status',

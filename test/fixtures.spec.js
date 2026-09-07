@@ -2,7 +2,9 @@
  * @fileoverview Tests for fixtures.
  */
 
+import expect from 'expect';
 import {describe, it} from 'mocha';
+import SVGLint from '../src/svglint.js';
 import {testFailsFactory, testSucceedsFactory} from './helpers.js';
 
 const testSVGTitle = 'Foo';
@@ -163,4 +165,74 @@ describe('Fixtures', () => {
 				],
 			},
 		}));
+	it('surfaces thrown fixture exception in results', async () => {
+		const linting = await SVGLint.lintSource(testSVG, {
+			fixtures() {
+				throw new Error('fixture exploded');
+			},
+		});
+		const ruleEvents = [];
+		linting.on('rule', (event) => {
+			ruleEvents.push(event);
+		});
+		await new Promise((resolve) => {
+			linting.on('done', resolve);
+			linting.lint();
+		});
+		expect(linting.state).toBe(linting.STATES.error);
+		expect(linting.results.fixtures.hasExceptions).toBe(true);
+		expect(linting.results.fixtures.messages).toMatchObject([
+			{
+				reason: 'Error: fixture exploded',
+				type: 'exception',
+			},
+		]);
+		expect(String(linting.results.fixtures.messages[0].message)).toMatch(
+			'fixture exploded',
+		);
+		expect(ruleEvents).toMatchObject([{name: 'fixtures'}]);
+	});
+	it('surfaces fixture reporter error in results', async () => {
+		const linting = await SVGLint.lintSource(testSVG, {
+			fixtures(reporter) {
+				reporter.error('fixture failed');
+			},
+		});
+		await new Promise((resolve) => {
+			linting.on('done', resolve);
+			linting.lint();
+		});
+		expect(linting.state).toBe(linting.STATES.error);
+		expect(linting.results.fixtures.hasErrors).toBe(true);
+		expect(linting.results.fixtures.messages).toMatchObject([
+			{
+				message: 'fixture failed',
+				reason: 'fixture failed',
+				type: 'error',
+			},
+		]);
+	});
+	it('does not execute rules after fixture failure', async () => {
+		let ruleExecuted = false;
+		const linting = await SVGLint.lintSource(testSVG, {
+			fixtures() {
+				throw new Error('fixture exploded');
+			},
+			rules: {
+				custom: [
+					() => {
+						ruleExecuted = true;
+					},
+				],
+			},
+		});
+		await new Promise((resolve) => {
+			linting.on('done', resolve);
+			linting.lint();
+		});
+		expect(linting.state).toBe(linting.STATES.error);
+		expect(ruleExecuted).toBe(false);
+		expect(linting.results.custom).toBeUndefined();
+		expect(linting.results.fixtures.hasExceptions).toBe(true);
+	});
 });
