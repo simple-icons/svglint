@@ -358,6 +358,8 @@ const config = {
 export default config;
 ```
 
+## References
+
 [*Selecting elements* on cheerio's documentation]: https://cheerio.js.org/docs/basics/selecting
 [`XMLValidator` of fast-xml-parser]: https://github.com/NaturalIntelligence/fast-xml-parser/blob/master/docs/v4%2C%20v5/4.XMLValidator.md
 [`Cheerio` object]: https://cheerio.js.org/docs/api/classes/cheerio/
